@@ -11,6 +11,10 @@ app.use(bodyParser.json())
 app.use(express.json())
 
 app.use(express())
-app.listen(PORT, () => {
-  console.log(`http://localhost:${PORT}`)
-})
+function start() {
+  app.listen(PORT, () => {
+    console.log(`http://localhost:${PORT}`)
+  })
+}
+start()
+
