@@ -4,7 +4,7 @@ module.exports = {
     es2021: true,
     node: true
   },
-  extends: [ 'eslint:recommended' ],
+  extends: ['eslint:recommended'],
   plugins: [
     '@stylistic/js'
   ],
@@ -32,7 +32,7 @@ module.exports = {
       configFile: false
       // your babel options
       // presets: ["@babel/preset-env"],
-    },
+    }
   },
   rules: {
     'no-console': 1,
