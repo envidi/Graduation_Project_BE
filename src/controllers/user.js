@@ -4,7 +4,6 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
 import { AccessTokenUser, RefeshTokenUser } from '../middleware/jwt.js';
-// import { sendMail } from '../ulitis/sendMail.js';
 
 export const register = asyncHandler(async(req, res) => {
   const { email, password, name } = req.body;
@@ -121,60 +120,7 @@ export const refreshToken = asyncHandler(async(req, res) => {
   })
 })
 
-
-export const forgotPassword = asyncHandler(async (req, res) => {
-
-
-  const { email } = req.query
-  if (!email ) throw new Error('Missing email input')
-  const user = await User.findOne({ email })
-  if (!user) throw new Error('User not Found')
-
-
-  const resetTokenPass = user.createPasswordChangedToken();
-
-  await user.save()
-
-  const html = `Xác nhận reset password <a href=${process.env.URL_SERVER}/api/user/forgotPassword/${resetTokenPass}>Click</a>`
-
-  const data = {
-    email,
-    html
-  }
-
-  const response = await sendMail(data)
-
-  return res.status(200).json({
-    success: true,
-    response
-  })
-
-})
-
-export const resetPassword = asyncHandler(async(req, res) => {
-  const { password, token } = req.body;
-  if (!password || !token) throw new Error('missing input')
-
-  const hashPassword = await bcrypt.hash(password, 10)
-
-
-  const passwordResetToken = crypto.createHash('sha256').update(token).digest('hex');
-  const user = await User.findOne({ passwordResetToken, passwordResetExpires: { $gt:Date.now() } })
-  if (!user) throw new Error('invalid reset token')
-  console.log('user', user);
-  user.password = hashPassword
-  user.passwordResetToken = undefined
-  user.passwordChangedAt = Date.now()
-  user.passwordResetExpires = undefined
-  await user.save()
-  return res.status(200).json({
-    success: user ? true : false,
-    message : user ? 'Update password success' : ' Something wrongs'
-
-  })
-
-})
-
+    
 
 export const deleteUser = asyncHandler(async(req, res) => {
 
