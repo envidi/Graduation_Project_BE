@@ -120,8 +120,6 @@ export const refreshToken = asyncHandler(async(req, res) => {
   })
 })
 
-    
-
 export const deleteUser = asyncHandler(async(req, res) => {
 
   const response = await User.findByIdAndDelete(req.params.id)
