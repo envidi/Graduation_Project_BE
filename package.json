@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "fix": "npx eslint --fix src/**",
-    "lint": "npx eslint src/index.js",
+    "lint": "npx eslint src/**",
     "start": "nodemon --inspect --experimental-specifier-resolution=node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
