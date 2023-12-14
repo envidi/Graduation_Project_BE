@@ -5,7 +5,7 @@ import { Router } from 'express';
 const routerInit = Router();
 
 routerInit.use('/user', routerUser )
-routerInit.use('/pruduct', routerProducts )
+routerInit.use('/product', routerProducts )
 
 
 export default routerInit;

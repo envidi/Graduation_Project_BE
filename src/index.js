@@ -15,6 +15,9 @@ app.use(express.json())
 mongoose.connect('mongodb+srv://admin:123@cluster0.kczgtan.mongodb.net/?retryWrites=true&w=majority').then(() => {
   console.log('Db kết nối thành công');
 })
+// mongoose.connect('mongodb://127.0.0.1:27017/datn').then(() => {
+//   console.log('Db kết nối thành công');
+// })
 app.use(express())
 function start() {
   app.listen(PORT, () => {
