@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import User from '../model/user.js'
 import bcrypt from 'bcrypt';
-import crypto from 'crypto'
+// import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
 import { AccessTokenUser, RefeshTokenUser } from '../middleware/jwt.js';
 
@@ -50,7 +50,8 @@ export const login = asyncHandler(async(req, res) => {
 
 
   if (response && isMatch) {
-    const { password, role, refreshToken, ...userData } = response.toObject()
+    // const { password, role, refreshToken, ...userData } = response.toObject()
+    const { role, ...userData } = response.toObject()
     // AccessToken dùng để xác thực người dùng, phân quyền
     const Accesstoken = AccessTokenUser(response._id, role)
     // refreshToken dùng để cập nhật accessToken
