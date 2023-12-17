@@ -5,8 +5,8 @@ import {
   getDetail,
   remove,
   update
-} from '../controllers/products.js';
-import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js';
+} from '../controllers/category.js';
+// import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js';
 // import { checkPermission } from "../middlewares/checkPermission";
 const routerProducts = express.Router();
 
@@ -17,8 +17,8 @@ const routerProducts = express.Router();
 // routerProducts.delete('/:id', verifyAccessToken, isAdmin, remove);
 
 routerProducts.get('/', getAll);
-routerProducts.get('/:id', getDetail);
-routerProducts.put('/:id', update);
+routerProducts.get('/query', getDetail);
+routerProducts.patch('/:id', update);
 routerProducts.post('/', create);
 routerProducts.delete('/:id', remove);
 

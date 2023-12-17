@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';// Erase if already required
-import bcrypt from 'bcrypt'
+// import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 // Declare the Schema of the Mongo model
 var userSchema = new mongoose.Schema({

@@ -1,10 +1,11 @@
 // import Product from '../models/Product.js';
-import Product from '../model/Product.js';
+import Category from '../model/Category.js';
 import productSchema from '../validations/product.js'
-import Category from '../model/Category.js'
+
 
 export const getAll = async (req, res) => {
   try {
+    const categoryId = req.params.id;
     const {
       _page = 1,
       _limit = 10,
@@ -18,13 +19,13 @@ export const getAll = async (req, res) => {
         [_sort]: _order === 'asc' ? 1 : -1
       }
     };
-    const data = await Product.paginate({}, options);
+    const data = await Category.paginate({ categoryId }, options);
     if (!data || data.docs.length === 0) {
-      throw new Error('No product found!');
+      throw new Error('Failed!');
     }
     return res.status(200).json({
       message: 'Success',
-      datas: data
+      datas: data.docs
     });
   } catch (error) {
     return res.status(500).json({
@@ -35,15 +36,48 @@ export const getAll = async (req, res) => {
 
 export const getDetail = async (req, res) => {
   try {
-    const id = req.params.id;
-    const data = await Product.findById(id);
-    if (!data) {
-      throw new Error('Failed!');
+    const categoryId = req.query.id;
+    const {
+      _page = 1,
+      _limit = 10,
+      _sort = 'createdAt',
+      _order = 'asc',
+      _embed
+    } = req.query;
+    const options = {
+      page: _page,
+      limit: _limit,
+      sort: {
+        [_sort]: _order === 'asc' ? 1 : -1
+      }
+    };
+    const populateOptions = _embed ? { path : 'products', select : 'name' } : []
+    const data = await Category.findOne({ _id : categoryId })
+    if (!data || data.length === 0) {
+      throw new Error('No category found!');
     }
-    return res.status(200).json({
-      message: 'Success',
-      datas: data
-    });
+    const result = await Category.paginate(
+      { _id:categoryId },
+      { ...options, populate : populateOptions }
+    )
+    if ( !result && result.docs.length === 0 ) {
+      return res.status(200).json({
+        message: 'Not found category'
+      })
+    }
+    if (_embed) {
+      return res.status(200).json({
+        data : {
+          categoryId,
+          products : result.docs
+        }
+      })
+    } else {
+      res.status(200).json({
+        data : result.docs
+
+      })
+    }
   } catch (error) {
     return res.status(500).json({
       message: error.message
@@ -55,15 +89,15 @@ export const update = async (req, res) => {
   try {
     const id = req.params.id;
     const body = req.body;
-    const { error } = productSchema.validate(body, { abortEarly: true });
-    if (error) {
-      return res.status(400).json({
-        message: error.details[0].message
-      });
-    }
-    const data = await Product.findByIdAndUpdate(id, body, { new: true });
+    // const { error } = productSchema.validate(body, { abortEarly: true });
+    // if (error) {
+    //   return res.status(400).json({
+    //     message: error.details[0].message
+    //   });
+    // }
+    const data = await Category.findByIdAndUpdate(id, body, { new: true });
     if (!data) {
-      throw new Error('Failed!');
+      throw new Error('Update category failed!');
     }
     return res.status(200).json({
       message: 'Success!',
@@ -85,26 +119,13 @@ export const create = async (req, res) => {
     //     message: error.details[0].message
     //   });
     // }
-    const data = await Product.create(body);
-    // Tạo ra mảng array của category
-    const arrayCategory = data.categoryId
-    // Tạo vòng lặp để thêm từng cái product id vào mỗi mảng product của category
-    for (let i = 0; i < arrayCategory.length; i++) {
-      await Category.findOneAndUpdate(arrayCategory[i], {
-        $addToSet :{
-          products : data._id
-        }
-      })
-
-    }
-
-
+    const data = await Category.create(body);
     if (!data) {
       throw new Error('Failed!');
     }
     return res.status(200).json({
       message: 'Success',
-      datas: data
+      data: data
     });
   } catch (error) {
     return res.status(500).json({
@@ -116,10 +137,10 @@ export const create = async (req, res) => {
 export const remove = async (req, res) => {
   try {
     const id = req.params.id;
-    const data = await Product.findOneAndDelete({ _id : id });
-    // if (!data) {
-    //   throw new Error('Failed!');
-    // }
+    const data = await Category.findByIdAndDelete(id);
+    if (!data) {
+      throw new Error('Failed!');
+    }
     return res.status(200).json({
       message: 'Success!',
       data
