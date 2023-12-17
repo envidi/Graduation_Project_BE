@@ -26,7 +26,7 @@ export const getAll = async (req, res) => {
       }
     };
     const data = await Category.paginate({ categoryId }, options);
-    if (!data?.docs.length) throw new Error('Failed!');
+    if (!data || data.docs.length === 0) throw new Error('Failed!');
     return res.status(200).json({
       message: 'Success',
       data: data.docs
@@ -40,7 +40,6 @@ export const getDetail = async (req, res) => {
   try {
     // const categoryId = req.query.id;
     const { id: categoryId } = req.query
-    console.log(categoryId);
     const {
       _page = 1,
       _limit = 10,
@@ -57,12 +56,12 @@ export const getDetail = async (req, res) => {
     };
     const populateOptions = _embed ? { path: 'products', select: 'name' } : [];
     const data = await Category.findOne({ _id: categoryId })
-    if (!data || data?.length === 0) throw new Error('No category found!');
+    if (!data || data.length === 0) throw new Error('No category found!');
     const result = await Category.paginate(
       { _id: categoryId },
       { ...options, populate: populateOptions }
     );
-    if (!result?.docs.length) {
+    if (!result && result.docs.length === 0) {
       return res.status(404).json({
         message: 'Not found category'
       });
