@@ -5,7 +5,7 @@ import {
   getDetail,
   remove,
   update
-} from '../controllers/products.js';
+} from '../controllers/movie.js';
 import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js';
 // import { checkPermission } from "../middlewares/checkPermission";
 const routerProducts = express.Router();

@@ -1,5 +1,5 @@
 // import Product from '../models/Product.js';
-import Product from '../model/Product.js';
+import Movie from '../model/Movie.js';
 import productSchema from '../validations/product.js'
 import Category from '../model/Category.js'
 
@@ -18,7 +18,7 @@ export const getAll = async (req, res) => {
         [_sort]: _order === 'asc' ? 1 : -1
       }
     };
-    const data = await Product.paginate({}, options);
+    const data = await Movie.paginate({}, options);
     if (!data || data.docs.length === 0) {
       throw new Error('No product found!');
     }
@@ -36,7 +36,7 @@ export const getAll = async (req, res) => {
 export const getDetail = async (req, res) => {
   try {
     const id = req.params.id;
-    const data = await Product.findById(id);
+    const data = await Movie.findById(id);
     if (!data) {
       throw new Error('Failed!');
     }
@@ -61,7 +61,7 @@ export const update = async (req, res) => {
         message: error.details[0].message
       });
     }
-    const data = await Product.findByIdAndUpdate(id, body, { new: true });
+    const data = await Movie.findByIdAndUpdate(id, body, { new: true });
     if (!data) {
       throw new Error('Failed!');
     }
@@ -79,13 +79,13 @@ export const update = async (req, res) => {
 export const create = async (req, res) => {
   try {
     const body = req.body;
-    // const { error } = productSchema.validate(body, { abortEarly: true });
-    // if (error) {
-    //   return res.status(400).json({
-    //     message: error.details[0].message
-    //   });
-    // }
-    const data = await Product.create(body);
+    const { error } = productSchema.validate(body, { abortEarly: true });
+    if (error) {
+      return res.status(400).json({
+        message: error.details[0].message
+      });
+    }
+    const data = await Movie.create(body);
     // Tạo ra mảng array của category
     const arrayCategory = data.categoryId
     // Tạo vòng lặp để thêm từng cái product id vào mỗi mảng product của category
@@ -116,7 +116,7 @@ export const create = async (req, res) => {
 export const remove = async (req, res) => {
   try {
     const id = req.params.id;
-    const data = await Product.findOneAndDelete({ _id : id });
+    const data = await Movie.findOneAndDelete({ _id : id });
     // if (!data) {
     //   throw new Error('Failed!');
     // }

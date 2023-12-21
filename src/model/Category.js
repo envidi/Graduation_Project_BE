@@ -22,7 +22,7 @@ const categorySchema = mongoose.Schema(
 categorySchema.pre('findOneAndDelete', async function (next) {
   try {
     // Lấy model Product từ biến đã importc
-    const Product = mongoose.model('Product')
+    const Product = mongoose.model('Movie')
     // Lấy điều kiện tìm kiếm hiện tại của câu lệnh , xác định category
     const filter = this.getFilter()
 
