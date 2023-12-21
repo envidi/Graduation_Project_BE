@@ -91,13 +91,13 @@ export const update = async (req, res) => {
 
     const { error } = categorySchema.validate(body, { abortEarly: true });
     if (error) {
-      return res.status(400).json({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         message: error.details[0].message
       });
     }
     const data = await Category.findByIdAndUpdate(id, body, { new: true });
     if (!data) throw new Error('Update category failed!');
-    return res.status(200).json({
+    return res.status(StatusCodes.OK).json({
       message: 'Success!',
       data: data
     });
@@ -111,13 +111,13 @@ export const create = async (req, res) => {
     const body = req.body;
     const { error } = categorySchema.validate(body, { abortEarly: true });
     if (error) {
-      return res.status(400).json({
+      return res.status(StatusCodes.BAD_REQUEST).json({
         message: error.details[0].message
       });
     }
     const data = await Category.create(body);
     if (!data) throw new Error('Failed!');
-    return res.status(201).json({
+    return res.status(StatusCodes.CREATED).json({
       message: 'Success',
       data: data
     });
@@ -133,12 +133,12 @@ export const remove = async (req, res) => {
     if (!data) {
       throw new Error('Failed!');
     }
-    return res.status(200).json({
+    return res.status(StatusCodes.OK).json({
       message: 'Success!',
       data
     });
   } catch (error) {
-    return res.status(404).json({
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: error.message
     });
   }
