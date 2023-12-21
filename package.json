@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
+    "commit": "cz",
     "fix": "npx eslint --fix src/**",
     "lint": "npx eslint src/**",
     "start": "nodemon --inspect --experimental-specifier-resolution=node src/index.js",

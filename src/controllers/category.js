@@ -1,9 +1,10 @@
 // import Product from '../models/Product.js';
 import Category from '../model/Category.js';
 import categorySchema from '../validations/category.js';
+import { StatusCodes } from 'http-status-codes';
 
 const handleErrorResponse = (res, error) => {
-  return res.status(500).json({
+  return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
     message: error.message
   });
 };
@@ -27,7 +28,7 @@ export const getAll = async (req, res) => {
     };
     const data = await Category.paginate({ categoryId }, options);
     if (!data || data.docs.length === 0) throw new Error('Failed!');
-    return res.status(200).json({
+    return res.status(StatusCodes.OK).json({
       message: 'Success',
       data: data.docs
     });
@@ -62,19 +63,19 @@ export const getDetail = async (req, res) => {
       { ...options, populate: populateOptions }
     );
     if (!result && result.docs.length === 0) {
-      return res.status(404).json({
+      return res.status(StatusCodes.NOT_FOUND).json({
         message: 'Not found category'
       });
     }
     if (_embed) {
-      return res.status(200).json({
+      return res.status(StatusCodes.OK).json({
         data: {
           categoryId,
           products: result.docs
         }
       });
     } else {
-      return res.status(200).json({
+      return res.status(StatusCodes.OK).json({
         data: result.docs
       });
     }
