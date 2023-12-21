@@ -9,7 +9,6 @@ routerUser.get('/', verifyAccessToken, isAdmin, getAllUser)
 routerUser.get('/userDetail', verifyAccessToken, getUserDetail)
 routerUser.put('/updateUser', verifyAccessToken, updateUser)
 
-
 routerUser.put('/:id', verifyAccessToken, isAdmin, updateUserById)
 routerUser.get('/refreshToken', refreshToken)
 routerUser.delete('/:id', verifyAccessToken, isAdmin, deleteUser)
