@@ -3,8 +3,9 @@ import Movie from '../model/Movie.js'
 import productSchema from '../validations/product.js'
 import Category from '../model/Category.js'
 import { StatusCodes } from 'http-status-codes'
+import ApiError from '../utils/ApiError.js'
 
-export const getAll = async (req, res) => {
+export const getAll = async (req, res, next) => {
   try {
     const {
       _page = 1,
@@ -21,72 +22,69 @@ export const getAll = async (req, res) => {
     }
     const data = await Movie.paginate({}, options)
     if (!data || data.docs.length === 0) {
-      throw new Error('No product found!')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
     }
     return res.status(StatusCodes.OK).json({
       message: 'Success',
       datas: data
     })
   } catch (error) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      message: error.message
-    })
+    next(error)
   }
 }
 
-export const getDetail = async (req, res) => {
+export const getDetail = async (req, res, next) => {
   try {
     const id = req.params.id
     const data = await Movie.findById(id)
     if (!data) {
-      throw new Error('Failed!')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No movie found!')
     }
     return res.status(StatusCodes.OK).json({
       message: 'Success',
       datas: data
     })
   } catch (error) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      message: error.message
-    })
+    next(error)
   }
 }
 
-export const update = async (req, res) => {
+export const update = async (req, res, next) => {
   try {
     const id = req.params.id
+    if (!id) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Id movie not found')
+    }
     const body = req.body
     const { error } = productSchema.validate(body, { abortEarly: true })
     if (error) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: error.details[0].message
-      })
+      throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
     const data = await Movie.findByIdAndUpdate(id, body, { new: true })
     if (!data) {
-      throw new Error('Failed!')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Update movie failed!')
     }
     return res.status(StatusCodes.OK).json({
       message: 'Success!',
       datas: data
     })
   } catch (error) {
-    return res.status(500).json({
-      message: error.message
-    })
+    next(error)
   }
 }
 
-export const create = async (req, res) => {
+export const create = async (req, res, next) => {
   try {
     const body = req.body
     const { error } = productSchema.validate(body, { abortEarly: true })
     if (error) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        message: error.details[0].message
-      })
+      throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
     const data = await Movie.create(body)
+
+    if (!data) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Create movie failed!')
+    }
     // Tạo ra mảng array của category
     const arrayCategory = data.categoryId
     // Tạo vòng lặp để thêm từng cái product id vào mỗi mảng product của category
@@ -97,35 +95,27 @@ export const create = async (req, res) => {
         }
       })
     }
-
-    if (!data) {
-      throw new Error('Failed!')
-    }
     return res.status(StatusCodes.OK).json({
       message: 'Success',
       datas: data
     })
   } catch (error) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      message: error.message
-    })
+    next(error)
   }
 }
 
-export const remove = async (req, res) => {
+export const remove = async (req, res, next) => {
   try {
     const id = req.params.id
     const data = await Movie.findOneAndDelete({ _id: id })
     if (!data) {
-      throw new Error('Failed!')
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete movie failed!')
     }
     return res.status(StatusCodes.OK).json({
       message: 'Success!',
       data
     })
   } catch (error) {
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      message: error.message
-    })
+    next(error)
   }
 }

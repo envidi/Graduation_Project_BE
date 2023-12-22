@@ -5,11 +5,11 @@ const productSchema = Joi.object({
   name: Joi.string().required().min(6).max(255).label('Name').messages({
     'string.empty': `{{ #label }} is 'required'`
   }),
-  desc: Joi.string(),
-  author: Joi.string().required().min(1).max(255),
-  image: Joi.string().required().min(1).max(255),
+  desc: Joi.string().min(3).max(255).trim().strict(),
+  author: Joi.string().required().min(1).max(255).trim().strict(),
+  image: Joi.string().required().min(1).max(255).trim().strict(),
   duration: Joi.number().required().min(30).max(300),
-  country: Joi.string().required().min(1).max(100),
+  country: Joi.string().required().min(1).max(100).trim().strict(),
   trailer: Joi.string().required().min(1),
   age_limit: Joi.number().required().min(1).max(100),
   categoryId: Joi.array().items(Joi.string()).min(1).required(),
