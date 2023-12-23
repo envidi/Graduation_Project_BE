@@ -1,6 +1,7 @@
 // import Product from '../models/Product.js';
 import Category from '../model/Category.js'
 import ApiError from '../utils/ApiError.js'
+import { slugify } from '../utils/stringToSlug.js'
 import categorySchema from '../validations/category.js'
 import { StatusCodes } from 'http-status-codes'
 
@@ -116,7 +117,10 @@ export const create = async (req, res, next) => {
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
-    const data = await Category.create(body)
+    const data = await Category.create({
+      ...body,
+      slug : slugify(body.name)
+    })
     if (!data) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Create category failed')
     }

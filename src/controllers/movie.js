@@ -4,6 +4,7 @@ import productSchema from '../validations/product.js'
 import Category from '../model/Category.js'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../utils/ApiError.js'
+import { slugify } from '../utils/stringToSlug.js'
 
 export const getAll = async (req, res, next) => {
   try {
@@ -80,7 +81,10 @@ export const create = async (req, res, next) => {
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
-    const data = await Movie.create(body)
+    const data = await Movie.create({
+      ...body,
+      slug : slugify(body.name)
+    })
 
     if (!data) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Create movie failed!')

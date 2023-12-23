@@ -14,7 +14,10 @@ const categorySchema = mongoose.Schema(
     products: [{
       type: mongoose.Types.ObjectId,
       ref: 'Product'
-    }]
+    }],
+    slug : {
+      type : String
+    }
   },
   { versionKey: false, timestamps: true }
 );

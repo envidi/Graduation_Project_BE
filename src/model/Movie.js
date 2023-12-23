@@ -67,7 +67,10 @@ const productSchema = mongoose.Schema(
         type :  mongoose.Schema.Types.ObjectId,
         ref : 'ShowSchedule'
       }
-    ]
+    ],
+    slug : {
+      type : String
+    }
   },
   { versionKey: false, timestamps: true }
 )
