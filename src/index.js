@@ -1,14 +1,17 @@
 /* eslint-disable no-console */
 import express from 'express'
+import cors from 'cors'
 import bodyParser from 'body-parser'
 import routerInit from './routes/index.js'
 import { errorHandlingMiddleware } from './middleware/errorHandlerMiddleware.js'
 import connectDB from './config/connect.js'
 import { env } from './config/environment.js'
+import { corsOptions } from './config/cors.js'
 const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(express.json())
+app.use(cors(corsOptions))
 
 app.use('/api', routerInit)
 // Middleware xử lý lỗi tập trung

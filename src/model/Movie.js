@@ -70,6 +70,10 @@ const productSchema = mongoose.Schema(
     ],
     slug : {
       type : String
+    },
+    destroy : {
+      type : Boolean,
+      default : false
     }
   },
   { versionKey: false, timestamps: true }
