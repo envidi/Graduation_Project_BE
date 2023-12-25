@@ -1,4 +1,4 @@
-import routerProducts from './products.js';
+import routerProducts from './movie.js';
 import routerCategory from './category.js';
 import routerUser from './user.js';
 import { Router } from 'express';

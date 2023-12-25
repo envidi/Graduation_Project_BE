@@ -13,7 +13,7 @@ const categorySchema = mongoose.Schema(
     },
     products: [{
       type: mongoose.Types.ObjectId,
-      ref: 'Product'
+      ref: 'Movie'
     }],
     slug : {
       type : String
