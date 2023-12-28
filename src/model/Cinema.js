@@ -9,11 +9,6 @@ const CinemaSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
-    // ScreeningRoomId:{
-    //     type:[mongoose.Schema.Types.ObjectId],
-    //     default:[],
-    //     ref: 'ScreeningRoom'
-    // }
 
     ScreeningRoomId: {
         type: [{
