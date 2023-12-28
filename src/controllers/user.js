@@ -18,7 +18,7 @@ export const register = asyncHandler(async (req, res) => {
   }
   const user = await User.findOne({ email: body.email })
   if (user) {
-    throw new Error('email đã được đăng kí')
+    throw new ApiError(StatusCodes.NOT_FOUND, 'No Email found!')
   }
   const hashPassword = await bcrypt.hash(body.password, 10)
   const response = await User.create({
@@ -36,11 +36,11 @@ export const login = asyncHandler(async (req, res) => {
 
   const response = await User.findOne({ email: body.email })
   if (!response) {
-    return res.json('Email chưa được đăng kí')
+    throw new ApiError(StatusCodes.BAD_REQUEST, ' Email đã đăng ký!')
   }
   const isMatch = await bcrypt.compare(body.password, response.password)
   if (!isMatch) {
-    return res.json('mật khẩu không khớp')
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Password not match!')
   }
 
   if (response && isMatch) {
