@@ -17,7 +17,7 @@ const productSchema = mongoose.Schema(
     duration: {
       type: Number,
       required: true
-    },
+    }, 
     country : {
       type : String,
       required : true
@@ -67,7 +67,14 @@ const productSchema = mongoose.Schema(
         type :  mongoose.Schema.Types.ObjectId,
         ref : 'ShowSchedule'
       }
-    ]
+    ],
+    slug : {
+      type : String
+    },
+    destroy : {
+      type : Boolean,
+      default : false
+    }
   },
   { versionKey: false, timestamps: true }
 )
