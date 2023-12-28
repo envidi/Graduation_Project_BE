@@ -18,7 +18,7 @@ export const register = asyncHandler(async (req, res) => {
   }
   const user = await User.findOne({ email: body.email })
   if (user) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'No Email found!')
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Email đã được đăng ký!')
   }
   const hashPassword = await bcrypt.hash(body.password, 10)
   const response = await User.create({
