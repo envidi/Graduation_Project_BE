@@ -5,7 +5,7 @@ const roleUserValidate = Joi.object({
     'string.empty': '{{#label}} is required',
   }),
   status: Joi.string().required().label('Status').messages({
-    'string.empty': '{{#label}} is required',
+    'string.empty': '{{#label}} is required'
   }),
   userIds: Joi.array().items(Joi.string().required()).min(1).label('User IDs').messages({
     'array.min': '{{#label}} must have at least 1 user',
