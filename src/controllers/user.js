@@ -82,7 +82,7 @@ export const getDetailUser = asyncHandler(async (req, res) => {
   })
 })
 
-export const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res, next) => {
   try {
     const response = await User.findByIdAndDelete(req.params.id)
     if (!response) {
@@ -101,7 +101,7 @@ export const deleteUser = async (req, res) => {
 export const updateUser = asyncHandler(async (req, res) => {
   const { _id } = req.user
   if (!_id || Object.keys(req.body).length === 0)
-    throw new Error('Missing inputs')
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Missing inputs')
 
   const body = req.body
 
@@ -124,7 +124,7 @@ export const updateUser = asyncHandler(async (req, res) => {
 export const updateUserById = asyncHandler(async (req, res) => {
   const { id } = req.params
   if (!id || Object.keys(req.body).length === 0)
-    throw new Error('Missing inputs')
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Missing inputs')
   const response = await User.findByIdAndUpdate(id, req.body, { new: true })
   if (!response || response.length === 0) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'No user found!')
