@@ -1,14 +1,13 @@
-import express from 'express';
+import express from 'express'
 import {
-  create,
-  getAll,
-  getDetail,
-  remove,
-  update
-} from '../controllers/category.js';
+  createRole,
+  deleteRole,
+  updateRole,
+  getRole
+} from '../controllers/roleUser.js'
 // import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js';
 // import { checkPermission } from "../middlewares/checkPermission";
-const routerCategory = express.Router();
+const routerRoleUser = express.Router()
 
 // routerProducts.get('/', verifyAccessToken, getAll);
 // routerProducts.get('/:id', verifyAccessToken, getDetail);
@@ -16,11 +15,10 @@ const routerCategory = express.Router();
 // routerProducts.post('/', verifyAccessToken, isAdmin, create);
 // routerProducts.delete('/:id', verifyAccessToken, isAdmin, remove);
 
-routerCategory.get('/', getAll);
-routerCategory.get('/query', getDetail);
-routerCategory.patch('/:id', update);
-routerCategory.post('/', create);
-routerCategory.delete('/:id', remove);
+routerRoleUser.get('/:id', getRole)
+// routerRoleUser.get('/query', getDetail);
+routerRoleUser.patch('/:id', updateRole)
+routerRoleUser.post('/', createRole)
+routerRoleUser.delete('/:id', deleteRole)
 
-
-export default routerCategory;
+export default routerRoleUser

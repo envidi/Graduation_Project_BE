@@ -23,11 +23,6 @@ var userSchema = new mongoose.Schema({
     type:String,
     required:true
   },
-  role:{
-    type:String,
-    default : 'user'
-  },
-  avatar: String,
   cart:[{
     product : { type : mongoose.Types.ObjectId, ref : 'Product' },
     quantity:Number,
@@ -53,6 +48,10 @@ var userSchema = new mongoose.Schema({
   },
   passwordResetExpires: {
     type:String
+  },
+  roleIds:{
+    type :  mongoose.Schema.Types.ObjectId,
+    ref : 'RoleUser'
   }
 }, {
   timestamps: true
