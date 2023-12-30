@@ -19,7 +19,7 @@ routerUser.get('/', getAllUser)
 routerUser.get('/userDetail/:id', getDetailUser)
 routerUser.put('/updateUser', updateUser)
 
-routerUser.put('/:id', updateUserById)
+routerUser.patch('/:id', updateUserById)
 routerUser.delete('/:id', deleteUser)
 
 

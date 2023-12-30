@@ -24,7 +24,7 @@ export const createRole = async (req, res, next) => {
       const errorMessage = validationResult.error.details
         .map((err) => err.message)
         .join(', ')
-      throw new Error(errorMessage)
+      throw new ApiError(StatusCodes.BAD_REQUEST, errorMessage)
     }
 
     const role = new RoleUser({ roleName, status })
@@ -52,7 +52,7 @@ export const createRole = async (req, res, next) => {
 // }
 export const getRole = async (req, res, next) => {
   try {
-    const roleId = req.params.roleId // Lấy roleId từ yêu cầu
+    const roleId = req.params.id // Lấy roleId từ yêu cầu
 
     const role = await RoleUser.findById(roleId) // Tìm vai trò trong cơ sở dữ liệu dựa trên roleId
 
@@ -78,25 +78,25 @@ export const getRole = async (req, res, next) => {
 ///b2
 export const updateRole = async (req, res, next) => {
   try {
-    const roleId = req.params.roleId
+    const roleId = req.params.id
     const updates = req.body
-
+    if (!roleId) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Id role user not found')
+    }
     // Xác thực thông tin cập nhật
     const validationResult = roleUserValidate.validate(updates)
     if (validationResult.error) {
       const errorMessage = validationResult.error.details
         .map((err) => err.message)
         .join(', ')
-      throw new Error(errorMessage)
+      throw new ApiError(StatusCodes.BAD_REQUEST, errorMessage)
     }
 
     const role = await RoleUser.findByIdAndUpdate(roleId, updates, {
       new: true
     })
 
-    if (!roleId) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Id role user not found')
-    }
+
     if (!role) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Id role user not found')
     }
@@ -116,18 +116,19 @@ export const updateRole = async (req, res, next) => {
 // b2
 export const deleteRole = async (req, res, next) => {
   try {
-    const roleId = req.params.roleId // Lấy roleId từ yêu cầu
-
-    const role = await RoleUser.findById(roleId) // Tìm vai trò trong cơ sở dữ liệu dựa trên roleId
+    const roleId = req.params.id // Lấy roleId từ yêu cầu
     if (!roleId) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Id role user not found')
     }
+    console.log(roleId)
+    const role = await RoleUser.findById(roleId) // Tìm vai trò trong cơ sở dữ liệu dựa trên roleId
+
     if (!role) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Id role user not found')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Role user not found')
     }
 
     if (role.roleName === 'user') {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Id role user not found')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'This role user is not allowed to delete')
     }
 
     // Kiểm tra xem vai trò đang được xóa có tên là "khách hàng" hay không
