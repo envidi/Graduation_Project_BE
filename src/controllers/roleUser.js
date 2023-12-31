@@ -36,7 +36,7 @@ export const createRole = async (req, res, next) => {
       res.status(StatusCodes.OK).json(role);
     } catch (error) {
       console.error('Lỗi:', error);
-      res.status(StatusCodes.OK).json({ message: 'Đã xảy ra lỗi trong quá trình tạo vai trò.' });
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Đã xảy ra lỗi trong quá trình tạo vai trò.' });
     }
   };
 // Lấy thông tin của vai trò
@@ -51,16 +51,16 @@ export const getRole = async (req, res, next) => {
     const role = await RoleUser.findById(roleId); // Tìm vai trò trong cơ sở dữ liệu dựa trên roleId
 
     if (!roleId) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Id category not found')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Id userRole not found')
     }
     if (!role) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Id category not found')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Id userRole not found')
     }
 
     res.status(StatusCodes.OK).json(role); // Trả về kết quả thành công dưới dạng JSON
   } catch (error) {
     console.error('Lỗi:', error);
-    res.status(StatusCodes.OK).json({ message: 'Đã xảy ra lỗi trong quá trình lấy thông tin vai trò.' });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Đã xảy ra lỗi trong quá trình lấy thông tin vai trò.' });
   }
 };
 // Cập nhật vai trò
@@ -86,15 +86,15 @@ export const updateRole = async (req, res, next) => {
       const role = await RoleUser.findByIdAndUpdate(roleId, updates, { new: true });
   
       if (!roleId) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'Id category not found');
+        throw new ApiError(StatusCodes.NOT_FOUND, 'Id userRole not found');
       }
       if (!role) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'Id category not found');
+        throw new ApiError(StatusCodes.NOT_FOUND, 'Id userRole not found');
       }
       res.status(StatusCodes.OK).json(role);
     } catch (error) {
       console.error('Lỗi:', error);
-      res.status(StatusCodes.OK).json({ message: 'Đã xảy ra lỗi trong quá trình cập nhật vai trò.' });
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Đã xảy ra lỗi trong quá trình cập nhật vai trò.' });
     }
   };
 
@@ -111,34 +111,44 @@ export const deleteRole = async (req, res, next) => {
   try {
     const roleId = req.params.roleId; // Lấy roleId từ yêu cầu
 
-    const role = await RoleUser.findById(roleId); // Tìm vai trò trong cơ sở dữ liệu dựa trên roleId
+    // const role = await RoleUser.findById(roleId); // Tìm vai trò trong cơ sở dữ liệu dựa trên roleId
     if (!roleId) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Id category not found')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Id userRole not found')
     }
     if (!role) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Id category not found')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Id userRole not found')
     }
 
-    if (role.roleName === 'user') {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Id category not found')
-    }
+    // if (role.roleName === 'user') {
+    //   throw new ApiError(StatusCodes.NOT_FOUND, 'Id userRole not found')
+    // }
 
     // Kiểm tra xem vai trò đang được xóa có tên là "khách hàng" hay không
     // Nếu có, thực hiện việc chuyển đổi các user đang là vai trò đó sang vai trò "khách hàng"
-    if (role.roleName !== 'user') {
-      // Lấy danh sách userIds của vai trò đang được xóa
-      const userIds = role.userIds;
+    // if (role.roleName !== 'user') {
+    //   // Lấy danh sách userIds của vai trò đang được xóa
+    //   const userIds = role.userIds;
 
-      // Tìm và cập nhật các user có userIds đúng với danh sách userIds của vai trò đang được xóa
-      await User.updateMany({ _id: { $in: userIds } }, { $set: { role: 'user' } });
-    }
+    //   // Tìm và cập nhật các user có userIds đúng với danh sách userIds của vai trò đang được xóa
+    //   await User.updateMany({ _id: { $in: userIds } }, { $set: { role: 'user' } });
+    // }
 
     await RoleUser.findByIdAndDelete(roleId); // Xóa vai trò trong cơ sở dữ liệu dựa trên roleId
 
     res.status(StatusCodes.OK).json({ message: 'Xóa vai trò thành công.' }); // Trả về kết quả thành công dưới dạng JSON
   } catch (error) {
     console.error('Lỗi:', error);
-    res.status(500).json({ message: 'Đã xảy ra lỗi trong quá trình xóa vai trò.' });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Đã xảy ra lỗi trong quá trình xóa vai trò.' });
+  }
+};
+export const getAll = async (req, res, next) => {
+  try {
+    const roles = await RoleUser.find(); // Lấy tất cả các vai trò từ cơ sở dữ liệu
+
+    res.status(StatusCodes.OK).json(roles); // Trả về danh sách vai trò dưới dạng JSON
+  } catch (error) {
+    console.error('Lỗi:', error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Đã xảy ra lỗi trong quá trình lấy danh sách vai trò.' });
   }
 };
 
