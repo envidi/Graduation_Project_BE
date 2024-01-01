@@ -8,4 +8,4 @@ const categorySchema = Joi.object({
   abortEarly: false
 });
 
-export default categorySchema; 
+export default categorySchema;

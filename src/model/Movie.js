@@ -17,7 +17,7 @@ const productSchema = mongoose.Schema(
     duration: {
       type: Number,
       required: true
-    }, 
+    },
     country : {
       type : String,
       required : true

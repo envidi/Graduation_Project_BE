@@ -61,7 +61,7 @@ export const getDetail = async (req, res, next) => {
     //       categoryCol : 1
     //     }
     //   }
- 
+
     // ])
     if (!data || data.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No movie found!')

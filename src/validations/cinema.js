@@ -5,6 +5,6 @@ const CinemaSchema = Joi.object({
   CinemaAdress: Joi.string().required(),
   ScreeningRoomId: Joi.array().items(Joi.string())
 }).options({
-  abortEarly: false,
+  abortEarly: false
 });
 export default CinemaSchema;
