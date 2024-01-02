@@ -1,4 +1,3 @@
-// import Product from '../models/Product.js';
 import Movie from '../model/Movie.js'
 import movieSchema from '../validations/movie.js'
 import Category from '../model/Category.js'
