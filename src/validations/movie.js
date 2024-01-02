@@ -1,7 +1,7 @@
 /* eslint-disable @stylistic/js/quotes */
 import Joi from 'joi'
 
-const movieSchema = Joi.object({
+const productSchema = Joi.object({
   name: Joi.string().required().min(6).max(255).label('Name').messages({
     'string.empty': `{{ #label }} is 'required'`
   }),
@@ -17,19 +17,17 @@ const movieSchema = Joi.object({
   toDate: Joi.date().required().greater(Joi.ref('fromDate')),
   status: Joi.string().required().min(1).max(255),
   rate: Joi.number().required().min(1).max(5),
-  show_scheduleId : Joi.array().items(Joi.string().trim().strict()).required().min(1).max(100)
   // Trong array của show_schedule thêm một object có trường id và name
-  // show_scheduleId: Joi.array()
-  //   .items(
-  //     Joi.object({
-  //       _id: Joi.string().required(),
-  //       name: Joi.string().required()
-  //     })
-  //   )
-  //   .min(1)
-  //   .required()
-
+  show_scheduleId: Joi.array()
+    .items(
+      Joi.object({
+        _id: Joi.string().required(),
+        name: Joi.string().required()
+      }) 
+    )
+    .min(1)
+    .required()
 }).options({
   abortEarly: false
 })
-export default movieSchema
+export default productSchema
