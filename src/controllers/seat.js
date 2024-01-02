@@ -1,9 +1,9 @@
 // import Product from '../models/Product.js';
-import Seat, { UNAVAILABLE } from '../model/Seat.js'
+import Seat, { SOLD, UNAVAILABLE } from '../model/Seat.js'
 import seatChema from '../validations/seat.js'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../utils/ApiError.js'
-import ScreenRoom from '../model/ScreenRoom.js'
+import ScreenRoom, { FULL } from '../model/ScreenRoom.js'
 
 export const getAll = async (req, res, next) => {
   try {
@@ -85,13 +85,14 @@ export const update = async (req, res, next) => {
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
-    // const data = await Seat.findByIdAndUpdate(id, body, { new: true })
+
     const data = await Seat.findById(id)
     const dataScreen = await ScreenRoom.findById(
       data.ScreeningRoomId,
       'destroy'
     )
-
+    // Nếu như bảng screen room mà ghế đang tồn tại bên trong đó đã bị xóa mềm
+    // và ghế đang muốn sửa có trạng thái là unavailable thì không thể cập nhật
     if (dataScreen.destroy === true && data.status === UNAVAILABLE) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
@@ -103,6 +104,17 @@ export const update = async (req, res, next) => {
       { _id: id },
       { $set: { status: body.status } }
     )
+    if (body.status === SOLD) {
+      const allSeat = await Seat.find({}, 'status')
+      const allSeatIsSold = allSeat.every((seat) => seat.status === SOLD)
+      if (allSeatIsSold) {
+        await ScreenRoom.updateOne({
+          _id : data.ScreeningRoomId
+        }, {
+          status : FULL
+        })
+      }
+    }
 
     if (!updateData) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Update seat failed!')

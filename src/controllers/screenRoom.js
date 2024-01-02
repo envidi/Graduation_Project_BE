@@ -202,8 +202,8 @@ export const createForPostMan = async (req, res, next) => {
 export const createForFe = async (req, res, next) => {
   try {
     const body = req.body
-    const rowCount = 5
-    const columnCount = 5
+    const rowCount = 1
+    const columnCount = 1
 
     const { error } = ScreeningRoomSchema.validate(body, { abortEarly: true })
     if (error) {
@@ -269,14 +269,15 @@ export const deleteSoft = async (req, res, next) => {
     const id = req.params.id
     const body = req.body
     const checkScreenRoom = await ScreeningRoom.paginate({ _id: id }, { populate: 'SeatId' })
-
+    // Tìm kiếm trong screen rooom có seat nào có trong trạng thái SOLD không 
+    // Nếu không thì không cho xóa
     const isSold = checkScreenRoom.docs[0].SeatId.some((seat) => {
-      // console.log(seat.status)
+
       return seat.status === SOLD
     })
-    // console.log(isSold)
+
     if (isSold) {
-      throw new ApiError(
+      throw new ApiError( 
         StatusCodes.CONFLICT,
         'Some seat in this screen room is sold!'
       )
