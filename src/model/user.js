@@ -35,7 +35,7 @@ var userSchema = new mongoose.Schema(
       type: String,
       default: null
     },
-    wishlist: [{ type: mongoose.Types.ObjectId, ref: 'Product' }],
+    wishlist: [{ type: mongoose.Types.ObjectId, ref: 'Movie' }],
     isBlocked: {
       type: Boolean,
       default: false
@@ -75,6 +75,7 @@ userSchema.methods = {
       this.passwordResetExpires = Date.now() + 15 * 60 * 1000
     } else {
       // Xử lý khi 'this' không hợp lệ
+      // eslint-disable-next-line no-console
       console.error('Error: \'this\' is undefined or null.')
     }
     return resetToken

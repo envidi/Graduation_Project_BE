@@ -1,6 +1,6 @@
 // import Product from '../models/Product.js';
 import Movie from '../model/Movie.js'
-import productSchema from '../validations/product.js'
+import movieSchema from '../validations/movie.js'
 import Category from '../model/Category.js'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../utils/ApiError.js'
@@ -61,7 +61,7 @@ export const getDetail = async (req, res, next) => {
     //       categoryCol : 1
     //     }
     //   }
- 
+
     // ])
     if (!data || data.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No movie found!')
@@ -82,7 +82,7 @@ export const update = async (req, res, next) => {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Id movie not found')
     }
     const body = req.body
-    const { error } = productSchema.validate(body, { abortEarly: true })
+    const { error } = movieSchema.validate(body, { abortEarly: true })
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
@@ -102,7 +102,6 @@ export const update = async (req, res, next) => {
       result
     )
     const updateData = await Movie.updateOne({ _id: id }, body)
-
 
     if (!updateData) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Update movie failed!')
@@ -151,7 +150,7 @@ export const update = async (req, res, next) => {
 export const create = async (req, res, next) => {
   try {
     const body = req.body
-    const { error } = productSchema.validate(body, { abortEarly: true })
+    const { error } = movieSchema.validate(body, { abortEarly: true })
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }

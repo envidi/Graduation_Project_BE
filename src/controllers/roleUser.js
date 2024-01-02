@@ -120,7 +120,6 @@ export const deleteRole = async (req, res, next) => {
     if (!roleId) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Id role user not found')
     }
-    console.log(roleId)
     const role = await RoleUser.findById(roleId) // Tìm vai trò trong cơ sở dữ liệu dựa trên roleId
 
     if (!role) {
