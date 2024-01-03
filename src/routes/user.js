@@ -5,7 +5,7 @@ const routerUser = Router();
 
 routerUser.post('/register', register)
 routerUser.post('/login', login)
-routerUser.get('/', verifyAccessToken, isAdmin, getAllUser)
+routerUser.get('/', getAllUser)
 routerUser.get('/userDetail/:id', verifyAccessToken, getDetailUser)
 routerUser.put('/updateUser', verifyAccessToken, updateUser)
 

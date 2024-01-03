@@ -3,7 +3,8 @@ import {
  createRole,
  deleteRole,
  updateRole,
- getRole
+ getRole,
+ getAll
 } from '../controllers/roleUser.js';
 // import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js';
 // import { checkPermission } from "../middlewares/checkPermission";
@@ -17,6 +18,7 @@ const routerRoleUser = express.Router();
 
 routerRoleUser.get('/:id', getRole);
 // routerRoleUser.get('/query', getDetail);
+routerRoleUser.get('/',getAll)
 routerRoleUser.patch('/:id', updateRole);
 routerRoleUser.post('/', createRole);
 routerRoleUser.delete('/:id', deleteRole);
