@@ -269,7 +269,7 @@ export const deleteSoft = async (req, res, next) => {
     const id = req.params.id
     const body = req.body
     const checkScreenRoom = await ScreeningRoom.paginate({ _id: id }, { populate: 'SeatId' })
-    // Tìm kiếm trong screen rooom có seat nào có trong trạng thái SOLD không 
+    // Tìm kiếm trong screen rooom có seat nào có trong trạng thái SOLD không
     // Nếu không thì không cho xóa
     const isSold = checkScreenRoom.docs[0].SeatId.some((seat) => {
 
@@ -277,7 +277,7 @@ export const deleteSoft = async (req, res, next) => {
     })
 
     if (isSold) {
-      throw new ApiError( 
+      throw new ApiError(
         StatusCodes.CONFLICT,
         'Some seat in this screen room is sold!'
       )

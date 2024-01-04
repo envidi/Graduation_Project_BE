@@ -23,7 +23,7 @@ const productSchema = Joi.object({
       Joi.object({
         _id: Joi.string().required(),
         name: Joi.string().required()
-      }) 
+      })
     )
     .min(1)
     .required()
