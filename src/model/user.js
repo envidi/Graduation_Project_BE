@@ -53,8 +53,8 @@ var userSchema = new mongoose.Schema(
       type: String
     },
     roleIds: {
-      type: [mongoose.Schema.Types.ObjectId], // Chỉ định kiểu dữ liệu là mảng ObjectId
-      default: [], // Đặt giá trị mặc định là một mảng rỗng
+      type: mongoose.Schema.Types.ObjectId, // Chỉ định kiểu dữ liệu là mảng ObjectId
+      default: null, // Đặt giá trị mặc định là một mảng rỗng
       ref:"RoleUser"
     },
   },

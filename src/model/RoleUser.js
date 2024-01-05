@@ -16,6 +16,8 @@ const roleUserSchema = new mongoose.Schema({
     default: [], // Đặt giá trị mặc định là một mảng rỗng
     ref:"User"
   },
+},{
+  timestamps: true
 });
 
 // Phương thức tùy chỉnh để xóa nhiều bản ghi

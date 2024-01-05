@@ -4,7 +4,8 @@ import {
  deleteRole,
  updateRole,
  getRole,
- getAll
+ getAll,
+//  addUserToRole
 } from '../controllers/roleUser.js';
 // import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js';
 // import { checkPermission } from "../middlewares/checkPermission";
@@ -22,6 +23,6 @@ routerRoleUser.get('/',getAll)
 routerRoleUser.patch('/:id', updateRole);
 routerRoleUser.post('/', createRole);
 routerRoleUser.delete('/:id', deleteRole);
-
+// routerRoleUser.post('/:id',addUserToRole)
 
 export default routerRoleUser;
