@@ -1,5 +1,6 @@
 import Movie from '../model/Movie.js'
 import MoviePrice from '../model/MoviePrice.js'
+import { moviePriceService } from '../services/moviePrice.js'
 import ApiError from '../utils/ApiError.js'
 import { slugify } from '../utils/stringToSlug.js'
 import {
@@ -124,7 +125,9 @@ export const create = async (req, res, next) => {
 export const remove = async (req, res, next) => {
   try {
     const id = req.params.id
-    const data = await MoviePrice.findByIdAndDelete(id)
+
+    const data = await moviePriceService.remove(id)
+
     if (!data) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete MoviePrice failed!')
     }

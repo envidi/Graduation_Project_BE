@@ -5,6 +5,7 @@ import { StatusCodes } from 'http-status-codes'
 import ApiError from '../utils/ApiError.js'
 import { slugify } from '../utils/stringToSlug.js'
 import findDifferentElements from '../utils/findDifferent.js'
+import { moviePriceService } from '../services/moviePrice.js'
 
 export const getAll = async (req, res, next) => {
   try {
@@ -184,6 +185,15 @@ export const remove = async (req, res, next) => {
   try {
     const id = req.params.id
     const data = await Movie.findOneAndDelete({ _id: id })
+
+    // get all price of movie
+    const prices = data.prices
+    //loop and delete all price of movie
+
+    for (let i = 0; i < prices.length; i++) {
+      await moviePriceService.remove(prices[i])
+    }
+
     if (!data) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete movie failed!')
     }
