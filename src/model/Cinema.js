@@ -24,6 +24,8 @@ const CinemaSchema = new mongoose.Schema({
     ],
     default: []
   }
+}, {
+  timestamps : true
 })
 
 export default mongoose.model('Cinema', CinemaSchema)

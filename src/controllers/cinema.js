@@ -20,7 +20,7 @@ export const getAll = async (req, res, next) => {
         [_sort]: _order === 'asc' ? 1 : -1
       }
     }
-    const data = await Cinema.find({})
+    const data = await Cinema.find({}, options)
     if (!data || data.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No Cinema found!')
     }
