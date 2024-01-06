@@ -1,5 +1,5 @@
 import mongoose from 'mongoose' // Erase if already required
-
+import { ObjectId } from 'mongodb'
 // import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 // Declare the Schema of the Mongo model
@@ -25,16 +25,13 @@ var userSchema = new mongoose.Schema(
     },
     cart: [
       {
-        product: { type: mongoose.Types.ObjectId, ref: 'Product' },
+        product: { type: mongoose.Types.ObjectId, ref: 'Movie' },
         quantity: Number,
         color: String,
         total: Number
       }
     ],
-    address: {
-      type: String,
-      default: null
-    },
+    address: { type: Array, default: [] },
     wishlist: [{ type: mongoose.Types.ObjectId, ref: 'Movie' }],
     isBlocked: {
       type: Boolean,
@@ -53,9 +50,9 @@ var userSchema = new mongoose.Schema(
       type: String
     },
     roleIds: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'RoleUser',
-      default : null
+      type: mongoose.Schema.Types.ObjectId, // Chỉ định kiểu dữ liệu là mảng ObjectId
+      default: null, // Đặt giá trị mặc định là một mảng rỗng
+      ref: 'RoleUser'
     }
   },
   {
@@ -63,6 +60,16 @@ var userSchema = new mongoose.Schema(
   }
 )
 
+userSchema.pre('save', function (next) {
+  if (!this.roleIds || this.roleIds.length === 0) {
+    this.roleIds = [
+      {
+        roleIds:  ObjectId() // Tạo một ObjectId mới
+      }
+    ];
+  }
+  next();
+});
 userSchema.methods = {
   createPasswordChangedToken: function () {
     const resetToken = crypto.randomBytes(32).toString('hex')
