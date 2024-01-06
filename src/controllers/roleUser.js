@@ -14,16 +14,15 @@ export const createRole = async (req, res, next) => {
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message);
     }
-
+    if (data.roleName==="admin") {
+      throw new ApiError(StatusCodes.NOT_FOUND,  'The role "admin" already exists');
+    }
     const data = await RoleUser.create({
       ...body,
     });
 
     if (!data) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Role creation failed');
-    }
-    if (data.roleName==="admin") {
-      throw new ApiError(StatusCodes.NOT_FOUND,  'The role "admin" already exists');
     }
     const roleId = data._id;
     const userIds = data.userIds || [];
@@ -64,86 +63,12 @@ export const getRole = async (req, res, next) => {
 
     res.status(StatusCodes.OK).json(role); // Trả về kết quả thành công dưới dạng JSON
   } catch (error) {
-    console.error('Lỗi:', error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'An error occurred while retrieving the role list.' });
+    next(error)
   }
 };
 // Cập nhật vai trò
 
-// export const updateRole = async (req, res, next) => {
-//   try {
-//     const roleId = req.params.id;
-//     const updates = req.body;
-//     const roleuser="65984c549f4041a641e8dec3";
-    
-//     // Xác thực thông tin cập nhật
-//     const validationResult = roleUserValidate.validate(updates);
-//     if (validationResult.error) {
-//       const errorMessage = validationResult.error.details.map((err) => err.message).join(', ');
-//       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(errorMessage).message);
-//     }
-//     // Lấy vai trò hiện tại từ cơ sở dữ liệu
-//     const roleUser = await RoleUser.findById(roleId, 'userIds');
-//     if (!roleUser && Object.keys(roleUser)===0) {
-//       throw new ApiError(StatusCodes.BAD_REQUEST,"Role does not exist")
-//     }
-//     // Tìm các phần tử khác nhau giữa danh sách người dùng hiện tại và danh sách người dùng mới
-//     const result = findDifferentElements(roleUser.userIds, updates.userIds);
-//     // console.log(result)
-//     // Lọc ra những người dùng mới được thêm vào vai trò
-//     const newRole = result.filter((user) => updates.userIds.includes(user));
-//     // console.log(newRole)
 
-//     // Tìm các vai trò đã bị xóa khỏi mảng vai trò của người dùng
-//     const deletedRolesFromRoleUser = findDifferentElements(newRole, result);
-
-//     // Cập nhật dữ liệu vai trò người dùng
-//     const updateData = await RoleUser.updateOne({ _id: roleId }, updates);
-//     if (!updateData) {
-//       throw new ApiError(StatusCodes.NOT_FOUND, 'User role update failed!');
-//     }
-//     console.log(newRole)
-//     // Thêm vai trò vào trường roleIds của tài liệu người dùng nếu chưa tồn tại
-//     if (newRole && newRole.length > 0) {
-//       await User.updateMany(
-//         {
-//           _id: {
-//             $in: newRole
-//           }
-//         },
-//         {
-//           $set: {
-//             roleIds: roleId
-//           }
-//         }
-//       );
-//     }
-//     // Xóa vai trò khỏi trường roleIds của tài liệu người dùng
-
-//     if (deletedRolesFromRoleUser && deletedRolesFromRoleUser.length > 0) {
-//       await User.updateMany(
-//         {
-//           _id: {
-//             // tìm ra tất cả những id trong mảng dùng $in
-//             $in: deletedRolesFromRoleUser
-//           }
-//         },
-//         {
-//           // Xóa productId khỏi products trong category thì dùng $pull
-//           $set: {
-//             roleIds: roleuser
-//           }
-//         }
-//       )
-//     }
-
-//     res.status(StatusCodes.OK).json({message: 'Success',
-//     data: updateData});
-//   } catch (error) {
-//     console.error('error:', error);
-//     res.status(StatusCodes.BAD_REQUEST).json({ message: 'An error occurred while retrieving the role list.' });
-//   }
-// };
 export const updateRole = async (req, res, next) => {
   try {
     const roleId = req.params.id;
@@ -189,8 +114,7 @@ export const updateRole = async (req, res, next) => {
       data: roleUser
     });
   } catch (error) {
-    console.error('error:', error);
-    res.status(StatusCodes.BAD_REQUEST).json({ message: 'An error occurred while updating the role.' });
+    next(error)
   }
 };
 // Xóa vai trò
@@ -203,7 +127,6 @@ export const deleteRole = async (req, res, next) => {
 
     // Tìm vai trò trong cơ sở dữ liệu dựa trên roleId
     const roleUser = await RoleUser.findById(roleId);
-    console.log(roleUser)
     if (!roleUser) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'User role ID not found');
     }
@@ -226,8 +149,7 @@ export const deleteRole = async (req, res, next) => {
     res.status(StatusCodes.OK).json({ message: 'Success',
         data: roleUser});
   } catch (error) {
-    console.error('Error:', error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Đã xảy ra lỗi trong quá trình xóa vai trò.' });
+    next(error)
   }
 };
 export const getAll = async (req, res, next) => {
@@ -236,8 +158,7 @@ export const getAll = async (req, res, next) => {
 
     res.status(StatusCodes.OK).json(roles); // Trả về danh sách vai trò dưới dạng JSON
   } catch (error) {
-    console.error('Lỗi:', error);
-    res.status(StatusCodes.BAD_REQUEST).json({ message: 'An error occurred while retrieving the role list.' });
+    next(error)
   }
 };
 
