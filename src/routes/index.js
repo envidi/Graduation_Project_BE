@@ -6,6 +6,7 @@ import routerRoleUser from './roleUser.js'
 import routerCinema from './cinema.js';
 import seatRouter from './seat.js';
 import screenRoom from './screenRoom.js';
+import ShowtimesRouter from './showtimes.js';
 
 const routerInit = Router()
 
@@ -16,5 +17,6 @@ routerInit.use('/cinema', routerCinema )
 routerInit.use('/roleUser', routerRoleUser)
 routerInit.use('/seat', seatRouter)
 routerInit.use('/screen', screenRoom)
+routerInit.use('/showtimes', ShowtimesRouter)
 
 export default routerInit;

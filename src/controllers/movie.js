@@ -150,10 +150,10 @@ export const update = async (req, res, next) => {
 export const create = async (req, res, next) => {
   try {
     const body = req.body
-    const { error } = movieSchema.validate(body, { abortEarly: true })
-    if (error) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
-    }
+    // const { error } = movieSchema.validate(body, { abortEarly: true })
+    // if (error) {
+    //   throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
+    // }
     const data = await Movie.create({
       ...body,
       slug: slugify(body.name)

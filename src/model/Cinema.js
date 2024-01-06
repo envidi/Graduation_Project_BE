@@ -23,7 +23,8 @@ const CinemaSchema = new mongoose.Schema({
       }
     ],
     default: []
-  }
+  },
+  
 })
 
 export default mongoose.model('Cinema', CinemaSchema)
