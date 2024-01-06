@@ -60,16 +60,16 @@ var userSchema = new mongoose.Schema(
   }
 )
 
-userSchema.pre('save', function (next) {
-  if (!this.roleIds || this.roleIds.length === 0) {
-    this.roleIds = [
-      {
-        roleIds:  ObjectId() // Tạo một ObjectId mới
-      }
-    ];
-  }
-  next();
-});
+// userSchema.pre('save', function (next) {
+//   if (!this.roleIds || this.roleIds.length === 0) {
+//     this.roleIds = [
+//       {
+//         roleIds:  ObjectId() // Tạo một ObjectId mới
+//       }
+//     ];
+//   }
+//   next();
+// });
 userSchema.methods = {
   createPasswordChangedToken: function () {
     const resetToken = crypto.randomBytes(32).toString('hex')

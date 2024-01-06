@@ -3,7 +3,6 @@ import RoleUser from '../model/RoleUser'
 import ApiError from '../utils/ApiError.js'
 import roleUserValidate from '../validations/roleUser.js'
 import User from '../model/user.js'
-import findDifferentElements from '../utils/findDifferent.js'
 // Thêm vai trò mới
 
 export const createRole = async (req, res, next) => {
@@ -16,7 +15,7 @@ export const createRole = async (req, res, next) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
 
-    if (data.roleName === 'admin') {
+    if (body.roleName === 'admin') {
       throw new ApiError(
         StatusCodes.NOT_FOUND,
         'The role "admin" already exists'
@@ -41,7 +40,7 @@ export const createRole = async (req, res, next) => {
     }
     const updatedUsers = await User.updateMany(
       { _id: { $in: userIds } },
-      { $addToSet: { roleIds: roleId } },
+      { $set: { roleIds: roleId } },
       { new: true }
     )
 
@@ -81,16 +80,16 @@ export const updateRole = async (req, res, next) => {
     const updates = req.body
 
     // Xác thực thông tin cập nhật
-    const validationResult = roleUserValidate.validate(updates)
-    if (validationResult.error) {
-      const errorMessage = validationResult.error.details
-        .map((err) => err.message)
-        .join(', ')
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        new Error(errorMessage).message
-      )
-    }
+    // const validationResult = roleUserValidate.validate(updates)
+    // if (validationResult.error) {
+    //   const errorMessage = validationResult.error.details
+    //     .map((err) => err.message)
+    //     .join(', ')
+    //   throw new ApiError(
+    //     StatusCodes.BAD_REQUEST,
+    //     new Error(errorMessage).message
+    //   )
+    // }
 
     // Lấy vai trò hiện tại từ cơ sở dữ liệu
     const roleUser = await RoleUser.findOneAndUpdate(
@@ -133,15 +132,16 @@ export const updateRole = async (req, res, next) => {
 
 // Xóa vai trò
 
-//b1
-// async function deleteRole(roleId) {
-//   await RoleUser.findByIdAndDelete(roleId);
-// }
-
 export const deleteRole = async (req, res, next) => {
   try {
     const roleId = req.params.id // Lấy roleId từ yêu cầu
-    const id = '65984c549f4041a641e8dec3'
+    const roleNameUser = await RoleUser.findOne({ roleName: 'user' })
+
+    if (!roleNameUser && roleNameUser.length === 0) {
+      throw new ApiError(StatusCodes.CONFLICT, 'This role is not exist in database')
+    }
+    const id = roleNameUser._id
+
 
     // Tìm vai trò trong cơ sở dữ liệu dựa trên roleId
     const roleUser = await RoleUser.findById(roleId)
@@ -170,23 +170,50 @@ export const deleteRole = async (req, res, next) => {
   }
 }
 
-// Sử dụng các phương thức CRUD theo dạng liên tục
-// createRole('Admin', 'Active', ['userId1', 'userId2'])
-//   .then(createdRole => {
-//     console.log('Vai trò mới:', createdRole);
-//     return getRole(createdRole._id);
-//   })
-//   .then(role => {
-//     console.log('Thông tin vai trò:', role);
-//     return updateRole(role._id, { status: 'Inactive' });
-//   })
-//   .then(updatedRole => {
-//     console.log('Vai trò đã cập nhật:', updatedRole);
-//     return deleteRole(updatedRole._id);
-//   })
-//   .then(() => {
-//     console.log('Vai trò đã được xóa.');
-//   })
-//   .catch(error => {
-//     console.error('Lỗi:', error);
-//   });
+export const getAll = async (req, res, next) => {
+  try {
+    const roles = await RoleUser.find() // Lấy tất cả các vai trò từ cơ sở dữ liệu
+
+    res.status(StatusCodes.OK).json(roles) // Trả về danh sách vai trò dưới dạng JSON
+  } catch (error) {
+    next(error)
+  }
+}
+
+// export const addUserToRole = async (req, res, next) => {
+//   try {
+//   const roleId = req.params.id; // Lấy roleId từ yêu cầu
+//   const userId = req.body.userId; // Lấy userId từ yêu cầu
+
+//   // Tìm vai trò trong cơ sở dữ liệu dựa trên roleId
+//   const roleUser = await RoleUser.findById(roleId);
+//   if (!roleUser) {
+//   throw new ApiError(StatusCodes.NOT_FOUND, 'User role ID not found');
+//   }
+
+//   // Lấy danh sách userIds hiện tại của vai trò
+//   const userIds = roleUser.userIds;
+
+//   // Kiểm tra xem userId đã tồn tại trong danh sách userIds hay chưa
+//   if (userIds.includes(userId)) {
+//          throw ApiError(StatusCodes.BAD_REQUEST, 'User ID already exists in the role');
+//   }
+
+//   // Thêm userId mới vào mảng userIds
+//   userIds.push(userId);
+
+//   // Cập nhật vai trò với danh sách userIds đã cập nhật
+//   await RoleUser.findByIdAndUpdate(roleId, { userIds });
+
+//   // Thêm roleId vào mảng roleIds của người dùng
+//   await User.updateMany(
+//   { _id: userId },
+//   { $addToSet: { roleIds: roleId } }
+//   );
+
+//   res.status(StatusCodes.OK).json({ message: 'Success', data: roleUser });
+//   catch (error) {
+//   console.error('Error:', error);
+//   res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'An error occurred while adding user to the role.' });
+//   }
+//   };

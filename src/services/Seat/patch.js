@@ -59,7 +59,7 @@ export const updateService = async (reqBody) => {
     // Nếu như screen của ghế đang được sửa có trạng thái là full
     // và ghế đang được sửa thành có trạng thái available và reserved
     // thì chuyển trạng thái screen sang available
-    
+
 
     if (isScreenFull) {
       if (isBodyStatusValid) {
