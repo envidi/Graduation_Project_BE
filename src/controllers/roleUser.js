@@ -8,37 +8,37 @@ import User from '../model/user.js'
 export const createRole = async (req, res, next) => {
   try {
     const body = req.body
-
-    // Xác thực dữ liệu đầu vào
     const { error } = roleUserValidate.validate(body, { abortEarly: true })
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
-
-    if (body.roleName === 'admin') {
+    const roleNameUser = await RoleUser.findOne({ roleName: 'admin' })
+    // kiểm tra nó đã tồn tại admin hay chưa
+    if (roleNameUser && Object.keys(roleNameUser).length > 0) {
       throw new ApiError(
-        StatusCodes.NOT_FOUND,
-        'The role "admin" already exists'
+        StatusCodes.CONFLICT,
+        'This role "admin" has already in database'
       )
     }
     const data = await RoleUser.create({
       ...body
     })
-
+    // kiểm tra data nó đã tồn tại hay chưa
     if (!data) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Role creation failed')
     }
+
     const roleId = data._id
     const userIds = data.userIds || []
     const usersWithRoleId = await User.find({ roleIds: roleId })
-
+    // kiểm tra roleids nó có tồn tại hay không
     if (usersWithRoleId.length > 0) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
         'The role has already been assigned to some users'
       )
     }
-    const updatedUsers = await User.updateMany(
+    await User.updateMany(
       { _id: { $in: userIds } },
       { $set: { roleIds: roleId } },
       { new: true }
@@ -79,22 +79,10 @@ export const updateRole = async (req, res, next) => {
     const roleId = req.params.id
     const updates = req.body
 
-    // Xác thực thông tin cập nhật
-    // const validationResult = roleUserValidate.validate(updates)
-    // if (validationResult.error) {
-    //   const errorMessage = validationResult.error.details
-    //     .map((err) => err.message)
-    //     .join(', ')
-    //   throw new ApiError(
-    //     StatusCodes.BAD_REQUEST,
-    //     new Error(errorMessage).message
-    //   )
-    // }
-
     // Lấy vai trò hiện tại từ cơ sở dữ liệu
-    const roleUser = await RoleUser.findOneAndUpdate(
-      { _id: roleId },
-      { $set: { userIds: updates.userIds } },
+    const roleUser = await RoleUser.findByIdAndUpdate(
+      roleId,
+      { userIds: updates.userIds },
       { new: true, fields: { userIds: 1 } }
     )
 
@@ -106,7 +94,7 @@ export const updateRole = async (req, res, next) => {
     if (roleUser.userIds.length > 0) {
       await User.updateMany(
         { _id: { $in: roleUser.userIds } },
-        { $set: { roleIds: roleId } }
+        { $addToSet: { roleIds: roleId } }
       )
     }
 
@@ -117,11 +105,11 @@ export const updateRole = async (req, res, next) => {
     if (deletedRolesFromRoleUser.length > 0) {
       await User.updateMany(
         { _id: { $in: deletedRolesFromRoleUser } },
-        { $set: { roleIds: roleId } }
+        { $pull: { roleIds: roleId } }
       )
     }
 
-    res.status(StatusCodes.OK).json({
+    return res.status(StatusCodes.OK).json({
       message: 'Success',
       data: roleUser
     })
@@ -136,13 +124,14 @@ export const deleteRole = async (req, res, next) => {
   try {
     const roleId = req.params.id // Lấy roleId từ yêu cầu
     const roleNameUser = await RoleUser.findOne({ roleName: 'user' })
-
+    //
     if (!roleNameUser && roleNameUser.length === 0) {
-      throw new ApiError(StatusCodes.CONFLICT, 'This role is not exist in database')
+      throw new ApiError(
+        StatusCodes.CONFLICT,
+        'This role is not exist in database'
+      )
     }
     const id = roleNameUser._id
-
-
     // Tìm vai trò trong cơ sở dữ liệu dựa trên roleId
     const roleUser = await RoleUser.findById(roleId)
     if (!roleUser) {
@@ -164,7 +153,9 @@ export const deleteRole = async (req, res, next) => {
     // Xóa vai trò trong cơ sở dữ liệu dựa trên roleId
     await RoleUser.findByIdAndDelete(roleId)
 
-    res.status(StatusCodes.OK).json({ message: 'Success', data: roleUser }) // Trả về kết quả thành công dưới dạng JSON
+    return res
+      .status(StatusCodes.OK)
+      .json({ message: 'Success', data: roleUser })
   } catch (error) {
     next(error)
   }
