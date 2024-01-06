@@ -43,9 +43,9 @@ export const getDetail = async (req, res, next) => {
     }
 
     return res.status(StatusCodes.OK).json({
-      data: 
+      data:
         data
-      
+
     })
   } catch (error) {
     next(error)
