@@ -5,7 +5,7 @@ import mongoose from 'mongoose'
 
 import Seat from '../../model/Seat.js'
 import ApiError from '../../utils/ApiError.js'
-
+// Lấy
 export const getAllService = async (reqBody) => {
   try {
     const {
@@ -25,6 +25,7 @@ export const getAllService = async (reqBody) => {
         select: 'status'
       }
     }
+    // Lấy ra cả dữ liệu của bảng screenroom
     const data = await Seat.paginate({}, options)
     if (!data || data.docs.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No seats found!')

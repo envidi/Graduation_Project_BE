@@ -25,6 +25,7 @@ export const updateService = async (reqBody) => {
     const currentTimeSlot = await TimeSlot.findById(id).populate('SeatId')
     const seatIds = await TimeSlot.findById(id)
 
+    // Kiểm tra xem timeslot hiện tại có ghế nào ở trạng thái đã bán chưa
     const currentTimeSlotSeats = currentTimeSlot.SeatId.some(
       (seat) => seat.status === SOLD
     )
@@ -34,11 +35,15 @@ export const updateService = async (reqBody) => {
         'Some seat in this timeslot is sold. Can not edit it!'
       )
     }
+    // Lấy ra screen cũ
     const screenRoomOld = await ScreenRoom.findById(
       currentTimeSlot.ScreenRoomId
     )
-
+    // Lấy ra screen mới
     const screenRoomNew = await ScreenRoom.findById(body.ScreenRoomId)
+    // Cập nhật screen mới , thêm timeslot hiện tại vào screen mới
+    // Cập nhật screen cũ , xóa timeslot hiện tại khỏi screen cũ
+    // Đặt lại screen id trong tất cả ghế của timeslot hiện tại
     let promises = [
       ScreenRoom.updateOne(
         { _id: screenRoomNew._id },
@@ -69,6 +74,7 @@ export const updateService = async (reqBody) => {
         }
       )
     ]
+    // Nếu như screen id mới không tồn tại trong database thì không cho phép sửa
     if (!screenRoomNew && Object.keys(screenRoomNew).length === 0) {
       throw new ApiError(
         StatusCodes.NOT_FOUND,
