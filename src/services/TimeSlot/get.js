@@ -2,7 +2,7 @@
 import { StatusCodes } from 'http-status-codes'
 import mongoose from 'mongoose'
 
-import ScreeningRoom from '../../model/ScreenRoom.js'
+import TimeSlot from '../../model/TimeSlot.js'
 import ApiError from '../../utils/ApiError.js'
 
 export const getAllService = async (reqBody) => {
@@ -17,21 +17,16 @@ export const getAllService = async (reqBody) => {
       page: _page,
       limit: _limit,
       sort: {
-        [_sort]: _order === 'asc' ? 1 : -1,
-
+        [_sort]: _order === 'asc' ? 1 : -1
       },
-      populate : {
-        path : 'TimeSlotId',
-        populate : { 
-          path : 'SeatId',
-          select : 'status'
-        }
+      populate: {
+        path: 'SeatId',
+        select: 'TimeSlotId typeSeat status'
       }
-
     }
-    const data = await ScreeningRoom.paginate({ destroy: false }, options)
+    const data = await TimeSlot.paginate({ destroy: false }, options)
     if (!data || data.docs.length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'No screening rooms found!')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No timeslot found!')
     }
     return data
   } catch (error) {
@@ -42,9 +37,9 @@ export const getAllService = async (reqBody) => {
 export const getOneService = async (reqBody) => {
   try {
     const id = reqBody.params.id
-    // const data = await ScreeningRoom.findById(id)
-    // Lấy dữ liệu từ bảng categories khi query data từ bảng ScreeningRoom
-    const data = await ScreeningRoom.aggregate([
+    // const data = await TimeSlot.findById(id)
+    // Lấy dữ liệu từ bảng categories khi query data từ bảng TimeSlot
+    const data = await TimeSlot.aggregate([
       {
         $match: {
           _id: new mongoose.Types.ObjectId(id)
@@ -62,8 +57,8 @@ export const getOneService = async (reqBody) => {
         $project: {
           name: 1,
           status: 1,
-          CinemaId: 1,
-          show_scheduleId: 1,
+          Show_scheduleId: 1,
+          ScreenRoomId: 1,
           SeatColumn: 1,
           createdAt: 1,
           updatedAt: 1
@@ -71,7 +66,7 @@ export const getOneService = async (reqBody) => {
       }
     ])
     if (!data || data.length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'No screening rooms found!')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No timeslot found!')
     }
     return data
   } catch (error) {
@@ -95,12 +90,12 @@ export const getAllIncludeDestroyService = async (reqBody) => {
       },
       populate: {
         path: 'SeatId',
-        select: 'ScreeningRoomId typeSeat status'
+        select: 'TimeSlotId typeSeat status'
       }
     }
-    const data = await ScreeningRoom.paginate({}, options)
+    const data = await TimeSlot.paginate({}, options)
     if (!data || data.docs.length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'No screening rooms found!')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No timeslot found!')
     }
     return data
   } catch (error) {

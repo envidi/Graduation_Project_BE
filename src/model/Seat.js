@@ -46,6 +46,17 @@ const seatChema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref : 'ScreeningRoom',
     required: true
+  },
+  ShowScheduleId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref : 'ShowSchedule',
+    required: true
+  }
+  ,
+  TimeSlotId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref : 'TimeSlot',
+    required: true
   }
 }, {
   timestamps: true, versionKey: false

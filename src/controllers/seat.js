@@ -1,20 +1,17 @@
 // import Product from '../models/Product.js';
-import Seat, { AVAILABLE, RESERVED, SOLD, UNAVAILABLE } from '../model/Seat.js'
-import { AVAILABLE as AvailableRoomStatus } from '../model/ScreenRoom.js'
-import seatChema from '../validations/seat.js'
 import { StatusCodes } from 'http-status-codes'
-import ApiError from '../utils/ApiError.js'
-import ScreenRoom, { FULL } from '../model/ScreenRoom.js'
-import { seatService } from '../services/Seat/index.js'
 
-export async function checkAndUpdateScreen(screenId, statusRoom) {
+import { seatService } from '../services/Seat/index.js'
+import TimeSlot from '../model/TimeSlot.js'
+
+export async function checkAndUpdateTimeSlot(timeSlotId, statusTimeSlot) {
   //...
-  await ScreenRoom.updateOne(
+  await TimeSlot.updateOne(
     {
-      _id: screenId
+      _id: timeSlotId
     },
     {
-      status: statusRoom
+      status: statusTimeSlot
     }
   )
 }
