@@ -1,10 +1,7 @@
 /* eslint-disable no-useless-catch */
-import Seat, {
-  SOLD
-} from '../../model/Seat.js'
+import Seat, { SOLD, UNAVAILABLE } from '../../model/Seat.js'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../utils/ApiError.js'
-
 
 export const removeService = async (reqBody) => {
   try {
@@ -14,10 +11,10 @@ export const removeService = async (reqBody) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Seat id is not found!')
     }
     const oldSeat = await Seat.findById(id)
-    if (oldSeat.status === SOLD) {
+    if ([UNAVAILABLE, SOLD].includes(oldSeat.status)) {
       throw new ApiError(
         StatusCodes.CONFLICT,
-        'This seat is sold. Can not delete it!'
+        'This seat is sold or unavailable. Can not delete it!'
       )
     }
     const data = await Seat.deleteOne({ _id: id })

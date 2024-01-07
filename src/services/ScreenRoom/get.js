@@ -94,8 +94,8 @@ export const getAllIncludeDestroyService = async (reqBody) => {
         [_sort]: _order === 'asc' ? 1 : -1
       },
       populate: {
-        path: 'SeatId',
-        select: 'ScreeningRoomId typeSeat status'
+        path: 'TimeSlotId',
+        select: 'ScreeningRoomId SeatId status destroy'
       }
     }
     const data = await ScreeningRoom.paginate({}, options)

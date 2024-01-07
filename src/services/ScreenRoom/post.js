@@ -8,6 +8,7 @@ import ScreeningRoomSchema from '../../validations/screenRoom.js'
 import ScreeningRoom from '../../model/ScreenRoom.js'
 import ApiError from '../../utils/ApiError.js'
 import { slugify } from '../../utils/stringToSlug.js'
+import Cinema from '../../model/Cinema.js'
 
 export const insertSeatIntoScreen = async (rowCount, columnCount, data) => {
   for (let row = 1; row <= rowCount; row++) {
@@ -50,7 +51,6 @@ export const createService = async (reqBody) => {
   try {
     const body = reqBody.body
 
-
     const { error } = ScreeningRoomSchema.validate(body, { abortEarly: true })
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
@@ -66,7 +66,19 @@ export const createService = async (reqBody) => {
         'Create screening rooms failed!'
       )
     }
-
+    const updateCinema = await Cinema.findByIdAndUpdate(
+      {
+        _id: body.CinemaId
+      },
+      {
+        $addToSet: {
+          ScreeningRoomId: data._id
+        }
+      }
+    )
+    if (!updateCinema) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Update cinema failed')
+    }
 
     return await findSingleDocument(data._id)
   } catch (error) {

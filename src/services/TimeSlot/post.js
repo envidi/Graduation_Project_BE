@@ -27,9 +27,9 @@ export const insertSeatIntoScreen = async (rowCount, columnCount, data) => {
 
       // Add the new seat with seat type
       const dataSeat = await Seat.create({
-        ShowScheduleId : data.Show_scheduleId,
+        ShowScheduleId: data.Show_scheduleId,
         ScreeningRoomId: data.ScreenRoomId,
-        TimeSlotId : data._id,
+        TimeSlotId: data._id,
         row,
         column,
         typeSeat: seatTypeToUse,
@@ -62,26 +62,25 @@ export const createService = async (reqBody) => {
     })
 
     if (!data) {
-      throw new ApiError(
-        StatusCodes.NOT_FOUND,
-        'Create timeslot failed!'
-      )
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Create timeslot failed!')
     }
     // Thêm 25 ghế vào room hiện tại
+    // Cập nhật nhật vào timeslot những ghế đã được tạo
+    // cập nhật screen , thêm time slot được tạo vào mảng timeSlotId trong model screen
     await Promise.all([
       insertSeatIntoScreen(rowCount, columnCount, data),
-      ScreenRoom.updateOne({ _id : data.ScreenRoomId }, {
-        $addToSet : {
-          TimeSlotId : data._id
+      ScreenRoom.updateOne(
+        { _id: data.ScreenRoomId },
+        {
+          $addToSet: {
+            TimeSlotId: data._id
+          }
         }
-      })
+      )
     ])
-
 
     return await findSingleDocument(data._id)
   } catch (error) {
     throw error
   }
 }
-
-
