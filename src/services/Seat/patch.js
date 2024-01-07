@@ -5,12 +5,13 @@ import Seat, {
   SOLD,
   UNAVAILABLE
 } from '../../model/Seat.js'
-import { AVAILABLE as AvailableRoomStatus } from '../../model/ScreenRoom.js'
+import { AVAILABLE as AvailableRoomStatus } from '../../model/TimeSlot.js'
 import seatChema from '../../validations/seat.js'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../utils/ApiError.js'
-import ScreenRoom, { FULL } from '../../model/ScreenRoom.js'
-import { checkAndUpdateScreen } from '../../controllers/seat.js'
+import { FULL } from '../../model/TimeSlot.js'
+import { checkAndUpdateTimeSlot } from '../../controllers/seat.js'
+import TimeSlot from '../../model/TimeSlot.js'
 
 export const updateService = async (reqBody) => {
   try {
@@ -25,15 +26,14 @@ export const updateService = async (reqBody) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
 
-    const data = await Seat.findById(id)
-    const dataScreen = await ScreenRoom.findById(
-      data.ScreeningRoomId,
-      'destroy status'
-    )
+    const dataTimeSlot = await TimeSlot.findOne({ _id : body.TimeSlotId }).populate('SeatId')
 
-    // Nếu như bảng screen room mà ghế đang tồn tại bên trong đó đã bị xóa mềm
+    const dataSeat = await Seat.findOne({ _id : id })
+
+
+    // Nếu như bảng timeslot mà ghế đang tồn tại bên trong đó đã bị xóa mềm
     // và ghế đang muốn sửa có trạng thái là unavailable thì không thể cập nhật
-    if (dataScreen.destroy === true && data.status === UNAVAILABLE) {
+    if (dataTimeSlot.destroy || dataSeat.status === UNAVAILABLE) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
         'This seat is unavailable to edit'
@@ -45,25 +45,23 @@ export const updateService = async (reqBody) => {
       { $set: { status: body.status } }
     )
 
-    const isScreenFull = dataScreen.status === FULL
+    const isTimeSlotFull = dataTimeSlot.status === FULL
     const isBodyStatusValid = [AVAILABLE, RESERVED].includes(body.status)
-    // Nếu như tất cả ghế có trạng thái là SOLD thì phòng chiếu tất cả
+    // Nếu như tất cả ghế có trạng thái là SOLD thì timeslot tất cả
     // ghế đó sẽ chuyển thành trạng thái là full
-    const allSeat = await Seat.find({}, 'status')
     if (body.status === SOLD) {
-      const allSeatIsSold = allSeat.every((seat) => seat.status === SOLD)
+      const allSeatIsSold = dataTimeSlot.SeatId.every((seat) => seat.status === SOLD)
       if (allSeatIsSold) {
-        await checkAndUpdateScreen(data.ScreeningRoomId, FULL)
+        await checkAndUpdateTimeSlot(dataTimeSlot._id, FULL)
       }
     }
-    // Nếu như screen của ghế đang được sửa có trạng thái là full
+    // Nếu như timeslot của ghế đang được sửa có trạng thái là full
     // và ghế đang được sửa thành có trạng thái available và reserved
     // thì chuyển trạng thái screen sang available
 
-
-    if (isScreenFull) {
+    if (isTimeSlotFull) {
       if (isBodyStatusValid) {
-        await checkAndUpdateScreen(data.ScreeningRoomId, AvailableRoomStatus)
+        await checkAndUpdateTimeSlot(dataTimeSlot._id, AvailableRoomStatus)
       }
     }
 

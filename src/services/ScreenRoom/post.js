@@ -29,6 +29,7 @@ export const insertSeatIntoScreen = async (rowCount, columnCount, data) => {
 
       const dataSeat = await Seat.create({
         ScreeningRoomId: data._id,
+        // ShowScheduleId : data. ,
         row,
         column,
         typeSeat: seatTypeToUse,
@@ -48,8 +49,7 @@ export const insertSeatIntoScreen = async (rowCount, columnCount, data) => {
 export const createService = async (reqBody) => {
   try {
     const body = reqBody.body
-    const rowCount = 2
-    const columnCount = 2
+
 
     const { error } = ScreeningRoomSchema.validate(body, { abortEarly: true })
     if (error) {
@@ -66,8 +66,7 @@ export const createService = async (reqBody) => {
         'Create screening rooms failed!'
       )
     }
-    // Thêm 25 ghế vào room hiện tại
-    await insertSeatIntoScreen(rowCount, columnCount, data)
+
 
     return await findSingleDocument(data._id)
   } catch (error) {
