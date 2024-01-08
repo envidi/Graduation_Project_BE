@@ -131,6 +131,7 @@ export const remove = async (req, res, next) => {
     if (!data) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete MoviePrice failed!')
     }
+
     return res.status(StatusCodes.OK).json({
       message: 'Success!',
       data
