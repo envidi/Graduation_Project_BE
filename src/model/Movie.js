@@ -27,11 +27,11 @@ const productSchema = mongoose.Schema(
       required: true
     },
     fromDate: {
-      type: Date,
+      type: String,
       required: true
     },
     toDate: {
-      type: Date,
+      type: String,
       required: true
     },
     author: {
@@ -78,10 +78,15 @@ const productSchema = mongoose.Schema(
     slug: {
       type: String
     },
-    destroy: {
-      type: Boolean,
-      default: false
-    }
+    destroy : {
+      type : Boolean,
+      default : false
+    },
+    showTimes : [
+      {
+        type : mongoose.Types.ObjectId,
+        ref : "Showtimes"
+    }]
   },
   { versionKey: false, timestamps: true }
 )

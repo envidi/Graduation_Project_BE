@@ -20,7 +20,12 @@ const ScreenRoomSchema = mongoose.Schema(
     destroy: {
       type: Boolean,
       default: false
-    }
+    },
+    showTimes : [
+      {
+        type : mongoose.Types.ObjectId,
+        ref : "Showtimes",
+    }]
   },
   { versionKey: false, timestamps: true }
 )

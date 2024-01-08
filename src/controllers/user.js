@@ -9,6 +9,7 @@ import { AccessTokenUser } from '../middleware/jwt.js'
 import userValidate from '../validations/user.js'
 
 export const register = asyncHandler(async (req, res) => {
+  
   const body = req.body
 
   const { error } = userValidate.validate(body, { abortEarly: true })
