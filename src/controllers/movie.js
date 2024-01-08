@@ -45,6 +45,7 @@ export const getAll = async (req, res, next) => {
       movie.price = priceObject ? priceObject.price : null
     })
 
+
     return res.status(StatusCodes.OK).json({
       message: 'Success',
       datas: {
