@@ -14,17 +14,30 @@ export const createRole = async (req, res, next) => {
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message);
     }
+
+    const roleNameAdmin = await RoleUser.find({ roleName: 'admin' })
+    // kiểm tra nó đã tồn tại admin hay chưa
+      if (body.roleName ==="admin"&&roleNameAdmin && Object.keys(roleNameAdmin).length >0) {
+        throw new ApiError(StatusCodes.CONFLICT, 'This role "admin" is not exist in database')
+    }
+    
+    const roleNameUser = await RoleUser.find({ roleName: 'user' })
+    // kiểm tra nó đã tồn tại user hay chưa
+      if (body.roleName ==="user"&&roleNameUser && Object.keys(roleNameUser).length >0) {
+        throw new ApiError(StatusCodes.CONFLICT, 'This role "user" is not exist in database')
+    }
+    const roleNameQuanLi = await RoleUser.find({ roleName: 'quan li' })
+    // kiểm tra nó đã tồn tại user hay chưa
+      if (body.roleName ==="quan li"&&roleNameQuanLi && Object.keys(roleNameQuanLi).length >0) {
+        throw new ApiError(StatusCodes.CONFLICT, 'This role "quan li" is not exist in database')
+    }
+    
     const data = await RoleUser.create({
       ...body,
     });
     // kiểm tra data nó đã tồn tại hay chưa
     if (!data) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Role creation failed');
-    }
-    const roleNameUser = await RoleUser.findOne({ roleName: 'admin' })
-    // kiểm tra nó đã tồn tại admin hay chưa
-    if (roleNameUser && Object.keys(roleNameUser).length >0) {
-      throw new ApiError(StatusCodes.CONFLICT, 'This role "admin" is not exist in database')
     }
     
     const roleId = data._id;
@@ -92,7 +105,7 @@ export const updateRole = async (req, res, next) => {
     if (roleUser.userIds.length > 0) {
       await User.updateMany(
         { _id: { $in: roleUser.userIds } },
-        { $addToSet: { roleIds: roleId } }
+        { $set: { roleIds: roleId } }
       );
     }
 
@@ -101,7 +114,7 @@ export const updateRole = async (req, res, next) => {
     if (deletedRolesFromRoleUser.length > 0) {
       await User.updateMany(
         { _id: { $in: deletedRolesFromRoleUser } },
-        { $pull: { roleIds: roleId } }
+        { $set: { roleIds: roleId } }
       );
     }
 
@@ -142,7 +155,7 @@ export const deleteRole = async (req, res, next) => {
 
     // Tìm và cập nhật các user có userIds đúng với danh sách userIds của vai trò đang được xóa
     await User.updateMany({ _id: { $in: userIds } }, { $set: { roleIds: id } });
-
+    
     // Xóa vai trò trong cơ sở dữ liệu dựa trên roleId
     await RoleUser.findByIdAndDelete(roleId);
 

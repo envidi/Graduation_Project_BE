@@ -1,9 +1,12 @@
 import mongoose from 'mongoose';
 
+const limitRoleName=["admin","manager","user"];
 const roleUserSchema = new mongoose.Schema({
   roleName: {
     type: String,
     default: "user",
+    unique:true,
+    enum:limitRoleName,
     required: true
   },
   status: {
