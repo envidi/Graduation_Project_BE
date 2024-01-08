@@ -16,6 +16,8 @@ export const RESERVED = 'Reserved'
 //hoặc vấn đề kỹ thuật khác
 export const UNAVAILABLE = 'Unavailable'
 export const statusSeat = [AVAILABLE, SOLD, RESERVED, UNAVAILABLE]
+export const NORMAL = 'normal'
+export const VIP = 'VIP'
 
 const seatChema = new mongoose.Schema({
   typeSeat: {
@@ -43,6 +45,17 @@ const seatChema = new mongoose.Schema({
   ScreeningRoomId: {
     type: mongoose.Schema.Types.ObjectId,
     ref : 'ScreeningRoom',
+    required: true
+  },
+  ShowScheduleId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref : 'ShowSchedule',
+    required: true
+  }
+  ,
+  TimeSlotId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref : 'TimeSlot',
     required: true
   }
 }, {

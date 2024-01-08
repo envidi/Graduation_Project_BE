@@ -1,3 +1,4 @@
+import mongoosePaginate from 'mongoose-paginate-v2'
 import mongoose from 'mongoose'
 
 const CinemaSchema = new mongoose.Schema({
@@ -23,8 +24,10 @@ const CinemaSchema = new mongoose.Schema({
       }
     ],
     default: []
-  },
-  
+  }
+}, {
+  timestamps : true
 })
+CinemaSchema.plugin(mongoosePaginate)
 
 export default mongoose.model('Cinema', CinemaSchema)

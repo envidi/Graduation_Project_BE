@@ -46,9 +46,9 @@ export const login = asyncHandler(async (req, res) => {
 
   if (response && isMatch) {
     // const { password, role, refreshToken, ...userData } = response.toObject()
-    const { role, ...userData } = response.toObject()
+    const { roleIds, ...userData } = response.toObject()
     // AccessToken dùng để xác thực người dùng, phân quyền
-    const Accesstoken = AccessTokenUser(response._id, role)
+    const Accesstoken = AccessTokenUser(response._id, roleIds)
 
     await User.findByIdAndUpdate(response._id, { new: true })
     return res.status(200).json({

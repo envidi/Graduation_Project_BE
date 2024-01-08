@@ -1,9 +1,9 @@
 import { StatusCodes } from 'http-status-codes'
-import { screenRoomService } from '../services/ScreenRoom/index.js'
+import { timeSlotService } from '../services/TimeSlot/index.js'
 
 export const getAll = async (req, res, next) => {
   try {
-    const data = await screenRoomService.getAllService(req)
+    const data = await timeSlotService.getAllService(req)
 
     return res.status(StatusCodes.OK).json({
       message: 'Success',
@@ -15,7 +15,7 @@ export const getAll = async (req, res, next) => {
 }
 export const getAllInCludeDestroy = async (req, res, next) => {
   try {
-    const data = await screenRoomService.getAllIncludeDestroyService(req)
+    const data = await timeSlotService.getAllIncludeDestroyService(req)
 
     return res.status(StatusCodes.OK).json({
       message: 'Success',
@@ -28,7 +28,7 @@ export const getAllInCludeDestroy = async (req, res, next) => {
 
 export const getDetail = async (req, res, next) => {
   try {
-    const data = await screenRoomService.getOneService(req)
+    const data = await timeSlotService.getOneService(req)
 
     return res.status(StatusCodes.OK).json({
       message: 'Success',
@@ -41,7 +41,7 @@ export const getDetail = async (req, res, next) => {
 
 export const update = async (req, res, next) => {
   try {
-    const updateData = await screenRoomService.updateService(req)
+    const updateData = await timeSlotService.updateService(req)
 
     return res.status(StatusCodes.OK).json({
       message: 'Success!',
@@ -54,7 +54,7 @@ export const update = async (req, res, next) => {
 
 export const createForPostMan = async (req, res, next) => {
   try {
-    const data = await screenRoomService.createForPostManService(req)
+    const data = await timeSlotService.createForPostManService(req)
 
     return res.status(StatusCodes.OK).json({
       message: 'Success',
@@ -67,7 +67,7 @@ export const createForPostMan = async (req, res, next) => {
 
 export const createForFe = async (req, res, next) => {
   try {
-    const data = await screenRoomService.createService(req)
+    const data = await timeSlotService.createService(req)
 
     return res.status(StatusCodes.OK).json({
       message: 'Success',
@@ -80,7 +80,7 @@ export const createForFe = async (req, res, next) => {
 
 export const deleteSoft = async (req, res, next) => {
   try {
-    const data = await screenRoomService.deleteSoftService(req)
+    const data = await timeSlotService.deleteSoftService(req)
 
     return res.status(StatusCodes.OK).json({
       message: 'Success!',
@@ -92,7 +92,7 @@ export const deleteSoft = async (req, res, next) => {
 }
 export const restore = async (req, res, next) => {
   try {
-    const data = await screenRoomService.restoreService(req)
+    const data = await timeSlotService.restoreService(req)
 
     return res.status(StatusCodes.OK).json({
       message: 'Success!',
@@ -104,7 +104,7 @@ export const restore = async (req, res, next) => {
 }
 export const remove = async (req, res, next) => {
   try {
-    const data = await screenRoomService.removeService(req)
+    const data = await timeSlotService.removeService(req.params.id)
 
     return res.status(StatusCodes.OK).json({
       message: 'Success!',

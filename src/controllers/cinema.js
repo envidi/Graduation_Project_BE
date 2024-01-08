@@ -20,7 +20,8 @@ export const getAll = async (req, res, next) => {
         [_sort]: _order === 'asc' ? 1 : -1
       }
     }
-    const data = await Cinema.find({})
+    const data = await Cinema.paginate({}, options)
+
     if (!data || data.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No Cinema found!')
     }
@@ -43,9 +44,9 @@ export const getDetail = async (req, res, next) => {
     }
 
     return res.status(StatusCodes.OK).json({
-      data: 
+      data:
         data
-      
+
     })
   } catch (error) {
     next(error)
