@@ -22,7 +22,6 @@ export const getAll = async (req, res, next) => {
     if (!data || data.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No food found!')
     }
-    // console.log(data)
     return res.status(StatusCodes.OK).json({
       message: 'Success',
       data: data

@@ -27,6 +27,16 @@ const productSchema = Joi.object({
     )
     .min(1)
     .required()
+  // Movie Price
+  // movie_priceId: Joi.array()
+  //   .items(
+  //     Joi.object({
+  //       _id: Joi.string().required(),
+  //       name: Joi.string().required()
+  //     })
+  //   )
+  //   .min(1)
+  //   .required()
 }).options({
   abortEarly: false
 })
