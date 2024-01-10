@@ -51,6 +51,12 @@ export const getDetail = async (req, res, next) => {
 export const create = async (req, res, next) => {
   try {
     const body = req.body
+    //thêm đường dẫn ảnh vòa body
+    if (req.file) {
+      body.image = req.file.path;
+    }
+    console.log(body);
+
     const { error } = foodSchema.validate(body, { abortEarly: true })
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)

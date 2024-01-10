@@ -1,4 +1,5 @@
 import express from 'express';
+import { upload } from '../middleware/multer';
 import { getAll, getDetail, create, update, remove } from '../controllers/food';
 const routerFood = express.Router();
 
@@ -10,7 +11,13 @@ const routerFood = express.Router();
 
 routerFood.get('/', getAll);
 routerFood.get('/:id', getDetail);
-routerFood.post('/', create);
+// routerFood.post('/', create);
+
+// tải 1 file
+routerFood.post('/', upload.single('image'), create);
+// tải nhiều file
+// routerFood.post('/', upload.array('images', 5), create);
+
 routerFood.patch('/:id', update);
 routerFood.delete('/:id', remove);
 
