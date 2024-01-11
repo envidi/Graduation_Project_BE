@@ -18,7 +18,7 @@ routerFood.post('/', upload.single('image'), create);
 // tải nhiều file
 // routerFood.post('/', upload.array('images', 5), create);
 
-routerFood.patch('/:id', update);
+routerFood.patch('/:id', upload.single('image'), update);
 routerFood.delete('/:id', remove);
 
 

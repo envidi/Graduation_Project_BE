@@ -1,5 +1,5 @@
 import Food from '../model/Food'
-import foodSchema from '../validations/food'
+import foodValidationSchema from '../validations/food'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../utils/ApiError.js'
 // import findDifferentElements from '../utils/findDifferent.js'
@@ -9,8 +9,12 @@ export const getAll = async (req, res, next) => {
       _page = 1,
       _limit = 10,
       _sort = 'createdAt',
-      _order = 'asc'
-    } = req.body
+      _order = 'asc',
+      includeDeleted // Thêm tham số này để kiểm tra query parameter
+    } = req.query; // Sử dụng req.query thay vì req.body để nhận tham số từ query string
+
+    const queryCondition = includeDeleted === 'true' ? {} : { isDeleted: false }
+
     const options = {
       page: _page,
       limit: _limit,
@@ -18,7 +22,10 @@ export const getAll = async (req, res, next) => {
         [_sort]: _order === 'asc' ? 1 : -1
       }
     }
-    const data = await Food.paginate({}, options)
+    // const data = await Food.paginate({}, options)
+    // const data = await Food.paginate({ isDeleted: false }, options); // Chỉ lấy các thực phẩm chưa bị xóa mềm
+    const data = await Food.paginate(queryCondition, options);
+
     if (!data || data.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No food found!')
     }
@@ -35,7 +42,12 @@ export const getAll = async (req, res, next) => {
 export const getDetail = async (req, res, next) => {
   try {
     const id = req.params.id
-    const data = await Food.findById(id)
+    // const data = await Food.findById(id)
+    // const data = await Food.findOne({ _id: id, isDeleted: false }); // Kiểm tra thêm điều kiện không bị xóa mềm
+    const { includeDeleted } = req.query // lấy tham số includeDeleted từ query string
+    const queryCondition = includeDeleted === 'true' ? { _id: id } : { _id: id, isDeleted: false };
+    const data = await Food.findOne(queryCondition)
+
     if (!data || data.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Not food found!')
     }
@@ -57,7 +69,7 @@ export const create = async (req, res, next) => {
     }
     console.log(body);
 
-    const { error } = foodSchema.validate(body, { abortEarly: true })
+    const { error } = foodValidationSchema.validate(body, { abortEarly: true })
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
@@ -80,15 +92,33 @@ export const update = async (req, res, next) => {
   try {
     const id = req.params.id
     const body = req.body
+
+    // Thêm đường dẫn ảnh vào body
+    if (req.file) {
+      body.image = req.file.path;
+    }
+
     if (!id) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Id Food not found')
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Id Food not found')
     }
-    const { error } = foodSchema.validate(body, { abortEarly: true })
+
+    const { error } = foodValidationSchema.validate(body, { abortEarly: true })
     if (error) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
+      throw new ApiError(StatusCodes.BAD_REQUEST, error.details[0].message)
     }
-    const data = await Food.findByIdAndUpdate(id, body, { new: true })
-    if (!data) throw new ApiError(StatusCodes.NOT_FOUND, 'Update Food failed!')
+
+    // Kiểm tra xem thực phẩm có bị xóa mềm không trước khi cập nhật
+    const existingFood = await Food.findOne({ _id: id, isDeleted: false });
+    if (!existingFood) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Food not found or has been deleted!')
+    }
+
+    // Thực hiện cập nhật
+    const data = await Food.findByIdAndUpdate(id, body, { new: true });
+    if (!data) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Update Food failed!')
+    }
+
     return res.status(StatusCodes.OK).json({
       message: 'Success!',
       data: data
@@ -98,16 +128,18 @@ export const update = async (req, res, next) => {
   }
 }
 
-
 export const remove = async (req, res, next) => {
   try {
     const id = req.params.id
-    const data = await Food.findByIdAndDelete(id)
+    // const data = await Food.findByIdAndDelete(id)
+
+    // Cập nhật trường isDeleted thành true thay vì xóa bản ghi
+    const data = await Food.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
     if (!data) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete food failed!')
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Food not found or already deleted!')
     }
     return res.status(StatusCodes.OK).json({
-      message: 'Success!',
+      message: 'Food has been soft deleted!',
       data: data
     })
   } catch (error) {
