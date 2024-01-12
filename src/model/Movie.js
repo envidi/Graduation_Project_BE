@@ -62,12 +62,6 @@ const productSchema = mongoose.Schema(
       enum: [1, 2, 3, 4, 5],
       required: true
     },
-    show_scheduleId: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'ShowSchedule'
-      }
-    ],
     prices: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -78,15 +72,16 @@ const productSchema = mongoose.Schema(
     slug: {
       type: String
     },
-    destroy : {
-      type : Boolean,
-      default : false
+    destroy: {
+      type: Boolean,
+      default: false
     },
-    showTimes : [
+    showTimes: [
       {
-        type : mongoose.Types.ObjectId,
-        ref : "Showtimes"
-    }]
+        type: mongoose.Types.ObjectId,
+        ref: 'Showtimes'
+      }
+    ]
   },
   { versionKey: false, timestamps: true }
 )
