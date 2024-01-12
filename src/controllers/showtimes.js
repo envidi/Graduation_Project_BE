@@ -74,7 +74,8 @@ export const createShowTime = async (req, res, next) => {
     if (!response ) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No list Show found!')
     }
-  
+    const checkSeatInScreenRoom = ScreeningRoom.find({})
+    console.log("check seat" , checkSeatInScreenRoom);
     return res.status(StatusCodes.OK).json({
       message: 'Gọi  lịch chiếu thành công',
       response
@@ -87,25 +88,33 @@ export const createShowTime = async (req, res, next) => {
     
   }
 
-  export const deleteShow = async (req, res) => {
-    try {
-      const {id} = req.params
-      const response = await Showtimes.findByIdAndDelete(id)
-      if (!response ) {
-        throw new ApiError(StatusCodes.NOT_FOUND, ' Show not found!')
-      }
+    export const deleteShow = async (req, res) => {
+      try {
+        const {id} = req.params
       
-      return res.status(StatusCodes.OK).json({
-        message: 'Xóa  lịch chiếu thành công',
-        response
-      })
-    } catch (error) {
-      return res.status(StatusCodes.NOT_FOUND).json({
-        message : "Không tìm thấy lịch "
-      })
+        // check xem có ai đặt ghê chưa
+        const checkSeatInScreenRoom = await ScreeningRoom.findOne({SeatId : {$exists : true }})
+        console.log(" check ghe", checkSeatInScreenRoom);
+        if(checkSeatInScreenRoom) {
+          return res.status(400).json({
+            message:"Không thể xóa vì screenRoom đã có người đặt ghế rồi !!!"
+          })
+        }
+        const response = await Showtimes.findByIdAndDelete(id)
+        if (!response ) {
+          throw new ApiError(StatusCodes.NOT_FOUND, ' Show not found!')
+        }
+        return res.status(StatusCodes.OK).json({
+          message: 'Xóa  lịch chiếu thành công',
+          response
+        })
+      } catch (error) {
+        return res.status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR).json({
+          message: error.message || 'Internal Server Error'
+        });
+      }
+    
     }
-   
-  }
   
 
 export const updateShowTime = async (req, res) => {

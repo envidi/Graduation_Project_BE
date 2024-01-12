@@ -16,10 +16,10 @@ const routerUser = Router();
 routerUser.post('/register', register)
 routerUser.post('/login', login)
 routerUser.get('/', getAllUser)
-routerUser.get('/userDetail/:id', verifyAccessToken, getDetailUser)
+routerUser.get('/userDetail/:id', getDetailUser)
 routerUser.put('/updateUser', verifyAccessToken, updateUser)
 
-routerUser.put('/:id', verifyAccessToken, isAdmin, updateUserById)
+routerUser.put('/:id', updateUserById)
 routerUser.delete('/:id', verifyAccessToken, isAdmin, deleteUser)
 
 
