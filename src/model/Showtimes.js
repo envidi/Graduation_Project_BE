@@ -7,34 +7,31 @@ const ShowtimesSchema = mongoose.Schema(
   {
     screenRoomId: [
       {
-        type : mongoose.Types.ObjectId,
-        ref : "ScreeningRoom",
-    }],
+        type: mongoose.Types.ObjectId, 
+        ref: 'ScreeningRoom'
+      }
+    ],
 
     movieId: {
-        type : mongoose.Types.ObjectId,
-        ref : "Movie",
-
+      type: mongoose.Types.ObjectId,
+      ref: 'Movie'
     },
     date: {
-        type : String,
-        required : true
+      type: String,
+      required: true
     },
-    times :  {
-        type : String,
-        required : true
+    times: {
+      type: String,
+      required: true
     },
     status: {
       type: String,
-      default : AVAILABLE
-    },
-    
+      default: AVAILABLE
+    }
   },
   { versionKey: false, timestamps: true }
 )
 
-ShowtimesSchema
-.plugin(mongoosePaginate)
+ShowtimesSchema.plugin(mongoosePaginate)
 
-export default mongoose.model('Showtimes', ShowtimesSchema
-)
+export default mongoose.model('Showtimes', ShowtimesSchema)
