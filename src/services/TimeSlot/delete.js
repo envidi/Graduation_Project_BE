@@ -5,7 +5,7 @@ import Seat from '../../model/Seat.js'
 import TimeSlot from '../../model/TimeSlot.js'
 import ApiError from '../../utils/ApiError.js'
 import { SOLD, UNAVAILABLE, AVAILABLE } from '../../model/Seat.js'
-import ScreenRoom, { FULL } from '../../model/ScreenRoom.js'
+import ScreenRoom from '../../model/ScreenRoom.js'
 
 export const removeService = async (timeSlotId) => {
   try {
@@ -18,6 +18,8 @@ export const removeService = async (timeSlotId) => {
         'Cannot find timeslot with this id'
       )
     }
+    // Nếu như một số ghế trong timeslot có trạng thái là SOLD
+    // thì ko cho tiếp tục
     const isSeatSold = data.SeatId.some((seat) => seat.status === SOLD)
     if (isSeatSold) {
       throw new ApiError(
@@ -26,6 +28,7 @@ export const removeService = async (timeSlotId) => {
       )
     }
     let promises = [TimeSlot.deleteOne({ _id: data._id })]
+    // Xóa timeslot hiện tại khỏi mảng TimeSlotId trong model screenroom
     if (data.ScreenRoomId) {
       promises.push(
         ScreenRoom.updateOne(
@@ -38,6 +41,7 @@ export const removeService = async (timeSlotId) => {
         )
       )
     }
+    // Xóa hết tất cả ghế có timeslotid hiện tại
     if (data.SeatId && data.SeatId.length > 0) {
       promises.push(
         Seat.deleteMany({
@@ -63,8 +67,8 @@ export const deleteSoftService = async (reqBody) => {
       { _id: id },
       { populate: 'SeatId' }
     )
-    // Tìm kiếm trong screen rooom có seat nào có trong trạng thái SOLD không
-    // Nếu không thì không cho xóa
+    // Nếu như một số ghế trong timeslot có trạng thái là SOLD
+    // thì ko cho tiếp tục
     const isSold = checkTimeSlot.docs[0].SeatId.some((seat) => {
       return seat.status === SOLD
     })
@@ -85,6 +89,7 @@ export const deleteSoftService = async (reqBody) => {
         'Delete screening rooms failed!'
       )
     }
+    // Cập nhất tất cả ghế của timeslot hiện tại thành UNAVAILABLE
     const updateSeat = await Seat.updateMany(
       {
         _id: {
@@ -107,7 +112,7 @@ export const deleteSoftService = async (reqBody) => {
     throw error
   }
 }
-
+// Ngược lại delete soft
 export const restoreService = async (reqBody) => {
   try {
     const id = reqBody.params.id

@@ -27,11 +27,11 @@ const productSchema = mongoose.Schema(
       required: true
     },
     fromDate: {
-      type: Date,
+      type: String,
       required: true
     },
     toDate: {
-      type: Date,
+      type: String,
       required: true
     },
     author: {
@@ -62,12 +62,6 @@ const productSchema = mongoose.Schema(
       enum: [1, 2, 3, 4, 5],
       required: true
     },
-    show_scheduleId: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'ShowSchedule'
-      }
-    ],
     prices: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -81,7 +75,13 @@ const productSchema = mongoose.Schema(
     destroy: {
       type: Boolean,
       default: false
-    }
+    },
+    showTimes: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'Showtimes'
+      }
+    ]
   },
   { versionKey: false, timestamps: true }
 )

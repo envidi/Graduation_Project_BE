@@ -5,6 +5,8 @@ import Seat from '../../model/Seat.js'
 import ScreeningRoom from '../../model/ScreenRoom.js'
 import ApiError from '../../utils/ApiError.js'
 import { SOLD, UNAVAILABLE, AVAILABLE } from '../../model/Seat.js'
+import TimeSlot from '../../model/TimeSlot.js'
+import Cinema from '../../model/Cinema.js'
 
 export const removeService = async (reqBody) => {
   try {
@@ -20,7 +22,8 @@ export const removeService = async (reqBody) => {
       }
     )
     const timeSlots = data.docs[0].TimeSlotId
-
+    // Kiểm tra xem tất cả ghế trong khung giờ có trạng thái là sold không
+    // Nếu có thì không cho xóa
     timeSlots.forEach((timeSlots) => {
       const isSeatSold = timeSlots.SeatId.some((seat) => seat.status === SOLD)
       if (isSeatSold) {
@@ -37,9 +40,25 @@ export const removeService = async (reqBody) => {
         'Cannot find screen with this id'
       )
     }
-    let promises = [ScreeningRoom.deleteOne({ _id: id })]
-    for (let i = 0; i < timeSlots.length; i++) {
-      promises.push(timeSlotService.removeService(timeSlots[i]._id))
+    // Kéo screenroom bị xóa ra khỏi mảng screen room id trong model cinema
+    let promises = [
+      ScreeningRoom.deleteOne({ _id: id }),
+      Cinema.findByIdAndUpdate(
+        {
+          _id: data.docs[0].CinemaId
+        },
+        {
+          $pull: {
+            ScreeningRoomId: data.docs[0]._id
+          }
+        }
+      )
+    ]
+    // Xóa hết các timeslot trong screen room
+    if (timeSlots.length > 0) {
+      for (let i = 0; i < timeSlots.length; i++) {
+        promises.push(timeSlotService.removeService(timeSlots[i]._id))
+      }
     }
 
     const result = await Promise.all(promises)
@@ -60,47 +79,98 @@ export const removeService = async (reqBody) => {
 export const deleteSoftService = async (reqBody) => {
   try {
     const id = reqBody.params.id
-    const body = reqBody.body
+    // const body = reqBody.body
     const checkScreenRoom = await ScreeningRoom.paginate(
       { _id: id },
-      { populate: 'SeatId' }
+      {
+        populate: {
+          path: 'TimeSlotId',
+          populate: {
+            path: 'SeatId'
+          }
+        }
+      }
     )
-    // Tìm kiếm trong screen rooom có seat nào có trong trạng thái SOLD không
-    // Nếu không thì không cho xóa
-    const isSold = checkScreenRoom.docs[0].SeatId.some((seat) => {
-      return seat.status === SOLD
+    const timeSlotIds = await ScreeningRoom.paginate(
+      {
+        _id: id
+      },
+      {
+        populate: {
+          path: 'TimeSlotId',
+          select: '_id SeatId'
+        }
+      }
+    )
+    // Tìm kiếm trong tất cả timeslot xem có ghế nào ở trạng thái được bán không
+    // Nếu có thì không cho xóa
+    const timeSlots = checkScreenRoom.docs[0].TimeSlotId
+    timeSlots.forEach((timeSlot) => {
+      const isSeatSold = timeSlot.SeatId.some((seat) => seat.status === SOLD)
+      if (isSeatSold) {
+        throw new ApiError(
+          StatusCodes.CONFLICT,
+          'Some seat in this screen is already sold'
+        )
+      }
     })
-
-    if (isSold) {
-      throw new ApiError(
-        StatusCodes.CONFLICT,
-        'Seat in this screen room is sold. Cant delete it!'
-      )
-    }
-    const data = await ScreeningRoom.findOneAndUpdate({ _id: id }, body, {
-      new: true
-    })
+    // Cập nhật screen room thành đã bị xóa mềm
+    const data = await ScreeningRoom.findByIdAndUpdate(
+      { _id: id },
+      {
+        destroy: true
+      },
+      {
+        new: true
+      }
+    )
     if (!data) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
         'Delete screening rooms failed!'
       )
     }
+    let promises = []
+    // Cập nhật tất cả timeslot trong screen thành đã bị xóa mềm
+    if (
+      timeSlotIds.docs[0].TimeSlotId &&
+      timeSlotIds.docs[0].TimeSlotId.length > 0
+    ) {
+      promises.push(
+        TimeSlot.updateMany(
+          {
+            _id: {
+              $in: timeSlotIds.docs[0].TimeSlotId
+            }
+          },
+          {
+            destroy: true
+          }
+        )
+      )
+    }
+    // Cập nhật tất cả ghế trong tất cả timeslot
+    // trong screen thành trạng thái unavailable
+    timeSlotIds.docs[0].TimeSlotId.forEach((timeSlot) => {
+      promises.push(
+        Seat.updateMany(
+          {
+            _id: {
+              $in: timeSlot.SeatId
+            }
+          },
+          {
+            status: UNAVAILABLE
+          }
+        )
+      )
+    })
 
-    const updateSeat = await Seat.updateMany(
-      {
-        _id: {
-          $in: data.SeatId
-        }
-      },
-      {
-        status: UNAVAILABLE
-      }
-    )
-    if (!updateSeat) {
+    const result = await Promise.all(promises)
+    if (!result) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Update seat from rooms failed!'
+        'Update timeslot from rooms failed!'
       )
     }
     return data
@@ -108,86 +178,80 @@ export const deleteSoftService = async (reqBody) => {
     throw new Error(error.message)
   }
 }
-// export const deleteSoftService = async (reqBody) => {
-//   try {
-//     const id = reqBody.params.id
-//     const body = reqBody.body
-//     const checkScreenRoom = await ScreeningRoom.paginate(
-//       { _id: id },
-//       { populate: 'SeatId' }
-//     )
-//     // Tìm kiếm trong screen rooom có seat nào có trong trạng thái SOLD không
-//     // Nếu không thì không cho xóa
-//     const isSold = checkScreenRoom.docs[0].SeatId.some((seat) => {
-//       return seat.status === SOLD
-//     })
 
-//     if (isSold) {
-//       throw new ApiError(
-//         StatusCodes.CONFLICT,
-//         'Seat in this screen room is sold. Cant delete it!'
-//       )
-//     }
-//     const data = await ScreeningRoom.findOneAndUpdate({ _id: id }, body, {
-//       new: true
-//     })
-//     if (!data) {
-//       throw new ApiError(
-//         StatusCodes.BAD_REQUEST,
-//         'Delete screening rooms failed!'
-//       )
-//     }
 
-//     const updateSeat = await Seat.updateMany(
-//       {
-//         _id: {
-//           $in: data.SeatId
-//         }
-//       },
-//       {
-//         status: UNAVAILABLE
-//       }
-//     )
-//     if (!updateSeat) {
-//       throw new ApiError(
-//         StatusCodes.BAD_REQUEST,
-//         'Update seat from rooms failed!'
-//       )
-//     }
-//     return data
-//   } catch (error) {
-//     throw new Error(error.message)
-//   }
-// }
-
+// Ngược lại cái so với delete soft
 export const restoreService = async (reqBody) => {
   try {
     const id = reqBody.params.id
-    const body = reqBody.body
-    const data = await ScreeningRoom.findOneAndUpdate({ _id: id }, body, {
-      new: true
-    })
+    // const body = reqBody.body
+
+    const timeSlotIds = await ScreeningRoom.paginate(
+      {
+        _id: id
+      },
+      {
+        populate: {
+          path: 'TimeSlotId',
+          select: '_id SeatId'
+        }
+      }
+    )
+
+    const data = await ScreeningRoom.findByIdAndUpdate(
+      { _id: id },
+      {
+        destroy: false
+      },
+      {
+        new: true
+      }
+    )
     if (!data) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Restore screening rooms failed!'
+        'Delete screening rooms failed!'
+      )
+    }
+    let promises = []
+    if (
+      timeSlotIds.docs[0].TimeSlotId &&
+      timeSlotIds.docs[0].TimeSlotId.length > 0
+    ) {
+      promises.push(
+        TimeSlot.updateMany(
+          {
+            _id: {
+              $in: timeSlotIds.docs[0].TimeSlotId
+            }
+          },
+          {
+            destroy: false
+          }
+        )
       )
     }
 
-    const updateSeat = await Seat.updateMany(
-      {
-        _id: {
-          $in: data.SeatId
-        }
-      },
-      {
-        status: AVAILABLE
-      }
-    )
-    if (!updateSeat) {
+    timeSlotIds.docs[0].TimeSlotId.forEach((timeSlot) => {
+      promises.push(
+        Seat.updateMany(
+          {
+            _id: {
+              $in: timeSlot.SeatId
+            }
+          },
+          {
+            status: AVAILABLE
+          }
+        )
+      )
+    })
+
+    const result = await Promise.all(promises)
+    if (!result) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Update seat from rooms failed!'
+        'Restore timeslot from rooms failed!'
       )
     }
     return data
