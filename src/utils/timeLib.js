@@ -23,4 +23,17 @@ export function convertTimeToCurrentZone(time) {
   const timezoneToString = iso.tz(timezoneCurrent).format('DD-MM-YYYY HH:mm')
   return timezoneToString
 }
+// Hàm chuyển số phút sang mili giây
+export function minutesToMilliseconds(minutes) {
+  // Kiểm tra xem 'minutes' có phải là một số không
+  if (typeof minutes !== 'number') {
+    throw new Error(`Tham số ${minutes} phải là một số.`)
+  }
+
+  // Chuyển đổi số phút sang mili giây
+  const milliseconds = minutes * 60 * 1000
+
+  // Trả về số mili giây
+  return milliseconds
+}
 export default dayjs

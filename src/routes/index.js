@@ -24,6 +24,6 @@ routerInit.use('/food', routerFood)
 routerInit.use('/timeslot', routerTimeSlot)
 routerInit.use('/movie/price', routerMoviePrice)
 routerInit.use('/showtimes', ShowtimesRouter)
-routerInit.use('/email',routerEmail )
+routerInit.use('/email', routerEmail )
 
 export default routerInit;

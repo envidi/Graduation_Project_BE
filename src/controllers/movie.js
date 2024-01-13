@@ -66,7 +66,6 @@ export const getDetail = async (req, res, next) => {
   try {
     const id = req.params.id
     const data = await Movie.findById(id)
-    const test = convertTimeToCurrentZone(data.fromDate)
     // Lấy dữ liệu từ bảng categories khi query data từ bảng movie
     // const data = await Movie.aggregate([
     //   {
@@ -134,7 +133,11 @@ export const update = async (req, res, next) => {
       newCategory,
       result
     )
-    const updateData = await Movie.updateOne({ _id: id }, body)
+    const updateData = await Movie.updateOne({ _id: id }, {
+      ...body,
+      fromDate: new Date(convertTimeToIsoString(body.fromDate)),
+      toDate: new Date(convertTimeToIsoString(body.toDate))
+    })
 
     if (!updateData) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Update movie failed!')

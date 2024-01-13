@@ -49,10 +49,9 @@ export const insertSeatIntoScreen = async (rowCount, columnCount, data) => {
 
 export const createService = async (reqBody) => {
   try {
-    const body = reqBody.body
+    const body = reqBody
     const rowCount = 2
     const columnCount = 2
-
     const { error } = timeSlotSchema.validate(body, { abortEarly: true })
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)

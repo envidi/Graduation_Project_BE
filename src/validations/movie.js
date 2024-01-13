@@ -20,7 +20,7 @@ const productSchema = JoiExtended.object({
   status: Joi.string().required().min(1).max(255),
   rate: Joi.number().required().min(1).max(5),
   // Trong array của show_schedule thêm một object có trường id và name
-  show_scheduleId: Joi.array()
+  showTimes: Joi.array()
     .items(
       Joi.object({
         _id: Joi.string().required(),

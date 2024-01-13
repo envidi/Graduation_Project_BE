@@ -67,7 +67,7 @@ export const createForPostMan = async (req, res, next) => {
 
 export const createForFe = async (req, res, next) => {
   try {
-    const data = await timeSlotService.createService(req)
+    const data = await timeSlotService.createService(req.body)
 
     return res.status(StatusCodes.OK).json({
       message: 'Success',

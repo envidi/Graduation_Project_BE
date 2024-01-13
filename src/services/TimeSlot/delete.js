@@ -10,6 +10,7 @@ import ScreenRoom from '../../model/ScreenRoom.js'
 export const removeService = async (timeSlotId) => {
   try {
     const id = timeSlotId
+    console.log(timeSlotId)
     // const data = await ScreeningRoom.findOneAndDelete({ _id: id })
     const data = await TimeSlot.findOne({ _id: id }).populate('SeatId')
     if (!data) {

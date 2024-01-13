@@ -11,11 +11,11 @@ const showtimesValidate = JoiExtended.object({
   date: JoiExtended.date().format(['YYYY/MM/DD HH:mm', 'DD-MM-YYYY HH:mm']).min('now').required().label('date').messages({
     'date.empty': '{{ #label }} is required'
   }),
-  timeFrom: JoiExtended.date().format('HH:mm').min('now').required().label('timeFrom').messages({
+  timeFrom: JoiExtended.date().format('DD-MM-YYYY HH:mm').min('now').required().label('timeFrom').messages({
     'string.pattern.base': '{{ #label }} must be in HH:mm AM/PM format',
     'string.empty': '{{ #label }} is required'
   }),
-  timeTo: JoiExtended.date().format('HH:mm').min(Joi.ref('timeFrom')).required().label('timeTo').messages({
+  timeTo: JoiExtended.date().format('DD-MM-YYYY HH:mm').min(Joi.ref('timeFrom')).required().label('timeTo').messages({
     'string.pattern.base': '{{ #label }} must be in HH:mm AM/PM format',
     'string.empty': '{{ #label }} is required'
   }),
