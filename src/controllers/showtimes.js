@@ -55,7 +55,7 @@ export const getAllShow = async (req, res, next) => {
     console.log(now)
     const response = await Showtimes.find({})
     if (!response || response.length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'No list Show found!')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No list show found!')
     }
 
     return res.status(StatusCodes.OK).json({
@@ -67,14 +67,15 @@ export const getAllShow = async (req, res, next) => {
   }
 }
 
-export const getDetailShow = async (req, res,next) => {
+export const getDetailShow = async (req, res, next) => {
   try {
     const { id } = req.params
     const response = await Showtimes.findById(id)
     if (!response) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No list Show found!')
     }
-
+    // const checkSeatInScreenRoom = ScreeningRoom.find({})
+    // console.log('check seat', checkSeatInScreenRoom)
     return res.status(StatusCodes.OK).json({
       message: 'Gọi  lịch chiếu thành công',
       response
@@ -84,14 +85,15 @@ export const getDetailShow = async (req, res,next) => {
   }
 }
 
-export const deleteShow = async (req, res,next) => {
+export const deleteShow = async (req, res, next) => {
   try {
     const { id } = req.params
+
+    // check xem có ai đặt ghê chưa
     const response = await Showtimes.findByIdAndDelete(id)
     if (!response) {
       throw new ApiError(StatusCodes.NOT_FOUND, ' Show not found!')
     }
-
     return res.status(StatusCodes.OK).json({
       message: 'Xóa  lịch chiếu thành công',
       response

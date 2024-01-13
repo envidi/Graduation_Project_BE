@@ -20,13 +20,22 @@ const ShowtimesSchema = mongoose.Schema(
       type: String,
       required: true
     },
-    times: {
+    timeFrom: {
+      type: Date,
+      // min : Date.now(),
+      required: true
+    },
+    timeTo: {
       type: String,
       required: true
     },
     status: {
       type: String,
       default: AVAILABLE
+    },
+    destroy : {
+      type : Boolean,
+      default : false
     }
   },
   { versionKey: false, timestamps: true }
