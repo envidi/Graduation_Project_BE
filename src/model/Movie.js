@@ -78,10 +78,9 @@ const productSchema = mongoose.Schema(
     },
     showTimes: [
       {
-        type: mongoose.Types.ObjectId,
-        ref: 'Showtimes'
-      }
-    ]
+        type : mongoose.Types.ObjectId,
+        ref : 'Showtimes'
+    }]
   },
   { versionKey: false, timestamps: true }
 )

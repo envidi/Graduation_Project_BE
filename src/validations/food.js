@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-const foodSchema = Joi.object({
+const foodValidationSchema = Joi.object({
   name: Joi.string().trim().required(),
   image: Joi.string().required(),
   price: Joi.number().min(0).required(),
@@ -9,4 +9,4 @@ const foodSchema = Joi.object({
 }).options({
   abortEarly: false
 })
-export default foodSchema
+export default foodValidationSchema

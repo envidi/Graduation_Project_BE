@@ -19,7 +19,6 @@ const ShowtimesSchema = mongoose.Schema(
     },
     timeFrom: {
       type: Date,
-      // min : Date.now(),
       required: true
     },
     timeTo: {

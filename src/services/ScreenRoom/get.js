@@ -17,12 +17,12 @@ export const getAllService = async (reqBody) => {
       page: _page,
       limit: _limit,
       sort: {
-        [_sort]: _order === 'asc' ? 1 : -1,
+        [_sort]: _order === 'asc' ? 1 : -1
 
       },
       populate : {
         path : 'TimeSlotId',
-        populate : { 
+        populate : {
           path : 'SeatId',
           select : 'status'
         }
