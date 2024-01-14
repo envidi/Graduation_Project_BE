@@ -5,7 +5,7 @@ const screenSchema = Joi.object({
     'string.empty': `{{ #label }} is 'required'`
   }),
   CinemaId: Joi.string().required().min(1).max(255).trim().strict(),
-  TimeSlotId: Joi.array().items(Joi.string()).required().min(1).max(255),
+  TimeSlotId: Joi.array().items(Joi.string()).required().min(0).max(255),
   destroy: Joi.boolean()
 }).options({
   abortEarly: false

@@ -10,6 +10,7 @@ import routerMoviePrice from './MoviePrice.js'
 import routerTimeSlot from './timeSlot.js'
 import routerFood from './food.js'
 import ShowtimesRouter from './showtimes.js';
+import routerEmail from './email.js'
 const routerInit = Router()
 
 routerInit.use('/user', routerUser)
@@ -23,5 +24,6 @@ routerInit.use('/food', routerFood)
 routerInit.use('/timeslot', routerTimeSlot)
 routerInit.use('/movie/price', routerMoviePrice)
 routerInit.use('/showtimes', ShowtimesRouter)
+routerInit.use('/email', routerEmail )
 
 export default routerInit;

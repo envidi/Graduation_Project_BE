@@ -7,6 +7,11 @@ import { slugify } from '../utils/stringToSlug.js'
 import findDifferentElements from '../utils/findDifferent.js'
 import { moviePriceService } from '../services/moviePrice.js'
 
+import {
+  convertTimeToCurrentZone,
+  convertTimeToIsoString
+} from '../utils/timeLib.js'
+
 export const getAll = async (req, res, next) => {
   try {
     const {
@@ -44,7 +49,6 @@ export const getAll = async (req, res, next) => {
 
       movie.price = priceObject ? priceObject.price : null
     })
-
 
     return res.status(StatusCodes.OK).json({
       message: 'Success',
@@ -86,12 +90,17 @@ export const getDetail = async (req, res, next) => {
     //   }
 
     // ])
+    const newData = {
+      ...data._doc,
+      fromDate: convertTimeToCurrentZone(data.fromDate),
+      toDate: convertTimeToCurrentZone(data.toDate)
+    }
     if (!data || data.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No movie found!')
     }
     return res.status(StatusCodes.OK).json({
       message: 'Success',
-      datas: data
+      datas: newData
     })
   } catch (error) {
     next(error)
@@ -124,7 +133,11 @@ export const update = async (req, res, next) => {
       newCategory,
       result
     )
-    const updateData = await Movie.updateOne({ _id: id }, body)
+    const updateData = await Movie.updateOne({ _id: id }, {
+      ...body,
+      fromDate: new Date(convertTimeToIsoString(body.fromDate)),
+      toDate: new Date(convertTimeToIsoString(body.toDate))
+    })
 
     if (!updateData) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Update movie failed!')
@@ -173,12 +186,15 @@ export const update = async (req, res, next) => {
 export const create = async (req, res, next) => {
   try {
     const body = req.body
-    // const { error } = movieSchema.validate(body, { abortEarly: true })
-    // if (error) {
-    //   throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
-    // }
+    const { error } = movieSchema.validate(body, { abortEarly: true })
+    if (error) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
+    }
+
     const data = await Movie.create({
       ...body,
+      fromDate: new Date(convertTimeToIsoString(body.fromDate)),
+      toDate: new Date(convertTimeToIsoString(body.toDate)),
       slug: slugify(body.name)
     })
 

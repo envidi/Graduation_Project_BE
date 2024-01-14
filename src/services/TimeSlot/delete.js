@@ -42,7 +42,7 @@ export const removeService = async (timeSlotId) => {
       )
     }
     // Xóa hết tất cả ghế có timeslotid hiện tại
-    if (data.SeatId && data.SeatId.length > 0) {
+    if (data.SeatId || data.SeatId.length > 0) {
       promises.push(
         Seat.deleteMany({
           _id: {

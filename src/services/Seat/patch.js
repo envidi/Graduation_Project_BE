@@ -12,6 +12,8 @@ import ApiError from '../../utils/ApiError.js'
 import { FULL } from '../../model/TimeSlot.js'
 import { checkAndUpdateTimeSlot } from '../../controllers/seat.js'
 import TimeSlot from '../../model/TimeSlot.js'
+import Showtimes from '../../model/Showtimes.js'
+import dayjs from '../../utils/timeLib.js'
 
 export const updateService = async (reqBody) => {
   try {
@@ -26,11 +28,21 @@ export const updateService = async (reqBody) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
 
-    const dataTimeSlot = await TimeSlot.findOne({ _id : body.TimeSlotId }).populate('SeatId')
+    const resultTimeSlotAndSeat = await Promise.all([
+      TimeSlot.findOne({ _id: body.TimeSlotId }).populate('SeatId'),
+      Seat.findOne({ _id: id }),
+      Showtimes.findOne({ _id: body.ShowScheduleId }, 'timeFrom timeTo')
+    ])
+    const [dataTimeSlot, dataSeat, dataShowTimes] = resultTimeSlotAndSeat
 
-    const dataSeat = await Seat.findOne({ _id : id })
-
-
+    // Kiểm tra xem thời gian đặt ghế đã quá thời gian chiếu phim chưa
+    const now = dayjs()
+    if (now > dataShowTimes.timeFrom) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'The seat reservation time has expired'
+      )
+    }
     // Nếu như bảng timeslot mà ghế đang tồn tại bên trong đó đã bị xóa mềm
     // và ghế đang muốn sửa có trạng thái là unavailable thì không thể cập nhật
     if (dataTimeSlot.destroy || dataSeat.status === UNAVAILABLE) {
@@ -50,7 +62,9 @@ export const updateService = async (reqBody) => {
     // Nếu như tất cả ghế có trạng thái là SOLD thì timeslot tất cả
     // ghế đó sẽ chuyển thành trạng thái là full
     if (body.status === SOLD) {
-      const allSeatIsSold = dataTimeSlot.SeatId.every((seat) => seat.status === SOLD)
+      const allSeatIsSold = dataTimeSlot.SeatId.every(
+        (seat) => seat.status === SOLD
+      )
       if (allSeatIsSold) {
         await checkAndUpdateTimeSlot(dataTimeSlot._id, FULL)
       }

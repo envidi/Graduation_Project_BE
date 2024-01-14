@@ -11,9 +11,9 @@ import {
 const ShowtimesRouter = express.Router()
 
 ShowtimesRouter.post('/', createShowTime)
-ShowtimesRouter.put('/:id', updateShowTime)
 ShowtimesRouter.get('/', getAllShow)
 ShowtimesRouter.get('/:id', getDetailShow)
 ShowtimesRouter.delete('/:id', deleteShow)
+ShowtimesRouter.patch('/:id', updateShowTime)
 
 export default ShowtimesRouter

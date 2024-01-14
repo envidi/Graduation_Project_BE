@@ -1,92 +1,68 @@
 /* eslint-disable no-useless-catch */
 import { StatusCodes } from 'http-status-codes'
-import { timeSlotService } from '../TimeSlot/index.js'
 import Seat from '../../model/Seat.js'
 import ScreeningRoom from '../../model/ScreenRoom.js'
 import ApiError from '../../utils/ApiError.js'
 import { SOLD, UNAVAILABLE, AVAILABLE } from '../../model/Seat.js'
 import TimeSlot from '../../model/TimeSlot.js'
-import Cinema from '../../model/Cinema.js'
-import { scheduleService } from '../ShowTime/index.js'
+import Showtimes from '../../model/Showtimes.js'
+import { timeSlotService } from '../TimeSlot/index.js'
+import Movie from '../../model/Movie.js'
 
-export const removeService = async (reqBody) => {
+export const removeService = async (req) => {
   try {
-    const id = reqBody.params.id
-    // const data = await ScreeningRoom.findOneAndDelete({ _id: id })
-    const data = await ScreeningRoom.paginate(
-      { _id: id },
-      {
-        populate: {
-          path: 'TimeSlotId',
-          populate: 'SeatId'
-        }
-      }
-    )
-    const timeSlots = data.docs[0].TimeSlotId
-    // Kiểm tra xem tất cả ghế trong khung giờ có trạng thái là sold không
-    // Nếu có thì không cho xóa
-    timeSlots.forEach((timeSlots) => {
-      const isSeatSold = timeSlots.SeatId.some((seat) => seat.status === SOLD)
-      if (isSeatSold) {
-        throw new ApiError(
-          StatusCodes.BAD_REQUEST,
-          'Some seat is sold. Can not delete this screen'
-        )
-      }
+    const { id } = req.params
+
+    // check xem có ai đặt ghê chưa
+    const response = await Showtimes.findById(id)
+    if (!response) {
+      throw new ApiError(StatusCodes.NOT_FOUND, ' Show not found!')
+    }
+
+    const timeSlot = await timeSlotService.getTimeSlotIdWithScreenRoomId({
+      showTimeId: response._id,
+      screenRoomId: response.screenRoomId
     })
 
-    if (!data) {
+    if (!timeSlot || Object.keys(timeSlot).length === 0) {
       throw new ApiError(
         StatusCodes.NOT_FOUND,
-        'Cannot find screen with this id'
+        'This showtime dont have a timeslot in this room'
       )
     }
-    // Kéo screenroom bị xóa ra khỏi mảng screen room id trong model cinema
-    let promises = [
-      ScreeningRoom.deleteOne({ _id: id }),
-      Cinema.findByIdAndUpdate(
+
+    const result = await Promise.all([
+      timeSlotService.removeService(timeSlot._id),
+      Showtimes.deleteOne({ _id: id }),
+      Movie.updateOne(
         {
-          _id: data.docs[0].CinemaId
+          _id: response.movieId
         },
         {
           $pull: {
-            ScreeningRoomId: data.docs[0]._id
+            showTimes: response._id
           }
         }
       )
-    ]
-    // Xóa hết các timeslot trong screen room
-    if (timeSlots.length > 0) {
-      timeSlots.forEach((timeslot) => {
-        const req = {
-          params : {
-            id : timeslot._id.toString()
-          }
-        }
-        promises.push(scheduleService.removeService(req))
-      })
-    }
-
-    const result = await Promise.all(promises)
-
+    ])
     if (!result || result.length === 0) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Delete screening rooms failed!'
+        'Cannot delete timeslot or delete showtime'
       )
     }
 
-    return result
+    return response
   } catch (error) {
     throw error
   }
 }
 
-export const deleteSoftService = async (reqBody) => {
+export const deleteSoftService = async (req) => {
   try {
-    const id = reqBody.params.id
+    const id = req.params.id
     // const body = reqBody.body
-    const checkScreenRoom = await ScreeningRoom.paginate(
+    const checkScreenRoom = await Showtimes.paginate(
       { _id: id },
       {
         populate: {
@@ -186,12 +162,12 @@ export const deleteSoftService = async (reqBody) => {
 }
 
 // Ngược lại cái so với delete soft
-export const restoreService = async (reqBody) => {
+export const restoreService = async (req) => {
   try {
-    const id = reqBody.params.id
+    const id = req.params.id
     // const body = reqBody.body
 
-    const timeSlotIds = await ScreeningRoom.paginate(
+    const timeSlotIds = await Showtimes.paginate(
       {
         _id: id
       },

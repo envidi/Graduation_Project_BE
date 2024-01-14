@@ -5,36 +5,39 @@ export const FULL = 'Full'
 export const statusScreen = [AVAILABLE, FULL]
 const ShowtimesSchema = mongoose.Schema(
   {
-    screenRoomId: [
-      {
-        type : mongoose.Types.ObjectId,
-        ref : "ScreeningRoom",
-    }],
-
+    screenRoomId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'ScreeningRoom'
+    },
     movieId: {
-        type : mongoose.Types.ObjectId,
-        ref : "Movie",
-
+      type: mongoose.Types.ObjectId,
+      ref: 'Movie'
     },
     date: {
-        type : String,
-        required : true
+      type: Date,
+      required: true
     },
-    times :  {
-        type : String,
-        required : true
+    timeFrom: {
+      type: Date,
+      // min : Date.now(),
+      required: true
+    },
+    timeTo: {
+      type: Date,
+      required: true
     },
     status: {
       type: String,
-      default : AVAILABLE
+      default: AVAILABLE
     },
-    
+    destroy: {
+      type: Boolean,
+      default: false
+    }
   },
   { versionKey: false, timestamps: true }
 )
 
-ShowtimesSchema
-.plugin(mongoosePaginate)
+ShowtimesSchema.plugin(mongoosePaginate)
 
-export default mongoose.model('Showtimes', ShowtimesSchema
-)
+export default mongoose.model('Showtimes', ShowtimesSchema)
