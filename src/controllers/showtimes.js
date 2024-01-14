@@ -75,6 +75,6 @@ export const updateShowTime = async (req, res, next) => {
       data: updatedShow
     })
   } catch (error) {
-    next(next)
+    next(error)
   }
 }

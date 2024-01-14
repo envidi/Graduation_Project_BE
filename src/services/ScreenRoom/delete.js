@@ -7,6 +7,7 @@ import ApiError from '../../utils/ApiError.js'
 import { SOLD, UNAVAILABLE, AVAILABLE } from '../../model/Seat.js'
 import TimeSlot from '../../model/TimeSlot.js'
 import Cinema from '../../model/Cinema.js'
+import { scheduleService } from '../ShowTime/index.js'
 
 export const removeService = async (reqBody) => {
   try {
@@ -56,14 +57,19 @@ export const removeService = async (reqBody) => {
     ]
     // Xóa hết các timeslot trong screen room
     if (timeSlots.length > 0) {
-      for (let i = 0; i < timeSlots.length; i++) {
-        promises.push(timeSlotService.removeService(timeSlots[i]._id))
-      }
+      timeSlots.forEach((timeslot) => {
+        const req = {
+          params : {
+            id : timeslot._id.toString()
+          }
+        }
+        promises.push(scheduleService.removeService(req))
+      })
     }
 
     const result = await Promise.all(promises)
 
-    if (!result && result.length === 0) {
+    if (!result || result.length === 0) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
         'Delete screening rooms failed!'
@@ -178,7 +184,6 @@ export const deleteSoftService = async (reqBody) => {
     throw new Error(error.message)
   }
 }
-
 
 // Ngược lại cái so với delete soft
 export const restoreService = async (reqBody) => {

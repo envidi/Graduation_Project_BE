@@ -24,7 +24,7 @@ export const removeService = async (req) => {
       screenRoomId: response.screenRoomId
     })
 
-    if (!timeSlot && Object.keys(timeSlot).length === 0) {
+    if (!timeSlot || Object.keys(timeSlot).length === 0) {
       throw new ApiError(
         StatusCodes.NOT_FOUND,
         'This showtime dont have a timeslot in this room'
@@ -45,7 +45,7 @@ export const removeService = async (req) => {
         }
       )
     ])
-    if (!result) {
+    if (!result || result.length === 0) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
         'Cannot delete timeslot or delete showtime'

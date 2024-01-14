@@ -66,7 +66,7 @@ export const createService = async (reqBody) => {
     // Thêm 25 ghế vào room hiện tại
     // Cập nhật nhật vào timeslot những ghế đã được tạo
     // cập nhật screen , thêm time slot được tạo vào mảng timeSlotId trong model screen
-    await Promise.all([
+    const result = await Promise.all([
       insertSeatIntoScreen(rowCount, columnCount, data),
       ScreenRoom.updateOne(
         { _id: data.ScreenRoomId },
@@ -77,6 +77,12 @@ export const createService = async (reqBody) => {
         }
       )
     ])
+    if (!result || result.length === 0) {
+      throw new ApiError(
+        StatusCodes.CONFLICT,
+        'Create seat or update screen failed!'
+      )
+    }
 
     return await findSingleDocument(data._id)
   } catch (error) {

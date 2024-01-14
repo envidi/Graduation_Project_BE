@@ -10,7 +10,7 @@ const seatSchema = Joi.object({
   column: Joi.number().required().min(0).max(255),
   status: Joi.string().valid(...statusSeat).trim().strict(),
   ScreeningRoomId: Joi.string().required().trim().strict(),
-  Show_scheduleId: Joi.string().required().trim().strict(),
+  ShowScheduleId: Joi.string().required().trim().strict(),
   TimeSlotId : Joi.string().required().trim().strict()
 }).options({
   abortEarly: false

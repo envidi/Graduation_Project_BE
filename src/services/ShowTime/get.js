@@ -40,7 +40,7 @@ export const getOneService = async (req) => {
     const newData = {
       ...response._doc,
       timeFrom : convertTimeToCurrentZone(response.timeFrom),
-      timeTo : convertTimeToCurrentZone(response.timeTo),
+      timeTo : convertTimeToCurrentZone(response.timeTo)
     }
     if (!response) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No list Show found!')

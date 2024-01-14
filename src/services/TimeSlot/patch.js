@@ -14,6 +14,7 @@ export const updateService = async (reqBody) => {
   try {
     const body = reqBody.body
     const id = reqBody.params.id
+
     if (!id) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Timeslot id not found')
     }
@@ -23,9 +24,8 @@ export const updateService = async (reqBody) => {
     }
     // const data = await ScreeningRoom.findByIdAndUpdate(id, body, { new: true })
     const currentTimeSlot = await TimeSlot.findById(id).populate('SeatId')
-    const seatIds = await TimeSlot.findById(id)
 
-    // Kiểm tra xem timeslot hiện tại có ghế nào ở trạng thái đã bán chưa
+    // // Kiểm tra xem timeslot hiện tại có ghế nào ở trạng thái đã bán chưa
     const currentTimeSlotSeats = currentTimeSlot.SeatId.some(
       (seat) => seat.status === SOLD
     )
@@ -41,6 +41,7 @@ export const updateService = async (reqBody) => {
     )
     // Lấy ra screen mới
     const screenRoomNew = await ScreenRoom.findById(body.ScreenRoomId)
+
     // Cập nhật screen mới , thêm timeslot hiện tại vào screen mới
     // Cập nhật screen cũ , xóa timeslot hiện tại khỏi screen cũ
     // Đặt lại screen id trong tất cả ghế của timeslot hiện tại
@@ -64,7 +65,7 @@ export const updateService = async (reqBody) => {
       Seat.updateMany(
         {
           _id: {
-            $in: seatIds.SeatId
+            $in: currentTimeSlot.SeatId
           }
         },
         {
@@ -74,8 +75,8 @@ export const updateService = async (reqBody) => {
         }
       )
     ]
-    // Nếu như screen id mới không tồn tại trong database thì không cho phép sửa
-    if (!screenRoomNew && Object.keys(screenRoomNew).length === 0) {
+    // // Nếu như screen id mới không tồn tại trong database thì không cho phép sửa
+    if (!screenRoomNew || Object.keys(screenRoomNew).length === 0) {
       throw new ApiError(
         StatusCodes.NOT_FOUND,
         'This new screen room is not exist in database'
@@ -91,6 +92,7 @@ export const updateService = async (reqBody) => {
     if (!result) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Request failed')
     }
+
 
     return result
   } catch (error) {
