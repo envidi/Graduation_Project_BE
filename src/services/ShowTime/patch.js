@@ -96,3 +96,14 @@ export const updateService = async (req) => {
     throw error
   }
 }
+
+export const updateStatusFull = async (id, body) => {
+  try {
+    const updateShowTime = await Showtimes.updateOne({_id : id }, body, {
+      new: true
+    })
+    return updateShowTime
+  } catch (error) {
+    throw error
+  }
+}

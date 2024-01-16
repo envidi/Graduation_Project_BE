@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-catch */
 import { createService } from './post.js'
 import { deleteSoftService, removeService, restoreService } from './delete.js'
-import { updateService } from './patch.js'
+import { updateService , updateStatusFull } from './patch.js'
 import { getAllService, getOneService, getAllIncludeDestroyService } from './get.js'
 
 
@@ -13,6 +13,7 @@ export const scheduleService = {
   removeService,
   updateService,
   getOneService,
-  getAllService
+  getAllService,
+  updateStatusFull
 
 }

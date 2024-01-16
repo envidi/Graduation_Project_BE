@@ -1,8 +1,8 @@
 import mongoose from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
-export const AVAILABLE = 'Available'
-export const FULL = 'Full'
-export const statusScreen = [AVAILABLE, FULL]
+export const AVAILABLE_SCHEDULE = 'Available'
+export const FULL_SCHEDULE = 'Full'
+export const statusSchedule = [AVAILABLE_SCHEDULE, FULL_SCHEDULE]
 const ShowtimesSchema = mongoose.Schema(
   {
     screenRoomId: {
@@ -27,7 +27,8 @@ const ShowtimesSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      default: AVAILABLE
+      enum : statusSchedule,
+      default: AVAILABLE_SCHEDULE
     },
     destroy: {
       type: Boolean,

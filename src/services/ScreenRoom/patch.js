@@ -33,3 +33,22 @@ export const updateService = async (reqBody) => {
     throw error
   }
 }
+
+export const updateStatusScreen = async (screenId, statusScreen) => {
+  try {
+
+    const updateData = await ScreeningRoom.updateOne({ _id: screenId }, statusScreen)
+
+    if (!updateData || Object.keys(updateData).length === 0) {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        'Update screening rooms failed!'
+      )
+    }
+    return updateData
+  } catch (error) {
+    throw error
+  }
+}
+
+

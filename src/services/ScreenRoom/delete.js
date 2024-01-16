@@ -1,6 +1,5 @@
 /* eslint-disable no-useless-catch */
 import { StatusCodes } from 'http-status-codes'
-import { timeSlotService } from '../TimeSlot/index.js'
 import Seat from '../../model/Seat.js'
 import ScreeningRoom from '../../model/ScreenRoom.js'
 import ApiError from '../../utils/ApiError.js'
