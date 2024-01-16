@@ -30,7 +30,6 @@ export const insertSeatIntoScreen = async (rowCount, columnCount, data) => {
 
       const dataSeat = await Seat.create({
         ScreeningRoomId: data._id,
-        // ShowScheduleId : data. ,
         row,
         column,
         typeSeat: seatTypeToUse,
