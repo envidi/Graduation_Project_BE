@@ -3,7 +3,6 @@ import RoleUser from "../model/RoleUser"
 import ApiError from '../utils/ApiError.js'
 import roleUserValidate from "../validations/roleUser.js";
 import User from "../model/user.js";
-import findDifferentElements from "../utils/findDifferent.js";
 // Thêm vai trò mới
 
 
@@ -26,10 +25,10 @@ export const createRole = async (req, res, next) => {
       if (body.roleName ==="user"&&roleNameUser && Object.keys(roleNameUser).length >0) {
         throw new ApiError(StatusCodes.CONFLICT, 'This role "user" is not exist in database')
     }
-    const roleNameQuanLi = await RoleUser.find({ roleName: 'quan li' })
+    const roleNameQuanLi = await RoleUser.find({ roleName: 'manager' })
     // kiểm tra nó đã tồn tại user hay chưa
-      if (body.roleName ==="quan li"&&roleNameQuanLi && Object.keys(roleNameQuanLi).length >0) {
-        throw new ApiError(StatusCodes.CONFLICT, 'This role "quan li" is not exist in database')
+      if (body.roleName ==="manager"&&roleNameQuanLi && Object.keys(roleNameQuanLi).length >0) {
+        throw new ApiError(StatusCodes.CONFLICT, 'This role "manager" is not exist in database')
     }
     
     const data = await RoleUser.create({
@@ -149,6 +148,7 @@ export const deleteRole = async (req, res, next) => {
     if (roleUser.roleName === 'admin') {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Cannot delete role "admin"');
     }
+    
  
     // Lấy danh sách userIds của vai trò đang được xóa
     const userIds = roleUser.userIds;

@@ -1,11 +1,11 @@
-// import Product from '../models/Product.js';
 import Movie from '../model/Movie.js'
-import productSchema from '../validations/product.js'
+import movieSchema from '../validations/movie.js'
 import Category from '../model/Category.js'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../utils/ApiError.js'
 import { slugify } from '../utils/stringToSlug.js'
 import findDifferentElements from '../utils/findDifferent.js'
+import { moviePriceService } from '../services/moviePrice.js'
 
 export const getAll = async (req, res, next) => {
   try {
@@ -20,15 +20,37 @@ export const getAll = async (req, res, next) => {
       limit: _limit,
       sort: {
         [_sort]: _order === 'asc' ? 1 : -1
-      }
+      },
+      populate: 'prices'
     }
     const data = await Movie.paginate({}, options)
+
     if (!data || data.docs.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
     }
+    // Convert Mongoose documents to plain JavaScript objects
+    const plainDocs = data.docs.map((doc) => doc.toObject())
+
+    const currentDate = new Date()
+    const currentDay = currentDate.getDay() // Sunday is 0, Monday is 1, ..., Saturday is 6
+
+    // Add the 'price' field to each movie based on the current day type
+    plainDocs.forEach((movie) => {
+      const priceObject = movie.prices.find((price) => {
+        return currentDay >= 1 && currentDay <= 5
+          ? price.dayType === 'weekday'
+          : price.dayType === 'weekend'
+      })
+
+      movie.price = priceObject ? priceObject.price : null
+    })
+
     return res.status(StatusCodes.OK).json({
       message: 'Success',
-      datas: data
+      datas: {
+        ...data,
+        docs: plainDocs
+      }
     })
   } catch (error) {
     next(error)
@@ -82,7 +104,7 @@ export const update = async (req, res, next) => {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Id movie not found')
     }
     const body = req.body
-    const { error } = productSchema.validate(body, { abortEarly: true })
+    const { error } = movieSchema.validate(body, { abortEarly: true })
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
@@ -102,7 +124,6 @@ export const update = async (req, res, next) => {
       result
     )
     const updateData = await Movie.updateOne({ _id: id }, body)
-
 
     if (!updateData) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Update movie failed!')
@@ -151,7 +172,7 @@ export const update = async (req, res, next) => {
 export const create = async (req, res, next) => {
   try {
     const body = req.body
-    const { error } = productSchema.validate(body, { abortEarly: true })
+    const { error } = movieSchema.validate(body, { abortEarly: true })
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
@@ -186,6 +207,15 @@ export const remove = async (req, res, next) => {
   try {
     const id = req.params.id
     const data = await Movie.findOneAndDelete({ _id: id })
+
+    // get all price of movie
+    const prices = data.prices
+    //loop and delete all price of movie
+
+    for (let i = 0; i < prices.length; i++) {
+      await moviePriceService.remove(prices[i])
+    }
+
     if (!data) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete movie failed!')
     }
