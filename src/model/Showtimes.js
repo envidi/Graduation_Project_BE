@@ -2,7 +2,8 @@ import mongoose from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
 export const AVAILABLE_SCHEDULE = 'Available'
 export const FULL_SCHEDULE = 'Full'
-export const statusSchedule = [AVAILABLE_SCHEDULE, FULL_SCHEDULE]
+export const CANCELLED_SCHEDULE = 'Cancelled'
+export const statusSchedule = [AVAILABLE_SCHEDULE, FULL_SCHEDULE, CANCELLED_SCHEDULE]
 const ShowtimesSchema = mongoose.Schema(
   {
     screenRoomId: {

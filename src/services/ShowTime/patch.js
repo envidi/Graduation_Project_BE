@@ -4,12 +4,18 @@ import { StatusCodes } from 'http-status-codes'
 import ScreeningRoom from '../../model/ScreenRoom.js'
 import ApiError from '../../utils/ApiError.js'
 import showtimesValidate from '../../validations/showtimes.js'
-import Showtimes from '../../model/Showtimes.js'
+import Showtimes, {
+  AVAILABLE_SCHEDULE,
+  CANCELLED_SCHEDULE,
+  FULL_SCHEDULE
+} from '../../model/Showtimes.js'
 import Movie from '../../model/Movie.js'
 import { timeSlotService } from '../TimeSlot/index.js'
 import { convertTimeToIsoString } from '../../utils/timeLib.js'
 
 import { validateDurationMovie, validateTime } from './post.js'
+import { checkSomeSeatSold } from '../TimeSlot/patch.js'
+import { CANCELLED_TIMESLOT } from '../../model/TimeSlot.js'
 
 export const updateService = async (req) => {
   try {
@@ -32,7 +38,7 @@ export const updateService = async (req) => {
       }
     }
 
-    if (!show) {
+    if (!show || Object.keys(show).length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Lịch chiếu không tồn tại')
     }
 
@@ -43,6 +49,9 @@ export const updateService = async (req) => {
     }
     if (body.movieId !== show.movieId.toString()) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Cannot change the movie id')
+    }
+    if (body.status === FULL_SCHEDULE) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Cannot change status schedule into full')
     }
 
     // // Kiểm tra tồn tại của movieId và screenRoomId
@@ -77,12 +86,48 @@ export const updateService = async (req) => {
         }
       )
     ]
+    // nếu như muốn hủy lịch chiếu thì phải kiểm tra xem tất cả ghế
+    // trong lịch chiếu đã được đặt chưa
+    if (
+      body.status === CANCELLED_SCHEDULE &&
+      !(await checkSomeSeatSold(timeSlot._id))
+    ) {
+      const updateTimeSlotCancelled = await timeSlotService.updateStatus(
+        timeSlot._id,
+        { status: CANCELLED_TIMESLOT }
+      )
+      if (
+        !updateTimeSlotCancelled ||
+        Object.keys(updateTimeSlotCancelled).length === 0
+      ) {
+        throw new ApiError(
+          StatusCodes.BAD_REQUEST,
+          'Update timeslot status to cancelled failed'
+        )
+      }
+    }
+    if (body.status !== show.status && body.status !== CANCELLED_SCHEDULE) {
+      promises.push(
+        timeSlotService.updateStatus(timeSlot._id, {
+          status: AVAILABLE_SCHEDULE
+        })
+      )
+    }
+    //  Thay đổi lịch chiếu sang phòng khác
     if (body.screenRoomId !== show.screenRoomId) {
-      promises.push(timeSlotService.updateService(reqBody))
+      const updateTimeSlot = await timeSlotService.updateService(reqBody)
+      if (!updateTimeSlot || updateTimeSlot.length === 0) {
+        throw new ApiError(
+          StatusCodes.BAD_REQUEST,
+          'Update timeslot failed when update showtime'
+        )
+      }
     }
 
     // Update lịch chiếu phim
-    const result = await Promise.all(promises)
+    const result = await Promise.all(promises).catch((error) => {
+      throw new ApiError(StatusCodes.CONFLICT, new Error(error.message))
+    })
 
     if (!result || result.length === 0) {
       throw new ApiError(
@@ -99,7 +144,7 @@ export const updateService = async (req) => {
 
 export const updateStatusFull = async (id, body) => {
   try {
-    const updateShowTime = await Showtimes.updateOne({_id : id }, body, {
+    const updateShowTime = await Showtimes.updateOne({ _id: id }, body, {
       new: true
     })
     return updateShowTime

@@ -2,9 +2,13 @@
 import TimeSlot from '../../model/TimeSlot.js'
 import { createService } from './post.js'
 import { deleteSoftService, removeService, restoreService } from './delete.js'
-import { updateService } from './patch.js'
-import { getAllService, getOneService, getAllIncludeDestroyService,getTimeSlotIdWithScreenRoomId } from './get.js'
-
+import { updateService, updateStatus, checkSomeSeatSold } from './patch.js'
+import {
+  getAllService,
+  getOneService,
+  getAllIncludeDestroyService,
+  getTimeSlotIdWithScreenRoomId
+} from './get.js'
 
 export const findSingleDocument = async (id) => {
   try {
@@ -14,7 +18,6 @@ export const findSingleDocument = async (id) => {
     throw error
   }
 }
-
 
 export const timeSlotService = {
   getAllIncludeDestroyService,
@@ -26,6 +29,7 @@ export const timeSlotService = {
   updateService,
   getOneService,
   getAllService,
-  getTimeSlotIdWithScreenRoomId
-
+  getTimeSlotIdWithScreenRoomId,
+  updateStatus,
+  checkSomeSeatSold
 }

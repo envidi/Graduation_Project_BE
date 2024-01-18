@@ -31,7 +31,7 @@ const productSchema = mongoose.Schema(
       required: true
     },
     toDate: {
-      type:  Date,
+      type: Date,
       required: true
     },
     author: {
@@ -78,9 +78,10 @@ const productSchema = mongoose.Schema(
     },
     showTimes: [
       {
-        type : mongoose.Types.ObjectId,
-        ref : 'Showtimes'
-    }]
+        type: mongoose.Types.ObjectId,
+        ref: 'Showtimes'
+      }
+    ]
   },
   { versionKey: false, timestamps: true }
 )

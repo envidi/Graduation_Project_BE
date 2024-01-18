@@ -67,7 +67,6 @@ export async function checkAndUpdateTimeSlot(
     }
   }
   await Promise.all(promises).catch((error) => {
-    console.log(error)
     throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error.message))
   })
 }
