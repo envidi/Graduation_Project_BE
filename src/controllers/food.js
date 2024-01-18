@@ -3,6 +3,28 @@
 // import { StatusCodes } from 'http-status-codes'
 // import ApiError from '../utils/ApiError.js'
 // // import findDifferentElements from '../utils/findDifferent.js'
+// import { v2 as cloudinary } from 'cloudinary';
+
+// // const checkImageExists = async (imageUrl) => {
+// //   try {
+// //     // Kiểm tra từ Cloudinary dựa trên URL của ảnh
+// //     // Giả sử imageUrl là public ID của ảnh trên Cloudinary
+// //     const result = await cloudinary.api.resource(imageUrl)
+// //     return result ? true : false
+// //   } catch (error) {
+// //     // ảnh ko tồn tại hoặc lỗi trả về false
+// //     return false
+// //   }
+// // }
+
+// // const checkImagesForFoodArray = async (foodArray) => {
+// //   for (let food of foodArray) {
+// //     const imageExists = await checkImageExists(food.image)
+// //     if (!imageExists) {
+// //       food.image = null
+// //     }
+// //   }
+// // }
 // export const getAll = async (req, res, next) => {
 //   try {
 //     const {
@@ -29,6 +51,8 @@
 //     if (!data || data.length === 0) {
 //       throw new ApiError(StatusCodes.NOT_FOUND, 'No food found!')
 //     }
+//     // Kiểm tra hình ảnh tồn tại cho từng đối tượng trong mảng
+//     // await checkImagesForFoodArray(data.docs);
 //     return res.status(StatusCodes.OK).json({
 //       message: 'Success',
 //       data: data
@@ -47,10 +71,16 @@
 //     const { includeDeleted } = req.query // lấy tham số includeDeleted từ query string
 //     const queryCondition = includeDeleted === 'true' ? { _id: id } : { _id: id, isDeleted: false };
 //     const data = await Food.findOne(queryCondition)
-
 //     if (!data || data.length === 0) {
 //       throw new ApiError(StatusCodes.NOT_FOUND, 'Not food found!')
 //     }
+//     // check ảnh trên Cloudinary
+//     // const imageExists = await checkImageExists(data.$getPopulatedDocs.image)
+//     // if (!imageExists) {
+//     //   // data.image = null
+//     //   throw new ApiError(StatusCodes.NOT_FOUND, 'Image not found!')
+//     // }
+//     /////////////////////////////////
 //     return res.status(StatusCodes.OK).json({
 //       message: 'Success',
 //       data: data
