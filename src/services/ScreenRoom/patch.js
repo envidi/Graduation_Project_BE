@@ -17,8 +17,6 @@ export const updateService = async (reqBody) => {
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
-    // const data = await ScreeningRoom.findByIdAndUpdate(id, body, { new: true })
-    // const data = await ScreeningRoom.findById(id, 'categoryId')
 
     const updateData = await ScreeningRoom.updateOne({ _id: id }, body)
 

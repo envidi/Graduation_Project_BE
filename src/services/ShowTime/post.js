@@ -119,7 +119,7 @@ export const createService = async (req) => {
     if (!data || Object.keys(data).length == 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Create showtime failed')
     }
-    const result = await Promise.all([
+    await Promise.all([
       timeSlotService.createService({
         ScreenRoomId: body.screenRoomId,
         Show_scheduleId: data._id.toString()
@@ -127,13 +127,9 @@ export const createService = async (req) => {
       Movie.findByIdAndUpdate(body.movieId, {
         $push: { showTimes: data._id }
       })
-    ])
-    if (!result || result.length === 0) {
-      throw new ApiError(
-        StatusCodes.CONFLICT,
-        'Cannot create timeslot or update movie failed'
-      )
-    }
+    ]).catch((error) => {
+      throw new ApiError(StatusCodes.CONFLICT, new Error(error.message))
+    })
 
     return data
   } catch (error) {

@@ -1,12 +1,7 @@
-import Showtimes from '../model/Showtimes.js'
-import Movie from '../model/Movie.js'
-import ScreeningRoom from '../model/ScreenRoom.js'
 import { scheduleService } from '../services/ShowTime/index.js'
-import ApiError from '../utils/ApiError.js'
 
 import { StatusCodes } from 'http-status-codes'
 
-import showtimesValidate from '../validations/showtimes.js'
 export const AVAILABLE = 'Available'
 export const ISCOMING = 'IsComming'
 export const statusScreen = [AVAILABLE, ISCOMING]
@@ -65,10 +60,44 @@ export const deleteShow = async (req, res, next) => {
     next(error)
   }
 }
+export const deleteSoftShow = async (req, res, next) => {
+  try {
+    const response = await scheduleService.deleteSoftService(req)
+    return res.status(StatusCodes.OK).json({
+      message: 'Xóa mềm lịch chiếu thành công',
+      response
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+export const restoreShow = async (req, res, next) => {
+  try {
+    const response = await scheduleService.restoreService(req)
+    return res.status(StatusCodes.OK).json({
+      message: 'Khôi phục lịch chiếu thành công',
+      response
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const updateShowTime = async (req, res, next) => {
   try {
     const updatedShow = await scheduleService.updateService(req)
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Cập nhật lịch chiếu thành công',
+      data: updatedShow
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+export const getAllIncludeDestroy = async (req, res, next) => {
+  try {
+    const updatedShow = await scheduleService.getAllIncludeDestroyService(req)
 
     return res.status(StatusCodes.OK).json({
       message: 'Cập nhật lịch chiếu thành công',

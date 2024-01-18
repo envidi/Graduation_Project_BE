@@ -1,7 +1,6 @@
 /* eslint-disable no-useless-catch */
 import { StatusCodes } from 'http-status-codes'
 import Showtimes from '../../model/Showtimes.js'
-import ScreeningRoom from '../../model/ScreenRoom.js'
 import ApiError from '../../utils/ApiError.js'
 import { convertTimeToCurrentZone } from '../../utils/timeLib.js'
 
@@ -64,13 +63,10 @@ export const getAllIncludeDestroyService = async (reqBody) => {
       limit: _limit,
       sort: {
         [_sort]: _order === 'asc' ? 1 : -1
-      },
-      populate: {
-        path: 'TimeSlotId',
-        select: 'ScreeningRoomId SeatId status destroy'
       }
+
     }
-    const data = await ScreeningRoom.paginate({}, options)
+    const data = await Showtimes.paginate({}, options)
     if (!data || data.docs.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No screening rooms found!')
     }

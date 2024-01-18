@@ -68,12 +68,17 @@ export const updateService = async (reqBody) => {
       })
       if (allSeatIsSold) {
         await Promise.all([
-          checkAndUpdateTimeSlot(dataTimeSlot._id, FULL_TIMESLOT, dataTimeSlot.ScreenRoomId ),
+          checkAndUpdateTimeSlot(
+            dataTimeSlot._id,
+            FULL_TIMESLOT,
+            dataTimeSlot.ScreenRoomId
+          ),
           scheduleService.updateStatusFull(dataShowTimes._id.toString(), {
             status: FULL_SCHEDULE
           })
-
-        ])
+        ]).catch((error) => {
+          throw new ApiError(StatusCodes.CONFLICT, new Error(error.message))
+        })
       }
     }
     // Nếu như timeslot của ghế đang được sửa có trạng thái là full
@@ -83,11 +88,17 @@ export const updateService = async (reqBody) => {
     if (isTimeSlotFull) {
       if (isBodyStatusValid) {
         await Promise.all([
-          checkAndUpdateTimeSlot(dataTimeSlot._id, AVAILABLE_TIMESLOT, dataTimeSlot.ScreenRoomId ),
+          checkAndUpdateTimeSlot(
+            dataTimeSlot._id,
+            AVAILABLE_TIMESLOT,
+            dataTimeSlot.ScreenRoomId
+          ),
           scheduleService.updateStatusFull(dataShowTimes._id.toString(), {
             status: AVAILABLE_SCHEDULE
           })
-        ])
+        ]).catch((error) => {
+          throw new ApiError(StatusCodes.CONFLICT, new Error(error.message))
+        })
       }
     }
 
