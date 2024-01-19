@@ -133,11 +133,14 @@ export const update = async (req, res, next) => {
       newCategory,
       result
     )
-    const updateData = await Movie.updateOne({ _id: id }, {
-      ...body,
-      fromDate: new Date(convertTimeToIsoString(body.fromDate)),
-      toDate: new Date(convertTimeToIsoString(body.toDate))
-    })
+    const updateData = await Movie.updateOne(
+      { _id: id },
+      {
+        ...body,
+        fromDate: new Date(convertTimeToIsoString(body.fromDate)),
+        toDate: new Date(convertTimeToIsoString(body.toDate))
+      }
+    )
 
     if (!updateData) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Update movie failed!')
@@ -191,8 +194,10 @@ export const create = async (req, res, next) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
 
+    const { prices, ...restBody } = body
+
     const data = await Movie.create({
-      ...body,
+      ...restBody,
       fromDate: new Date(convertTimeToIsoString(body.fromDate)),
       toDate: new Date(convertTimeToIsoString(body.toDate)),
       slug: slugify(body.name)
@@ -211,6 +216,27 @@ export const create = async (req, res, next) => {
         }
       })
     }
+
+    // Tạo giá
+    if (prices && prices.length > 0) {
+      for (let i = 0; i < prices.length; i++) {
+        await moviePriceService.create({
+          movieId: data._id.toString(),
+          ...prices[i]
+        })
+      }
+    }
+
+    data._doc = {
+      ...data._doc,
+      prices: prices.map((price) => {
+        return {
+          ...price,
+          movieId: data._id
+        }
+      })
+    }
+
     return res.status(StatusCodes.OK).json({
       message: 'Success',
       datas: data

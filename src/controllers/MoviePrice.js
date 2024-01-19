@@ -82,37 +82,8 @@ export const update = async (req, res, next) => {
 
 export const create = async (req, res, next) => {
   try {
-    const body = req.body
-    const { error } = moviePriceSchema.validate(body, { abortEarly: true })
-    if (error) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
-    }
+    const data = await moviePriceService.create(req.body)
 
-    // Check if a MoviePrice with the same movieId and dayType already exists
-    const existingMoviePrice = await MoviePrice.findOne({
-      movieId: body.movieId,
-      dayType: body.dayType
-    })
-    if (existingMoviePrice) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'A MoviePrice with the same movieId and dayType already exists'
-      )
-    }
-
-    const data = await MoviePrice.create({
-      ...body,
-      slug: slugify(body.name)
-    })
-    if (!data) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Create MoviePrice failed')
-    }
-    // Update movie prices in movie collection
-    await Movie.findOneAndUpdate(data.movieId, {
-      $addToSet: {
-        prices: data._id
-      }
-    })
     return res.status(StatusCodes.CREATED).json({
       message: 'Success',
       data: data
@@ -127,10 +98,6 @@ export const remove = async (req, res, next) => {
     const id = req.params.id
 
     const data = await moviePriceService.remove(id)
-
-    if (!data) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete MoviePrice failed!')
-    }
 
     return res.status(StatusCodes.OK).json({
       message: 'Success!',
