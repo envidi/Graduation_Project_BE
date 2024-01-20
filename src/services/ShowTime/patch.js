@@ -16,13 +16,24 @@ import { convertTimeToIsoString } from '../../utils/timeLib.js'
 import { validateDurationMovie, validateTime } from './post.js'
 import { checkSomeSeatSold } from '../TimeSlot/patch.js'
 import { CANCELLED_TIMESLOT } from '../../model/TimeSlot.js'
+import ScreenRoom from '../../model/ScreenRoom.js'
 
 export const updateService = async (req) => {
   try {
     const { id } = req.params
     const body = req.body
-    const show = await Showtimes.findById(id)
 
+    const [show, { CinemaId: currentCinema }] = await Promise.all([
+      Showtimes.findById(id).populate('screenRoomId'),
+      ScreenRoom.findById(body.screenRoomId)
+    ])
+
+    if (show.screenRoomId.CinemaId !== currentCinema) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Cannot change showtime into another cinema'
+      )
+    }
     const timeSlot = await timeSlotService.getTimeSlotIdWithScreenRoomId({
       showTimeId: show._id,
       screenRoomId: show.screenRoomId
@@ -51,7 +62,17 @@ export const updateService = async (req) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Cannot change the movie id')
     }
     if (body.status === FULL_SCHEDULE) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Cannot change status schedule into full')
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Cannot change status schedule into full'
+      )
+    }
+    // Nếu như lịch chiếu đã bị xóa mềm thì không thể sửa
+    if (show.destroy) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'This timeslot is deleted soft'
+      )
     }
 
     // // Kiểm tra tồn tại của movieId và screenRoomId
@@ -106,6 +127,7 @@ export const updateService = async (req) => {
         )
       }
     }
+    // Nếu như status hiện tại khác khi sửa và khác trạng thái đã hủy
     if (body.status !== show.status && body.status !== CANCELLED_SCHEDULE) {
       promises.push(
         timeSlotService.updateStatus(timeSlot._id, {
