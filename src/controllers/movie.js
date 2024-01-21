@@ -176,23 +176,24 @@ export const update = async (req, res, next) => {
     const checkshowtimes = await Showtimes.find({ movieId: id })
     const showtime = await checkshowtimes[0]
     if (showtime != undefined) {
-      if (checkmovie.author != req.body.author) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang công chiếu không thể sửa author !')
-      }
-      if (checkmovie.duration != req.body.duration) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang công chiếu không thể sửa duration !')
-      }
-      // throw new ApiError(StatusCodes.NOT_FOUND, 'Movies that are currently playing cannot be Update! (phim đang có xuất chiếu không thể sửa được )')
+      // if (checkmovie.author != req.body.author) {
+      //   throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang có xuất chiếu không thể sửa author !')
+      // }
+      // if (checkmovie.duration != req.body.duration) {
+      //   throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang xuất chiếu không thể sửa duration !')
+      // }
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Movies that are currently playing cannot be Update! (phim đang có xuất chiếu không thể sửa được )')
     }
     // check status nếu đang công chiếu thì k sửa dc 1 số trường
     if (checkmovie.status == 'IS_SHOWING') {
-      if (checkmovie.author != req.body.author) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang công chiếu không thể sửa author !')
-      }
-      if (checkmovie.duration != req.body.duration) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang công chiếu không thể sửa duration !')
-      }
-      // console.log(checkmovie)
+      
+      // if (checkmovie.author != req.body.author) {
+        //   throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang công chiếu không thể sửa author !')
+        // }
+        // if (checkmovie.duration != req.body.duration) {
+          //   throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang công chiếu không thể sửa duration !')
+          // }
+          throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang công chiếu không thể sửa !')
     }
     // check destroy nếu đang xóa mềm thì không thể sửa được bất cứ trường nào
     if (checkmovie.destroy==true) {
@@ -361,6 +362,7 @@ export const remove = async (req, res, next) => {
     // check status 
     const checkmovie = await Movie.findById(id)
     if (checkmovie.status == 'IS_SHOWING') {
+
       console.log(checkmovie)
       throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang công chiếu không thể xóa !')
     }
