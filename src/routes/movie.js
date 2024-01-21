@@ -2,10 +2,14 @@ import express from 'express';
 import {
   create,
   getAll,
+  getAllSoftDelete,
   getDetail,
   remove,
+  restore,
+  softDelete,
   update
-} from '../controllers/movie.js';
+} from '../controllers/movie.js'; 
+
 import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js';
 // import { checkPermission } from "../middlewares/checkPermission";
 const routerProducts = express.Router();
@@ -17,10 +21,13 @@ const routerProducts = express.Router();
 // routerProducts.delete('/:id', verifyAccessToken, isAdmin, remove);
 
 routerProducts.get('/', getAll);
+routerProducts.get('/softdelete', getAllSoftDelete);
 routerProducts.get('/:id', getDetail);
 routerProducts.patch('/:id', update);
 routerProducts.post('/', create);
 routerProducts.delete('/:id', remove);
+routerProducts.patch('/softdelete/:id', softDelete);
+routerProducts.patch('/restore/:id', restore);
 
 
 export default routerProducts;

@@ -17,10 +17,10 @@ const productSchema = mongoose.Schema(
     duration: {
       type: Number,
       required: true
-    }, 
-    country : {
-      type : String,
-      required : true
+    },
+    country: {
+      type: String,
+      required: true
     },
     age_limit: {
       type: Number,
@@ -31,7 +31,7 @@ const productSchema = mongoose.Schema(
       required: true
     },
     toDate: {
-      type: Date,
+      type:  Date,
       required: true
     },
     author: {
@@ -55,26 +55,33 @@ const productSchema = mongoose.Schema(
     status: {
       type: String,
       enum: statusProduct,
-      required: true
+      required: true,
+      enum: ['COMING_SOON', 'IS_SHOWING','PRTMIERED','CANCELLED'],
     },
     rate: {
       type: Number,
       enum: [1, 2, 3, 4, 5],
-      required : true
+      required: true
     },
-    show_scheduleId : [
+    prices: [
       {
-        type :  mongoose.Schema.Types.ObjectId,
-        ref : 'ShowSchedule'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MoviePrice',
+        validate: [(val) => val <= 2, '{PATH} exceeds the limit of 2']
       }
     ],
-    slug : {
-      type : String
+    slug: {
+      type: String
     },
-    destroy : {
-      type : Boolean,
-      default : false
-    }
+    destroy: {
+      type: Boolean,
+      default: false
+    },
+    showTimes: [
+      {
+        type : mongoose.Types.ObjectId,
+        ref : 'Showtimes'
+    }]
   },
   { versionKey: false, timestamps: true }
 )

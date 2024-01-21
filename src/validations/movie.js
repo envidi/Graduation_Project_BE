@@ -1,11 +1,14 @@
 /* eslint-disable @stylistic/js/quotes */
 import Joi from 'joi'
+import JoiDate from '@joi/date'
 
-const productSchema = Joi.object({
+const JoiExtended = Joi.extend(JoiDate)
+const productSchema = JoiExtended.object({
   name: Joi.string().required().min(6).max(255).label('Name').messages({
     'string.empty': `{{ #label }} is 'required'`
   }),
   desc: Joi.string().min(3).max(255).trim().strict(),
+  prices: Joi.array().items(Joi.string()).min(1),
   author: Joi.string().required().min(1).max(255).trim().strict(),
   image: Joi.string().required().min(1).max(255).trim().strict(),
   duration: Joi.number().required().min(30).max(300),
@@ -13,20 +16,30 @@ const productSchema = Joi.object({
   trailer: Joi.string().required().min(1),
   age_limit: Joi.number().required().min(1).max(100),
   categoryId: Joi.array().items(Joi.string()).min(1).required(),
-  fromDate: Joi.date().required().greater('now'),
-  toDate: Joi.date().required().greater(Joi.ref('fromDate')),
-  status: Joi.string().required().min(1).max(255),
+  fromDate: JoiExtended.date().format(['YYYY/MM/DD HH:mm', 'DD-MM-YYYY HH:mm']).required().min('now'),
+  toDate: JoiExtended.date().format(['YYYY/MM/DD HH:mm', 'DD-MM-YYYY HH:mm']).required().greater(Joi.ref('fromDate')),
+  status: Joi.string().required().min(1).max(255).valid('COMING_SOON', 'IS_SHOWING','PRTMIERED','CANCELLED'),
   rate: Joi.number().required().min(1).max(5),
   // Trong array của show_schedule thêm một object có trường id và name
-  show_scheduleId: Joi.array()
+  showTimes: Joi.array()
     .items(
       Joi.object({
         _id: Joi.string().required(),
         name: Joi.string().required()
-      }) 
+      })
     )
-    .min(1)
+    .min(0)
     .required()
+  // Movie Price
+  // movie_priceId: Joi.array()
+  //   .items(
+  //     Joi.object({
+  //       _id: Joi.string().required(),
+  //       name: Joi.string().required()
+  //     })
+  //   )
+  //   .min(1)
+  //   .required()
 }).options({
   abortEarly: false
 })

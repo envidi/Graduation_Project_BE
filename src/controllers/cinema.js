@@ -18,8 +18,8 @@ export const getAll = async (req, res, next) => {
         [_sort]: _order === 'asc' ? 1 : -1
       }
     }
-    const data = await Cinema.find({})
-    console.log(data)
+    const data = await Cinema.paginate({}, options)
+
     if (!data || data.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No Cinema found!')
     }
@@ -36,16 +36,15 @@ export const getDetail = async (req, res, next) => {
     const id = req.params.id;
 
     const data = await Cinema.findById(id)
-    console.log(data)
     if (!data || data.length === 0) {
 
       throw new ApiError(StatusCodes.NOT_FOUND, 'Not Cinema found!')
     }
 
     return res.status(StatusCodes.OK).json({
-      data: {
-        data,
-      }
+      data:
+        data
+
     })
   } catch (error) {
     next(error)
@@ -64,7 +63,7 @@ export const update = async (req, res, next) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
     const data = await Cinema.findByIdAndUpdate(id, body, { new: true })
-    if (!data) throw new Error('Update Cinema failed!')
+    if (!data) throw new ApiError(StatusCodes.NOT_FOUND, 'Update Cinema failed!')
     return res.status(StatusCodes.OK).json({
       message: 'Success!',
       data: data
@@ -102,7 +101,7 @@ export const remove = async (req, res, next) => {
     const data = await Cinema.findByIdAndDelete(id)
     if (!data) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete Cinema failed!')
-    }
+    }             
     return res.status(StatusCodes.OK).json({
       message: 'Success!',
       data
