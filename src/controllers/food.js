@@ -2,29 +2,8 @@
 // import foodValidationSchema from '../validations/food'
 // import { StatusCodes } from 'http-status-codes'
 // import ApiError from '../utils/ApiError.js'
-// // import findDifferentElements from '../utils/findDifferent.js'
-// import { v2 as cloudinary } from 'cloudinary';
+// import findDifferentElements from '../utils/findDifferent.js'
 
-// // const checkImageExists = async (imageUrl) => {
-// //   try {
-// //     // Kiểm tra từ Cloudinary dựa trên URL của ảnh
-// //     // Giả sử imageUrl là public ID của ảnh trên Cloudinary
-// //     const result = await cloudinary.api.resource(imageUrl)
-// //     return result ? true : false
-// //   } catch (error) {
-// //     // ảnh ko tồn tại hoặc lỗi trả về false
-// //     return false
-// //   }
-// // }
-
-// // const checkImagesForFoodArray = async (foodArray) => {
-// //   for (let food of foodArray) {
-// //     const imageExists = await checkImageExists(food.image)
-// //     if (!imageExists) {
-// //       food.image = null
-// //     }
-// //   }
-// // }
 // export const getAll = async (req, res, next) => {
 //   try {
 //     const {
@@ -75,12 +54,13 @@
 //       throw new ApiError(StatusCodes.NOT_FOUND, 'Not food found!')
 //     }
 //     // check ảnh trên Cloudinary
-//     // const imageExists = await checkImageExists(data.$getPopulatedDocs.image)
-//     // if (!imageExists) {
-//     //   // data.image = null
-//     //   throw new ApiError(StatusCodes.NOT_FOUND, 'Image not found!')
-//     // }
-//     /////////////////////////////////
+//     const imageExists = await checkImageExists(data.image)
+//     console.log('data.image:', data.image);
+//     console.log('imageExists:', imageExists);
+//     if (!imageExists) {
+//       throw new ApiError(StatusCodes.NOT_FOUND, 'Image not found!')
+//     }
+//     ///////////////////////////////
 //     return res.status(StatusCodes.OK).json({
 //       message: 'Success',
 //       data: data
@@ -97,8 +77,6 @@
 //     if (req.file) {
 //       body.image = req.file.path;
 //     }
-//     console.log(body);
-
 //     const { error } = foodValidationSchema.validate(body, { abortEarly: true })
 //     if (error) {
 //       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
