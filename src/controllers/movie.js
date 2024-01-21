@@ -185,7 +185,7 @@ export const update = async (req, res, next) => {
       // throw new ApiError(StatusCodes.NOT_FOUND, 'Movies that are currently playing cannot be Update! (phim đang có xuất chiếu không thể sửa được )')
     }
     // check status nếu đang công chiếu thì k sửa dc 1 số trường
-    if (checkmovie.status == '1') {
+    if (checkmovie.status == 'IS_SHOWING') {
       if (checkmovie.author != req.body.author) {
         throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang công chiếu không thể sửa author !')
       }
@@ -362,7 +362,7 @@ export const remove = async (req, res, next) => {
     const checkmovie = await Movie.findById(id)
     if (checkmovie.status == 'IS_SHOWING') {
       console.log(checkmovie)
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Movies that are currently playing cannot be deleted!')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang công chiếu không thể xóa !')
     }
 
     const data = await Movie.findOneAndDelete({ _id: id })
