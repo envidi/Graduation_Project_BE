@@ -14,7 +14,7 @@ import routerEmail from './email.js'
 const routerInit = Router()
 
 routerInit.use('/user', routerUser)
-routerInit.use('/product', routerProducts)
+routerInit.use('/movie', routerProducts)
 routerInit.use('/category', routerCategory)
 routerInit.use('/cinema', routerCinema)
 routerInit.use('/roleUser', routerRoleUser)

@@ -55,7 +55,8 @@ const productSchema = mongoose.Schema(
     status: {
       type: String,
       enum: statusProduct,
-      required: true
+      required: true,
+      enum: ['COMING_SOON', 'IS_SHOWING','PRTMIERED','CANCELLED'],
     },
     rate: {
       type: Number,
