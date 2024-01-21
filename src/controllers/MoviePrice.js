@@ -1,5 +1,6 @@
 import Movie from '../model/Movie.js'
 import MoviePrice from '../model/MoviePrice.js'
+import Seat from '../model/Seat.js'
 import { moviePriceService } from '../services/moviePrice.js'
 import ApiError from '../utils/ApiError.js'
 import { slugify } from '../utils/stringToSlug.js'
@@ -130,24 +131,30 @@ export const remove = async (req, res, next) => {
     if (!moviePrice) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'MoviePrice not found!');
     }
+    const movie = await Movie.findById(movcóiePrice.movieId);
 
-    if (moviePrice.released) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Cannot delete a released movie price!');
+    if(movie.status === 'COMING_SOON' || movie.status === 'HOT') {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Movie is not released yet!');
     }
+     
+     // Kiểm tra xem có chỗ nào được đặt trước cho bộ phim không
+     const seatBookings = await Seat.find({ movie: moviePrice.movie, seats: { $exists: true, $not: {$size: 0} } }).exec(); // Giả sử việc đặt chỗ có mảng 'chỗ ngồi'
+     if (seatBookings.length > 0) {
+       throw new ApiError(StatusCodes.BAD_REQUEST, 'Cannot delete price as there are seat bookings for this movie.');
+     }
+    
+    await moviePriceService.remove(id);
 
-    if (moviePrice.booked) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Cannot delete a movie price with booked seats!');
-    }
-
-    const data = await moviePriceService.remove(id);
-
-    if (!data) {
-      throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to delete MoviePrice!');
-    }
+    // Cập nhật mảng giá trong Movie bằng cách loại bỏ giá đã xóa
+    const updatedMovie = await Movie.findByIdAndUpdate(
+      moviePrice.movie,
+      { $set: { prices: moviePrice._id } }, // Giả sử Movie có một mảng prices chứa các ID của MoviePrice
+      { new: [] } // Trả về Movie đã được cập nhật
+    );
 
     return res.status(StatusCodes.OK).json({
-      message: 'Success!',
-      data
+      message: 'MoviePrice deleted successfully!',
+      movie: updatedMovie
     });
   } catch (error) {
     next(error);

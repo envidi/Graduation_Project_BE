@@ -16,15 +16,7 @@ const moviePriceSchema = mongoose.Schema(
       type: String,
       enum: ['weekday', 'weekend'],
       required: true
-    },
-    released: {
-      type: Boolean,
-      default: false,
-    },
-    booked: {
-      type: Boolean,
-      default: false,
-    },
+    }
   },
   { versionKey: false, timestamps: true }
 )
