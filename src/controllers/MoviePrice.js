@@ -1,10 +1,13 @@
+// import Movie from '../model/Movie.js'
 import Movie from '../model/Movie.js'
 import MoviePrice from '../model/MoviePrice.js'
 import { moviePriceService } from '../services/moviePrice.js'
+import Showtimes from '../model/Showtimes.js'
+
 import ApiError from '../utils/ApiError.js'
-import { slugify } from '../utils/stringToSlug.js'
+// import { slugify } from '../utils/stringToSlug.js'
 import {
-  moviePriceSchema,
+  // moviePriceSchema,
   updateMoviePriceSchema
 } from '../validations/MoviePrice.js'
 import { StatusCodes } from 'http-status-codes'
@@ -58,6 +61,27 @@ export const update = async (req, res, next) => {
     const body = req.body
     if (!id) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Id MoviePrice not found')
+    }
+    //
+    const checkprice = await MoviePrice.findById(id)
+    const checkmovie = await Movie.find({ _id: checkprice.movieId })
+    // check xuat chieu
+    const checkshowtimes = await Showtimes.find({ movieId: checkprice.movieId })
+    const showtime = await checkshowtimes[0]
+    if (showtime != undefined) {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        'Movies that are currently playing cannot be Update! (phim đang có xuất chiếu không thể sửa được )'
+      )
+    }
+    /// check status movie
+
+    const checkstt = checkmovie[0]
+    if (checkstt.status == 'COMING_SOON') {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        'Phim đang công chiếu không thể sửa giá !'
+      )
     }
     const { error } = updateMoviePriceSchema.validate(body, {
       abortEarly: true

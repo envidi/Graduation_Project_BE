@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import MoviePrice from '../model/MoviePrice'
 import ApiError from '../utils/ApiError'
 import { moviePriceSchema } from '../validations/MoviePrice'
-import slugify from 'slugify'
+// import slugify from 'slugify'
 import Movie from '../model/Movie'
 
 export const moviePriceService = {
