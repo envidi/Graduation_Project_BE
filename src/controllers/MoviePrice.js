@@ -1,10 +1,13 @@
+// import Movie from '../model/Movie.js'
 import Movie from '../model/Movie.js'
 import MoviePrice from '../model/MoviePrice.js'
 import { moviePriceService } from '../services/moviePrice.js'
+import Showtimes from '../model/Showtimes.js'
+
 import ApiError from '../utils/ApiError.js'
-import { slugify } from '../utils/stringToSlug.js'
+// import { slugify } from '../utils/stringToSlug.js'
 import {
-  moviePriceSchema,
+  // moviePriceSchema,
   updateMoviePriceSchema
 } from '../validations/MoviePrice.js'
 import { StatusCodes } from 'http-status-codes'
@@ -59,6 +62,27 @@ export const update = async (req, res, next) => {
     if (!id) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Id MoviePrice not found')
     }
+    //
+    const checkprice = await MoviePrice.findById(id)
+    const checkmovie = await Movie.find({ _id: checkprice.movieId })
+    // check xuat chieu
+    const checkshowtimes = await Showtimes.find({ movieId: checkprice.movieId })
+    const showtime = await checkshowtimes[0]
+    if (showtime != undefined) {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        'Movies that are currently playing cannot be Update! (phim đang có xuất chiếu không thể sửa được )'
+      )
+    }
+    /// check status movie
+
+    const checkstt = checkmovie[0]
+    if (checkstt.status == 'COMING_SOON') {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        'Phim đang công chiếu không thể sửa giá !'
+      )
+    }
     const { error } = updateMoviePriceSchema.validate(body, {
       abortEarly: true
     })
@@ -82,37 +106,8 @@ export const update = async (req, res, next) => {
 
 export const create = async (req, res, next) => {
   try {
-    const body = req.body
-    const { error } = moviePriceSchema.validate(body, { abortEarly: true })
-    if (error) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
-    }
+    const data = await moviePriceService.create(req.body)
 
-    // Check if a MoviePrice with the same movieId and dayType already exists
-    const existingMoviePrice = await MoviePrice.findOne({
-      movieId: body.movieId,
-      dayType: body.dayType
-    })
-    if (existingMoviePrice) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'A MoviePrice with the same movieId and dayType already exists'
-      )
-    }
-
-    const data = await MoviePrice.create({
-      ...body,
-      slug: slugify(body.name)
-    })
-    if (!data) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Create MoviePrice failed')
-    }
-    // Update movie prices in movie collection
-    await Movie.findOneAndUpdate(data.movieId, {
-      $addToSet: {
-        prices: data._id
-      }
-    })
     return res.status(StatusCodes.CREATED).json({
       message: 'Success',
       data: data
@@ -127,10 +122,6 @@ export const remove = async (req, res, next) => {
     const id = req.params.id
 
     const data = await moviePriceService.remove(id)
-
-    if (!data) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete MoviePrice failed!')
-    }
 
     return res.status(StatusCodes.OK).json({
       message: 'Success!',
