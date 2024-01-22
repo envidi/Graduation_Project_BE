@@ -1,10 +1,10 @@
 /* eslint-disable no-useless-catch */
 import { StatusCodes } from 'http-status-codes'
-import Seat from '../../model/Seat.js'
-import ScreeningRoom from '../../model/ScreenRoom.js'
+// import Seat from '../../model/Seat.js'
+// import ScreeningRoom from '../../model/ScreenRoom.js'
 import ApiError from '../../utils/ApiError.js'
-import { SOLD, UNAVAILABLE, AVAILABLE } from '../../model/Seat.js'
-import TimeSlot from '../../model/TimeSlot.js'
+// import { SOLD, UNAVAILABLE, AVAILABLE } from '../../model/Seat.js'
+// import TimeSlot from '../../model/TimeSlot.js'
 import Showtimes from '../../model/Showtimes.js'
 import { timeSlotService } from '../TimeSlot/index.js'
 import Movie from '../../model/Movie.js'
@@ -60,7 +60,17 @@ export const removeService = async (req) => {
     throw error
   }
 }
-
+export const deleteShowTime = async (id) => {
+  try {
+    const deleteShow = await Showtimes.findByIdAndDelete(id)
+    if (!deleteShow || Object.keys(deleteShow).length === 0) {
+      throw new ApiError(StatusCodes.CONFLICT, 'Delete show failed')
+    }
+    return deleteShow
+  } catch (error) {
+    throw error
+  }
+}
 export const deleteSoftService = async (req) => {
   try {
     const id = req.params.id
