@@ -5,7 +5,7 @@ import {
   getDetail,
   remove,
   update
-} from '../controllers/moviePrice.js'
+} from '../controllers/MoviePrice.js'
 
 const routerMoviePrice = express.Router()
 

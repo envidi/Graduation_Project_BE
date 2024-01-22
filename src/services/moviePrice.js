@@ -6,13 +6,28 @@ import { moviePriceSchema } from '../validations/MoviePrice'
 import Movie from '../model/Movie'
 
 export const moviePriceService = {
-  remove: async (id) => {
-    const data = await MoviePrice.findByIdAndDelete(id)
-
-    if (!data) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete MoviePrice failed!')
+  findById: async (id) => {
+    try {
+      const moviePrice = await MoviePrice.findById(id)
+      return moviePrice
+    } catch (error) {
+      throw new Error('Lỗi khi tìm giá phim theo ID')
     }
-    return data
+  },
+  remove: async (id) => {
+    try {
+      const deletedMoviePrice = await MoviePrice.findByIdAndDelete(id)
+      return deletedMoviePrice
+    } catch (error) {
+      throw new Error('Lỗi khi xóa giá phim')
+    }
+
+    // const data = await MoviePrice.findByIdAndDelete(id)
+
+    // if (!data) {
+    //   throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete MoviePrice failed!')
+    // }
+    // return data
   },
   create: async (body) => {
     const { error } = moviePriceSchema.validate(body, { abortEarly: true })

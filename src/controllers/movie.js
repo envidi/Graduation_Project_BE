@@ -98,7 +98,7 @@ export const getAllSoftDelete = async (req, res, next) => {
           : price.dayType === 'weekend'
       })
 
-      movie.price = priceObject ? priceObject.price : null
+      // movie.price = priceObject ? priceObject.price : null
     })
 
     return res.status(StatusCodes.OK).json({

@@ -1,6 +1,7 @@
 // import Movie from '../model/Movie.js'
 import Movie from '../model/Movie.js'
 import MoviePrice from '../model/MoviePrice.js'
+import Seat from '../model/Seat.js'
 import { moviePriceService } from '../services/moviePrice.js'
 import Showtimes from '../model/Showtimes.js'
 
@@ -13,6 +14,8 @@ import {
 import { StatusCodes } from 'http-status-codes'
 
 export const getAll = async (req, res, next) => {
+  // console.log(1)
+  // return 1
   try {
     const {
       _page = 1,
@@ -120,12 +123,41 @@ export const create = async (req, res, next) => {
 export const remove = async (req, res, next) => {
   try {
     const id = req.params.id
+    const moviePrice = await moviePriceService.findById(id)
 
-    const data = await moviePriceService.remove(id)
+    if (!moviePrice) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'MoviePrice not found!')
+    }
+    const movie = await Movie.findById(moviePrice.movieId)
+
+    if (movie.status === 'IS_SHOWING') {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Movie is released. Cannot delete this price!')
+    }
+
+    // Kiểm tra xem có chỗ nào được đặt trước cho bộ phim không
+    const seatBookings = await Seat.find({
+      movie: moviePrice.movieId,
+      seats: { $exists: true, $not: { $size: 0 } }
+    }).exec() // Giả sử việc đặt chỗ có mảng 'chỗ ngồi'
+    if (seatBookings.status === 'SOLD') {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Cannot delete price as there are seat bookings for this movie.'
+      )
+    }
+
+    await moviePriceService.remove(id)
+
+    // Cập nhật mảng giá trong Movie bằng cách loại bỏ giá đã xóa
+    const updatedMovie = await Movie.findByIdAndUpdate(
+      moviePrice.movie,
+      { $set: { prices: moviePrice._id } }, // Giả sử Movie có một mảng prices chứa các ID của MoviePrice
+      { new: [] } // Trả về Movie đã được cập nhật
+    )
 
     return res.status(StatusCodes.OK).json({
-      message: 'Success!',
-      data
+      message: 'MoviePrice deleted successfully!',
+      movie: updatedMovie
     })
   } catch (error) {
     next(error)
