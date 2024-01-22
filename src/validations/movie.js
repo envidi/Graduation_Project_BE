@@ -1,6 +1,7 @@
 /* eslint-disable @stylistic/js/quotes */
 import Joi from 'joi'
 import JoiDate from '@joi/date'
+// import { moviePriceSchema } from './MoviePrice'
 
 const JoiExtended = Joi.extend(JoiDate)
 const productSchema = JoiExtended.object({
@@ -8,7 +9,7 @@ const productSchema = JoiExtended.object({
     'string.empty': `{{ #label }} is 'required'`
   }),
   desc: Joi.string().min(3).max(255).trim().strict(),
-  prices: Joi.array().items(Joi.string()).min(1),
+
   author: Joi.string().required().min(1).max(255).trim().strict(),
   image: Joi.string().required().min(1).max(255).trim().strict(),
   duration: Joi.number().required().min(30).max(300),
@@ -18,7 +19,7 @@ const productSchema = JoiExtended.object({
   categoryId: Joi.array().items(Joi.string()).min(1).required(),
   fromDate: JoiExtended.date().format(['YYYY/MM/DD HH:mm', 'DD-MM-YYYY HH:mm']).required().min('now'),
   toDate: JoiExtended.date().format(['YYYY/MM/DD HH:mm', 'DD-MM-YYYY HH:mm']).required().greater(Joi.ref('fromDate')),
-  status: Joi.string().required().min(1).max(255).valid('COMING_SOON', 'IS_SHOWING','PRTMIERED','CANCELLED'),
+  status: Joi.string().required().min(1).max(255).valid('COMING_SOON', 'IS_SHOWING', 'PRTMIERED', 'CANCELLED'),
   rate: Joi.number().required().min(1).max(5),
   // Trong array của show_schedule thêm một object có trường id và name
   showTimes: Joi.array()
@@ -29,17 +30,17 @@ const productSchema = JoiExtended.object({
       })
     )
     .min(0)
-    .required()
+    .required(),
   // Movie Price
-  // movie_priceId: Joi.array()
-  //   .items(
-  //     Joi.object({
-  //       _id: Joi.string().required(),
-  //       name: Joi.string().required()
-  //     })
-  //   )
-  //   .min(1)
-  //   .required()
+  prices: Joi.array()
+    .items(
+      Joi.object({
+        price: Joi.number().required().min(0),
+        dayType: Joi.string().required().valid('weekday', 'weekend')
+      })
+    )
+    .min(2)
+    .required()
 }).options({
   abortEarly: false
 })
