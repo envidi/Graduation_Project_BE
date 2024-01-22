@@ -8,7 +8,7 @@ import {
 } from '../controllers/category.js';
 // import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js';
 // import { checkPermission } from "../middlewares/checkPermission";
-const routerProducts = express.Router();
+const routerCategory = express.Router();
 
 // routerProducts.get('/', verifyAccessToken, getAll);
 // routerProducts.get('/:id', verifyAccessToken, getDetail);
@@ -16,11 +16,11 @@ const routerProducts = express.Router();
 // routerProducts.post('/', verifyAccessToken, isAdmin, create);
 // routerProducts.delete('/:id', verifyAccessToken, isAdmin, remove);
 
-routerProducts.get('/', getAll);
-routerProducts.get('/query', getDetail);
-routerProducts.patch('/:id', update);
-routerProducts.post('/', create);
-routerProducts.delete('/:id', remove);
+routerCategory.get('/', getAll);
+routerCategory.get('/query', getDetail);
+routerCategory.patch('/:id', update);
+routerCategory.post('/', create);
+routerCategory.delete('/:id', remove);
 
 
-export default routerProducts;
+export default routerCategory;

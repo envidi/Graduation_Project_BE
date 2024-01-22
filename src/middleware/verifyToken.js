@@ -12,7 +12,7 @@ export const verifyAccessToken = asyncHandler(async (req, res, next) => {
         })
 
       }
-      console.log('decode là', decode);
+
       req.user = decode
       next()
     })

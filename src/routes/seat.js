@@ -5,10 +5,10 @@ import {
   getDetail,
   remove,
   update
-} from '../controllers/movie.js';
+} from '../controllers/seat.js';
 import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js';
 // import { checkPermission } from "../middlewares/checkPermission";
-const routerProducts = express.Router();
+const routerSeat = express.Router();
 
 // routerProducts.get('/', verifyAccessToken, getAll);
 // routerProducts.get('/:id', verifyAccessToken, getDetail);
@@ -16,11 +16,11 @@ const routerProducts = express.Router();
 // routerProducts.post('/', verifyAccessToken, isAdmin, create);
 // routerProducts.delete('/:id', verifyAccessToken, isAdmin, remove);
 
-routerProducts.get('/', getAll);
-routerProducts.get('/:id', getDetail);
-routerProducts.put('/:id', update);
-routerProducts.post('/', create);
-routerProducts.delete('/:id', remove);
+routerSeat.get('/', getAll);
+routerSeat.get('/:id', getDetail);
+routerSeat.patch('/:id', update);
+routerSeat.post('/', create);
+routerSeat.delete('/:id', remove);
 
 
-export default routerProducts;
+export default routerSeat;
