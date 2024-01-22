@@ -8,27 +8,26 @@ import Movie from '../model/Movie'
 export const moviePriceService = {
   findById: async (id) => {
     try {
-      const moviePrice = await MoviePrice.findById(id);
-      return moviePrice;
+      const moviePrice = await MoviePrice.findById(id)
+      return moviePrice
     } catch (error) {
-      throw new Error('Lỗi khi tìm giá phim theo ID');
+      throw new Error('Lỗi khi tìm giá phim theo ID')
     }
   },
   remove: async (id) => {
-
     try {
-      const deletedMoviePrice = await MoviePrice.findByIdAndDelete(id);
-      return deletedMoviePrice;
+      const deletedMoviePrice = await MoviePrice.findByIdAndDelete(id)
+      return deletedMoviePrice
     } catch (error) {
-      throw new Error('Lỗi khi xóa giá phim');
+      throw new Error('Lỗi khi xóa giá phim')
     }
 
-    const data = await MoviePrice.findByIdAndDelete(id)
+    // const data = await MoviePrice.findByIdAndDelete(id)
 
-    if (!data) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete MoviePrice failed!')
-    }
-    return data
+    // if (!data) {
+    //   throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete MoviePrice failed!')
+    // }
+    // return data
   },
   create: async (body) => {
     const { error } = moviePriceSchema.validate(body, { abortEarly: true })
@@ -62,6 +61,5 @@ export const moviePriceService = {
     })
 
     return data
-
   }
 }

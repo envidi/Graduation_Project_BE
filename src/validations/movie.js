@@ -39,8 +39,8 @@ const productSchema = JoiExtended.object({
         dayType: Joi.string().required().valid('weekday', 'weekend')
       })
     )
-    .min(2)
-    .required()
+    .min(0)
+    // .required()
 }).options({
   abortEarly: false
 })
