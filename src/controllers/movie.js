@@ -12,7 +12,7 @@ import {
   convertTimeToCurrentZone,
   convertTimeToIsoString
 } from '../utils/timeLib.js'
-import { get } from 'mongoose'
+// import { get } from 'mongoose'
 
 export const getAll = async (req, res, next) => {
   try {
@@ -321,7 +321,7 @@ export const softDelete = async (req, res, next) => {
       data
     })
   } catch (error) {
-
+    next(error)
   }
 }
 export const restore = async (req, res, next) => {
@@ -342,7 +342,7 @@ export const restore = async (req, res, next) => {
       data
     })
   } catch (error) {
-
+    next(error)
   }
 }
 
