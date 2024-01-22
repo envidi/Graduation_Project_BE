@@ -2,7 +2,8 @@
 // import foodValidationSchema from '../validations/food'
 // import { StatusCodes } from 'http-status-codes'
 // import ApiError from '../utils/ApiError.js'
-// // import findDifferentElements from '../utils/findDifferent.js'
+// import findDifferentElements from '../utils/findDifferent.js'
+
 // export const getAll = async (req, res, next) => {
 //   try {
 //     const {
@@ -29,6 +30,8 @@
 //     if (!data || data.length === 0) {
 //       throw new ApiError(StatusCodes.NOT_FOUND, 'No food found!')
 //     }
+//     // Kiểm tra hình ảnh tồn tại cho từng đối tượng trong mảng
+//     // await checkImagesForFoodArray(data.docs);
 //     return res.status(StatusCodes.OK).json({
 //       message: 'Success',
 //       data: data
@@ -47,10 +50,17 @@
 //     const { includeDeleted } = req.query // lấy tham số includeDeleted từ query string
 //     const queryCondition = includeDeleted === 'true' ? { _id: id } : { _id: id, isDeleted: false };
 //     const data = await Food.findOne(queryCondition)
-
 //     if (!data || data.length === 0) {
 //       throw new ApiError(StatusCodes.NOT_FOUND, 'Not food found!')
 //     }
+//     // check ảnh trên Cloudinary
+//     const imageExists = await checkImageExists(data.image)
+//     console.log('data.image:', data.image);
+//     console.log('imageExists:', imageExists);
+//     if (!imageExists) {
+//       throw new ApiError(StatusCodes.NOT_FOUND, 'Image not found!')
+//     }
+//     ///////////////////////////////
 //     return res.status(StatusCodes.OK).json({
 //       message: 'Success',
 //       data: data
@@ -67,8 +77,6 @@
 //     if (req.file) {
 //       body.image = req.file.path;
 //     }
-//     console.log(body);
-
 //     const { error } = foodValidationSchema.validate(body, { abortEarly: true })
 //     if (error) {
 //       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
