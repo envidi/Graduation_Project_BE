@@ -60,9 +60,10 @@ export const removeService = async (reqBody) => {
       timeSlots.forEach((timeslot) => {
         const req = {
           params: {
-            id: timeslot._id.toString()
+            id: timeslot.Show_scheduleId.toString()
           }
         }
+
         promises.push(scheduleService.removeService(req))
       })
     }
