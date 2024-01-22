@@ -138,7 +138,7 @@ export const remove = async (req, res, next) => {
     }
      
      // Kiểm tra xem có chỗ nào được đặt trước cho bộ phim không
-     const seatBookings = await Seat.find({ movie: moviePrice.movie, seats: { $exists: true, $not: {$size: 0} } }).exec(); // Giả sử việc đặt chỗ có mảng 'chỗ ngồi'
+     const seatBookings = await Seat.find({ movie: moviePrice.movieId, seats: { $exists: true, $not: {$size: 0} } }).exec(); // Giả sử việc đặt chỗ có mảng 'chỗ ngồi'
      if (seatBookings.length > 0) {
        throw new ApiError(StatusCodes.BAD_REQUEST, 'Cannot delete price as there are seat bookings for this movie.');
      }
