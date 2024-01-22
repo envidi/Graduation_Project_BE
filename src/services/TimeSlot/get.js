@@ -74,6 +74,24 @@ export const getOneService = async (reqBody) => {
   }
 }
 
+export const getTimeSlotIdWithScreenRoomId = async (reqBody) => {
+  try {
+    const { showTimeId, screenRoomId } = reqBody
+    // const data = await TimeSlot.findById(id)
+    // Lấy dữ liệu từ bảng categories khi query data từ bảng TimeSlot
+    const data = await TimeSlot.findOne({
+      $and: [{ Show_scheduleId: showTimeId }, { ScreenRoomId: screenRoomId }]
+    })
+
+    if (!data || data.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No timeslot found!')
+    }
+    return data
+  } catch (error) {
+    throw error
+  }
+}
+
 export const getAllIncludeDestroyService = async (reqBody) => {
   try {
     const {

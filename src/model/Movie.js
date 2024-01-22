@@ -1,9 +1,11 @@
 import mongoose from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
-const COMING_SOON = 'COMING_SOON'
-const RELEASED = 'RELEASED'
-const HOT = 'HOT'
-const statusProduct = [COMING_SOON, RELEASED, HOT]
+export const COMING_SOON = 'COMING_SOON'
+export const IS_SHOWING = 'IS_SHOWING'
+export const PRTMIERED = 'PRTMIERED'
+export const CANCELLED = 'CANCELLED'
+// const HOT = 'HOT'
+const statusProduct = [COMING_SOON, IS_SHOWING, PRTMIERED, CANCELLED]
 const productSchema = mongoose.Schema(
   {
     name: {
@@ -54,20 +56,14 @@ const productSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: statusProduct,
-      required: true
+      required: true,
+      enum: statusProduct
     },
     rate: {
       type: Number,
       enum: [1, 2, 3, 4, 5],
       required: true
     },
-    show_scheduleId: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'ShowSchedule'
-      }
-    ],
     prices: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -81,7 +77,13 @@ const productSchema = mongoose.Schema(
     destroy: {
       type: Boolean,
       default: false
-    }
+    },
+    showTimes: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'Showtimes'
+      }
+    ]
   },
   { versionKey: false, timestamps: true }
 )

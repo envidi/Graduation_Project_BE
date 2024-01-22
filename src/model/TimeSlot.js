@@ -1,8 +1,9 @@
 import mongoose from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
-export const AVAILABLE = 'Available'
-export const FULL = 'Full'
-export const statusScreen = [AVAILABLE, FULL]
+export const AVAILABLE_TIMESLOT = 'Available'
+export const FULL_TIMESLOT = 'Full'
+export const CANCELLED_TIMESLOT = 'Cancelled'
+export const statusTimeSlot = [AVAILABLE_TIMESLOT, FULL_TIMESLOT, CANCELLED_TIMESLOT]
 const TimeSlotSchema = mongoose.Schema(
   {
     ScreenRoomId: {
@@ -23,8 +24,8 @@ const TimeSlotSchema = mongoose.Schema(
     ],
     status: {
       type: String,
-      enum: statusScreen,
-      default: AVAILABLE
+      enum: statusTimeSlot,
+      default: AVAILABLE_TIMESLOT
     },
 
     destroy: {

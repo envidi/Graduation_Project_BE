@@ -2,7 +2,7 @@
 import ScreeningRoom from '../../model/ScreenRoom.js'
 import { createService, createForPostManService } from './post.js'
 import { deleteSoftService, removeService, restoreService } from './delete.js'
-import { updateService } from './patch.js'
+import { updateService, updateStatusScreen } from './patch.js'
 import { getAllService, getOneService, getAllIncludeDestroyService } from './get.js'
 
 
@@ -26,6 +26,7 @@ export const screenRoomService = {
   createForPostManService,
   updateService,
   getOneService,
-  getAllService
+  getAllService,
+  updateStatusScreen
 
 }

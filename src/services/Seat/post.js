@@ -32,7 +32,7 @@ export const createService = async (reqBody) => {
         }
       ]
     })
-    if (isExistSeat && isExistSeat.length > 0) {
+    if (isExistSeat || isExistSeat.length > 0) {
       throw new ApiError(StatusCodes.CONFLICT, 'Seat is already in use')
     }
 
@@ -40,7 +40,7 @@ export const createService = async (reqBody) => {
       ...body
     })
 
-    if (!data) {
+    if (!data || Object.keys(data).length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Create seat failed!')
     }
 
