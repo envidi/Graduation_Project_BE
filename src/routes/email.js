@@ -5,5 +5,4 @@ const routerEmail = express.Router();
 routerEmail.post('/', sendMailController);
 
 
-
 export default routerEmail;

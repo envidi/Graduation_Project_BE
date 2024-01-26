@@ -4,9 +4,9 @@ import { updateService } from './patch';
 import { removeService } from './delete'
 
 export const ticketService = {
-    getAllService,
-    getOneService,
-    createService,
-    updateService,
-    removeService
+  getAllService,
+  getOneService,
+  createService,
+  updateService,
+  removeService
 }

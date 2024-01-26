@@ -21,7 +21,7 @@ const showtimesValidate = JoiExtended.object({
   }),
   status: Joi.string().min(1).max(255),
   screenRoomId: Joi.string().required().min(1).max(255).trim().strict(),
-  movieId: Joi.string().required().min(1).max(255).trim().strict(),
+  movieId: Joi.string().required().min(1).max(255).trim().strict()
 }).options({
   abortEarly: false
 });

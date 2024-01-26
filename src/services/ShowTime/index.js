@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-catch */
 import { createService } from './post.js'
 import { deleteSoftService, removeService, restoreService, deleteShowTime } from './delete.js'
-import { updateService , updateStatusFull } from './patch.js'
+import { updateService, updateStatusFull } from './patch.js'
 import { getAllService, getOneService, getAllIncludeDestroyService } from './get.js'
 
 
