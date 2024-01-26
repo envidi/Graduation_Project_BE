@@ -112,7 +112,6 @@ export const getAllSoftDelete = async (req, res, next) => {
     next(error)
   }
 }
-
 export const getDetail = async (req, res, next) => {
   try {
     const id = req.params.id
@@ -184,6 +183,7 @@ export const update = async (req, res, next) => {
       // }
       throw new ApiError(StatusCodes.NOT_FOUND, 'Movies that are currently playing cannot be Update! (phim đang có xuất chiếu không thể sửa được )')
     }
+    
     // check status nếu đang công chiếu thì k sửa dc 1 số trường
     if (checkmovie.status == 'IS_SHOWING') {
       
