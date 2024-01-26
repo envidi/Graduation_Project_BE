@@ -5,7 +5,8 @@ const foodValidationSchema = Joi.object({
   image: Joi.string().required(),
   price: Joi.number().min(0).required(),
   quantity: Joi.number().min(0).required(),
-  ticketId: Joi.array().items(Joi.string())
+  ticketId: Joi.array().items(Joi.string()),
+  isDeleted: Joi.boolean()
 }).options({
   abortEarly: false
 })

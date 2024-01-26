@@ -6,6 +6,7 @@ import ApiError from '../../utils/ApiError.js'
 import { SOLD, UNAVAILABLE, AVAILABLE } from '../../model/Seat.js'
 import TimeSlot from '../../model/TimeSlot.js'
 import Cinema from '../../model/Cinema.js'
+import Showtimes from '../../model/Showtimes.js'
 import { scheduleService } from '../ShowTime/index.js'
 
 export const removeService = async (reqBody) => {
@@ -58,22 +59,18 @@ export const removeService = async (reqBody) => {
     if (timeSlots.length > 0) {
       timeSlots.forEach((timeslot) => {
         const req = {
-          params : {
-            id : timeslot._id.toString()
+          params: {
+            id: timeslot.Show_scheduleId.toString()
           }
         }
+
         promises.push(scheduleService.removeService(req))
       })
     }
 
-    const result = await Promise.all(promises)
-
-    if (!result || result.length === 0) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'Delete screening rooms failed!'
-      )
-    }
+    const result = await Promise.all(promises).catch((error) => {
+      throw new ApiError(StatusCodes.CONFLICT, new Error(error.message))
+    })
 
     return result
   } catch (error) {
@@ -84,32 +81,37 @@ export const removeService = async (reqBody) => {
 export const deleteSoftService = async (reqBody) => {
   try {
     const id = reqBody.params.id
-    // const body = reqBody.body
-    const checkScreenRoom = await ScreeningRoom.paginate(
-      { _id: id },
-      {
-        populate: {
-          path: 'TimeSlotId',
+
+    const [checkScreenRoom, timeSlotIds] = await Promise.all([
+      ScreeningRoom.paginate(
+        { _id: id },
+        {
           populate: {
-            path: 'SeatId'
+            path: 'TimeSlotId',
+            populate: {
+              path: 'SeatId'
+            }
           }
         }
-      }
-    )
-    const timeSlotIds = await ScreeningRoom.paginate(
-      {
-        _id: id
-      },
-      {
-        populate: {
-          path: 'TimeSlotId',
-          select: '_id SeatId'
+      ),
+      ScreeningRoom.paginate(
+        {
+          _id: id
+        },
+        {
+          populate: {
+            path: 'TimeSlotId',
+            select: '_id SeatId'
+          }
         }
-      }
-    )
+      )
+    ]).catch((error) => {
+      throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error.message))
+    })
     // Tìm kiếm trong tất cả timeslot xem có ghế nào ở trạng thái được bán không
     // Nếu có thì không cho xóa
     const timeSlots = checkScreenRoom.docs[0].TimeSlotId
+    const arrayShowTime = timeSlots.map((timeslot) => timeslot.Show_scheduleId)
     timeSlots.forEach((timeSlot) => {
       const isSeatSold = timeSlot.SeatId.some((seat) => seat.status === SOLD)
       if (isSeatSold) {
@@ -138,14 +140,24 @@ export const deleteSoftService = async (reqBody) => {
     let promises = []
     // Cập nhật tất cả timeslot trong screen thành đã bị xóa mềm
     if (
-      timeSlotIds.docs[0].TimeSlotId &&
+      timeSlotIds.docs[0].TimeSlotId ||
       timeSlotIds.docs[0].TimeSlotId.length > 0
     ) {
       promises.push(
         TimeSlot.updateMany(
           {
             _id: {
-              $in: timeSlotIds.docs[0].TimeSlotId
+              $in: checkScreenRoom.docs[0].TimeSlotId
+            }
+          },
+          {
+            destroy: true
+          }
+        ),
+        Showtimes.updateMany(
+          {
+            _id: {
+              $in: arrayShowTime
             }
           },
           {
@@ -171,16 +183,13 @@ export const deleteSoftService = async (reqBody) => {
       )
     })
 
-    const result = await Promise.all(promises)
-    if (!result) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'Update timeslot from rooms failed!'
-      )
-    }
+    await Promise.all(promises).catch((error) => {
+      throw new Error(StatusCodes.CONFLICT, new Error(error.message))
+    })
+
     return data
   } catch (error) {
-    throw new Error(error.message)
+    throw error
   }
 }
 
@@ -197,11 +206,14 @@ export const restoreService = async (reqBody) => {
       {
         populate: {
           path: 'TimeSlotId',
-          select: '_id SeatId'
+          select: '_id SeatId Show_scheduleId'
         }
       }
     )
 
+    const arrayShowTime = timeSlotIds.docs[0].TimeSlotId.map(
+      (timeslot) => timeslot.Show_scheduleId
+    )
     const data = await ScreeningRoom.findByIdAndUpdate(
       { _id: id },
       {
@@ -232,6 +244,16 @@ export const restoreService = async (reqBody) => {
           {
             destroy: false
           }
+        ),
+        Showtimes.updateMany(
+          {
+            _id: {
+              $in: arrayShowTime
+            }
+          },
+          {
+            destroy: false
+          }
         )
       )
     }
@@ -251,13 +273,9 @@ export const restoreService = async (reqBody) => {
       )
     })
 
-    const result = await Promise.all(promises)
-    if (!result) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'Restore timeslot from rooms failed!'
-      )
-    }
+    await Promise.all(promises).catch((error) => {
+      throw new Error(StatusCodes.CONFLICT, new Error(error.message))
+    })
     return data
   } catch (error) {
     throw error

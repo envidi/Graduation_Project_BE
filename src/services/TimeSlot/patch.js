@@ -88,13 +88,39 @@ export const updateService = async (reqBody) => {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Update timeslot failed!')
     }
 
-    const result = await Promise.all(promises)
+    const result = await Promise.all(promises).catch((err) => {
+      throw new ApiError(StatusCodes.CONFLICT, new Error(err.message))
+    })
     if (!result) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Request failed')
     }
 
-
     return result
+  } catch (error) {
+    throw error
+  }
+}
+
+export const updateStatus = async (id, data) => {
+  try {
+    const updateStatusTimeSlot = await TimeSlot.findByIdAndUpdate(id, data, {
+      new: true
+    })
+    return updateStatusTimeSlot
+  } catch (error) {
+    throw error
+  }
+}
+export const checkSomeSeatSold = async (timeslotId) => {
+  try {
+    const currentTimeSlot =
+      await TimeSlot.findById(timeslotId).populate('SeatId')
+
+    // // Kiểm tra xem timeslot hiện tại có ghế nào ở trạng thái đã bán chưa
+    const currentTimeSlotSeats = currentTimeSlot.SeatId.some(
+      (seat) => seat.status === SOLD
+    )
+    return currentTimeSlotSeats
   } catch (error) {
     throw error
   }

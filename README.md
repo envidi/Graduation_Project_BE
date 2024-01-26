@@ -14,3 +14,14 @@ git clone and npm i
 - chore: Những sửa đổi nhỏ nhặt không liên quan tới code.
 - BREAKING CHANGE: Nhưng commit mới footer là BREAKING CHANGE thể hiện những thay đổi gây ảnh hướng lớn đến source code ví dụ thay đổi kiểu dữ liệu, cách lấy dữ liệu… => Qua đó cảnh báo mọi người để tránh phát sinh các vấn đề.
 # Examples : fix(login):Corect way to get user data
+# VN Pay : 
+- Ngân hàng: NCB
+- Số thẻ: 9704198526191432198
+- Tên chủ thẻ: NGUYEN VAN A
+- Ngày phát hành: 07/15
+- Mật khẩu OTP: 123456
+# Momo : 
+- NGUYEN VAN A
+- 9704 0000 0000 0018
+- 03/07
+- OTP

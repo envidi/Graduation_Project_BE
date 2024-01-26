@@ -1,9 +1,11 @@
 import mongoose from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
-const COMING_SOON = 'COMING_SOON'
-const RELEASED = 'RELEASED'
-const HOT = 'HOT'
-const statusProduct = [COMING_SOON, RELEASED, HOT]
+export const COMING_SOON = 'COMING_SOON'
+export const IS_SHOWING = 'IS_SHOWING'
+export const PRTMIERED = 'PRTMIERED'
+export const CANCELLED = 'CANCELLED'
+// const HOT = 'HOT'
+const statusProduct = [COMING_SOON, IS_SHOWING, PRTMIERED, CANCELLED]
 const productSchema = mongoose.Schema(
   {
     name: {
@@ -31,7 +33,7 @@ const productSchema = mongoose.Schema(
       required: true
     },
     toDate: {
-      type:  Date,
+      type: Date,
       required: true
     },
     author: {
@@ -54,9 +56,8 @@ const productSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: statusProduct,
       required: true,
-      enum: ['COMING_SOON', 'IS_SHOWING','PRTMIERED','CANCELLED'],
+      enum: statusProduct
     },
     rate: {
       type: Number,
@@ -79,9 +80,10 @@ const productSchema = mongoose.Schema(
     },
     showTimes: [
       {
-        type : mongoose.Types.ObjectId,
-        ref : 'Showtimes'
-    }]
+        type: mongoose.Types.ObjectId,
+        ref: 'Showtimes'
+      }
+    ]
   },
   { versionKey: false, timestamps: true }
 )
@@ -90,11 +92,11 @@ productSchema.pre('findOneAndDelete', async function (next) {
   try {
     // Lấy model Product từ biến đã importc
     const Category = mongoose.model('Category')
-    const Product = mongoose.model('Movie')
+    const Movie = mongoose.model('Movie')
     // Lấy điều kiện tìm kiếm hiện tại của câu lệnh , xác định category
     const filter = this.getFilter()
     // Tìm sản phẩm bị xóa và lấy ra mảng category của sản phẩm bị xóa
-    const { categoryId } = await Product.findOne(
+    const { categoryId } = await Movie.findOne(
       { _id: filter._id },
       { categoryId: 1 }
     )

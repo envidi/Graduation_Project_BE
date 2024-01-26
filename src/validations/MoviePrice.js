@@ -1,7 +1,7 @@
 import Joi from 'joi'
 
 export const moviePriceSchema = Joi.object({
-  movieId: Joi.array().required(),
+  movieId: Joi.string().required(),
   price: Joi.number().required().min(0),
   dayType: Joi.string().required().valid('weekday', 'weekend')
 }).options({

@@ -59,65 +59,63 @@ export const removeService = async (timeSlotId) => {
   }
 }
 
-export const deleteSoftService = async (reqBody) => {
-  try {
-    const id = reqBody.params.id
-    const body = reqBody.body
-    const checkTimeSlot = await TimeSlot.paginate(
-      { _id: id },
-      { populate: 'SeatId' }
-    )
-    // Nếu như một số ghế trong timeslot có trạng thái là SOLD
-    // thì ko cho tiếp tục
-    const isSold = checkTimeSlot.docs[0].SeatId.some((seat) => {
-      return seat.status === SOLD
-    })
+// export const deleteSoftService = async (reqBody) => {
+//   try {
+//     const id = reqBody.params.id
+//     const body = reqBody.body
+//     const checkTimeSlot = await TimeSlot.paginate(
+//       { _id: id },
+//       { populate: 'SeatId' }
+//     )
+//     // Nếu như một số ghế trong timeslot có trạng thái là SOLD
+//     // thì ko cho tiếp tục
+//     const isSold = checkTimeSlot.docs[0].SeatId.some((seat) => {
+//       return seat.status === SOLD
+//     })
 
-    if (isSold) {
-      throw new ApiError(
-        StatusCodes.CONFLICT,
-        'Seat in this screen room is sold. Cant delete it!'
-      )
-    }
-    const data = await TimeSlot.findOneAndUpdate({ _id: id }, body, {
-      new: true
-    })
+//     if (isSold) {
+//       throw new ApiError(
+//         StatusCodes.CONFLICT,
+//         'Seat in this screen room is sold. Cant delete it!'
+//       )
+//     }
+//     const data = await TimeSlot.findOneAndUpdate({ _id: id }, body, {
+//       new: true
+//     })
 
-    if (!data) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'Delete screening rooms failed!'
-      )
-    }
-    // Cập nhất tất cả ghế của timeslot hiện tại thành UNAVAILABLE
-    const updateSeat = await Seat.updateMany(
-      {
-        _id: {
-          $in: data.SeatId
-        }
-      },
-      {
-        status: UNAVAILABLE
-      }
-    )
-    if (!updateSeat) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'Update seat from rooms failed!'
-      )
-    }
+//     if (!data) {
+//       throw new ApiError(
+//         StatusCodes.BAD_REQUEST,
+//         'Delete screening rooms failed!'
+//       )
+//     }
+//     // Cập nhất tất cả ghế của timeslot hiện tại thành UNAVAILABLE
+//     const updateSeat = await Seat.updateMany(
+//       {
+//         _id: {
+//           $in: data.SeatId
+//         }
+//       },
+//       {
+//         status: UNAVAILABLE
+//       }
+//     )
+//     if (!updateSeat) {
+//       throw new ApiError(
+//         StatusCodes.BAD_REQUEST,
+//         'Update seat from rooms failed!'
+//       )
+//     }
 
-    return data
-  } catch (error) {
-    throw error
-  }
-}
+//     return data
+//   } catch (error) {
+//     throw error
+//   }
+// }
 // Ngược lại delete soft
-export const restoreService = async (reqBody) => {
+export const restoreService = async (id) => {
   try {
-    const id = reqBody.params.id
-    const body = reqBody.body
-    const data = await TimeSlot.findOneAndUpdate({ _id: id }, body, {
+    const data = await TimeSlot.findOneAndUpdate({ Show_scheduleId: id }, { destroy : false }, {
       new: true
     })
     if (!data) {
@@ -143,6 +141,44 @@ export const restoreService = async (reqBody) => {
         'Update seat from rooms failed!'
       )
     }
+    return data
+  } catch (error) {
+    throw error
+  }
+}
+
+export const deleteSoftService = async (showTimeId) => {
+  try {
+    const id = showTimeId
+
+    const data = await TimeSlot.findOneAndUpdate({ Show_scheduleId: id }, { destroy : true }, {
+      new: true
+    })
+
+    if (!data) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Delete soft timeslot failed'
+      )
+    }
+    // Cập nhất tất cả ghế của timeslot hiện tại thành UNAVAILABLE
+    const updateSeat = await Seat.updateMany(
+      {
+        _id: {
+          $in: data.SeatId
+        }
+      },
+      {
+        status: UNAVAILABLE
+      }
+    )
+    if (!updateSeat) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Update seat from rooms failed!'
+      )
+    }
+
     return data
   } catch (error) {
     throw error

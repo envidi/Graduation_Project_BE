@@ -15,6 +15,7 @@ import TimeSlot from '../../model/TimeSlot.js'
 import Showtimes from '../../model/Showtimes.js'
 import dayjs from '../../utils/timeLib.js'
 import { scheduleService } from '../ShowTime/index.js'
+import { IS_SHOWING } from '../../model/Movie.js'
 
 export const updateService = async (reqBody) => {
   try {
@@ -32,9 +33,20 @@ export const updateService = async (reqBody) => {
     const resultTimeSlotAndSeat = await Promise.all([
       TimeSlot.findOne({ _id: body.TimeSlotId }).populate('SeatId'),
       Seat.findOne({ _id: id }),
-      Showtimes.findOne({ _id: body.ShowScheduleId }, 'timeFrom timeTo')
+      Showtimes.findOne(
+        { _id: body.ShowScheduleId },
+        'timeFrom timeTo'
+      ).populate('movieId', 'status')
     ])
+
     const [dataTimeSlot, dataSeat, dataShowTimes] = resultTimeSlotAndSeat
+    // Nếu như bộ phim chưa công chiếu thì không thể đặt ghế
+    if (dataShowTimes.movieId.status !== IS_SHOWING) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'The movie is not released. Cannot order the seat'
+      )
+    }
 
     // Kiểm tra xem thời gian đặt ghế đã quá thời gian chiếu phim chưa
     const now = dayjs()
@@ -68,12 +80,17 @@ export const updateService = async (reqBody) => {
       })
       if (allSeatIsSold) {
         await Promise.all([
-          checkAndUpdateTimeSlot(dataTimeSlot._id, FULL_TIMESLOT, dataTimeSlot.ScreenRoomId ),
+          checkAndUpdateTimeSlot(
+            dataTimeSlot._id,
+            FULL_TIMESLOT,
+            dataTimeSlot.ScreenRoomId
+          ),
           scheduleService.updateStatusFull(dataShowTimes._id.toString(), {
             status: FULL_SCHEDULE
           })
-
-        ])
+        ]).catch((error) => {
+          throw new ApiError(StatusCodes.CONFLICT, new Error(error.message))
+        })
       }
     }
     // Nếu như timeslot của ghế đang được sửa có trạng thái là full
@@ -83,11 +100,17 @@ export const updateService = async (reqBody) => {
     if (isTimeSlotFull) {
       if (isBodyStatusValid) {
         await Promise.all([
-          checkAndUpdateTimeSlot(dataTimeSlot._id, AVAILABLE_TIMESLOT, dataTimeSlot.ScreenRoomId ),
+          checkAndUpdateTimeSlot(
+            dataTimeSlot._id,
+            AVAILABLE_TIMESLOT,
+            dataTimeSlot.ScreenRoomId
+          ),
           scheduleService.updateStatusFull(dataShowTimes._id.toString(), {
             status: AVAILABLE_SCHEDULE
           })
-        ])
+        ]).catch((error) => {
+          throw new ApiError(StatusCodes.CONFLICT, new Error(error.message))
+        })
       }
     }
 

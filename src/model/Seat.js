@@ -22,7 +22,7 @@ export const VIP = 'VIP'
 const seatChema = new mongoose.Schema({
   typeSeat: {
     type: String,
-    enum: ['normal', 'VIP'],
+    enum: [NORMAL, VIP],
     required: true
   },
   price: {

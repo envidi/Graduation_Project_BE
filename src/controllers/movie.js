@@ -12,7 +12,7 @@ import {
   convertTimeToCurrentZone,
   convertTimeToIsoString
 } from '../utils/timeLib.js'
-import { get } from 'mongoose'
+// import { get } from 'mongoose'
 
 export const getAll = async (req, res, next) => {
   try {
@@ -98,7 +98,7 @@ export const getAllSoftDelete = async (req, res, next) => {
           : price.dayType === 'weekend'
       })
 
-      movie.price = priceObject ? priceObject.price : null
+      // movie.price = priceObject ? priceObject.price : null
     })
 
     return res.status(StatusCodes.OK).json({
@@ -156,8 +156,6 @@ export const getDetail = async (req, res, next) => {
     next(error)
   }
 }
-
-
 export const update = async (req, res, next) => {
   try {
     const id = req.params.id
@@ -175,29 +173,22 @@ export const update = async (req, res, next) => {
     const checkshowtimes = await Showtimes.find({ movieId: id })
     const showtime = await checkshowtimes[0]
     if (showtime != undefined) {
-      // if (checkmovie.author != req.body.author) {
-      //   throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang có xuất chiếu không thể sửa author !')
-      // }
       // if (checkmovie.duration != req.body.duration) {
       //   throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang xuất chiếu không thể sửa duration !')
       // }
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Movies that are currently playing cannot be Update! (phim đang có xuất chiếu không thể sửa được )')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Movies that are currently playing cannot be Update!')
     }
     
     // check status nếu đang công chiếu thì k sửa dc 1 số trường
     if (checkmovie.status == 'IS_SHOWING') {
-      
-      // if (checkmovie.author != req.body.author) {
-        //   throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang công chiếu không thể sửa author !')
-        // }
         // if (checkmovie.duration != req.body.duration) {
           //   throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang công chiếu không thể sửa duration !')
           // }
-          throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang công chiếu không thể sửa !')
+          throw new ApiError(StatusCodes.NOT_FOUND, 'Movies currently being released cannot be edited !')
     }
     // check destroy nếu đang xóa mềm thì không thể sửa được bất cứ trường nào
     if (checkmovie.destroy==true) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang trong danh sách xóa không thể sửa !')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'The movie is in the deletion list and cannot be edited !')
     }
 
     // const data = await Movie.findByIdAndUpdate(id, body, { new: true })
@@ -215,14 +206,12 @@ export const update = async (req, res, next) => {
       newCategory,
       result
     )
-
-    // if () 
     const updateData = await Movie.updateOne({ _id: id }, {
       ...body,
       fromDate: new Date(convertTimeToIsoString(body.fromDate)),
       toDate: new Date(convertTimeToIsoString(body.toDate))
     })
-    ///
+
     if (!updateData) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Update movie failed!')
     }
@@ -275,8 +264,10 @@ export const create = async (req, res, next) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
 
+    const { prices, ...restBody } = body
+
     const data = await Movie.create({
-      ...body,
+      ...restBody,
       fromDate: new Date(convertTimeToIsoString(body.fromDate)),
       toDate: new Date(convertTimeToIsoString(body.toDate)),
       slug: slugify(body.name)
@@ -295,6 +286,27 @@ export const create = async (req, res, next) => {
         }
       })
     }
+
+    // Tạo giá
+    if (prices && prices.length > 0) {
+      for (let i = 0; i < prices.length; i++) {
+        await moviePriceService.create({
+          movieId: data._id.toString(),
+          ...prices[i]
+        })
+      }
+    }
+
+    data._doc = {
+      ...data._doc,
+      prices: prices.map((price) => {
+        return {
+          ...price,
+          movieId: data._id
+        }
+      })
+    }
+
     return res.status(StatusCodes.OK).json({
       message: 'Success',
       datas: data
@@ -311,7 +323,7 @@ export const softDelete = async (req, res, next) => {
     const checkshowtimes = await Showtimes.find({ movieId: id })
     const showtime = await checkshowtimes[0]
     if (showtime != undefined) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Movies that are currently playing cannot be deleted! đã có xuất chiếu không thể xóa')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Movies that have already been released cannot be deleted !')
     }
     const data = await Movie.updateOne({ _id: id }, { destroy: true });
     if (!data) {
@@ -322,7 +334,7 @@ export const softDelete = async (req, res, next) => {
       data
     })
   } catch (error) {
-
+    next(error)
   }
 }
 export const restore = async (req, res, next) => {
@@ -332,18 +344,18 @@ export const restore = async (req, res, next) => {
     const checkshowtimes = await Showtimes.find({ movieId: id })
     const showtime = await checkshowtimes[0]
     if (showtime != undefined) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Movies that are currently playing cannot be deleted! đã có xuất chiếu không thể xóa')
+      throw new ApiError(StatusCodes.NOT_FOUND, '')
     }
     const data = await Movie.updateOne({ _id: id }, { destroy: false });
     if (!data) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Soft Delete movie failed!')
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Movie restore failed !')
     }
     return res.status(StatusCodes.OK).json({
       message: 'Success!',
       data
     })
   } catch (error) {
-
+    next(error)
   }
 }
 
@@ -355,16 +367,15 @@ export const remove = async (req, res, next) => {
     const checkshowtimes = await Showtimes.find({ movieId: id })
     const showtime = await checkshowtimes[0]
     if (showtime != undefined) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Movies that are currently playing cannot be deleted! xoa lam sao ma dc')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Movies that are currently showing cannot be deleted !')
     }
     // console.log(showtime.movieId == id)
 
-    // check status 
+    // check status
     const checkmovie = await Movie.findById(id)
     if (checkmovie.status == 'IS_SHOWING') {
-
       console.log(checkmovie)
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang công chiếu không thể xóa !')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Movies that are currently showing cannot be deleted !')
     }
 
     const data = await Movie.findOneAndDelete({ _id: id })
