@@ -14,15 +14,15 @@ const ScreenRoomSchema = mongoose.Schema(
       type: String,
       required: true
     },
-    NumberSeat : {
-      type : Number,
-      default : 20,
-      required : true
+    NumberSeat: {
+      type: Number,
+      default: 20,
+      required: true
     },
-    projector:{
-      type : String,
-      enum : projectors,
-      required : true
+    projector: {
+      type: String,
+      enum: projectors,
+      required: true
     },
     CinemaId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -31,13 +31,12 @@ const ScreenRoomSchema = mongoose.Schema(
     },
     TimeSlotId: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'TimeSlot',
-      required: true
+      ref: 'TimeSlot'
     }],
-    status : {
-      type : String,
-      enum : statusScreen,
-      default : AVAILABLE_SCREEN
+    status: {
+      type: String,
+      enum: statusScreen,
+      default: AVAILABLE_SCREEN
     },
     destroy: {
       type: Boolean,

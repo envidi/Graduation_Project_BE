@@ -1,3 +1,4 @@
+import { types } from 'joi';
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2'
 export const RESERVED = 'RESERVED' //vé đã được đặt chỗ nhưng chưa thanh toán.
@@ -9,11 +10,18 @@ const TicketSchema = new mongoose.Schema({
     type: mongoose.Types.ObjectId,
     ref: 'MoviePrice'
   },
-  seatId: {
-    type: mongoose.Types.ObjectId,
-    ref: 'Seat',
-    required: true
-  },
+  // seatId: {
+  //   type: mongoose.Types.ObjectId,
+  //   ref: 'Seat',
+  //   required: true
+  // },
+  seatId: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: 'Seat',
+      require: true
+    },
+  ],
   foodId: {
     type: [
       {
@@ -29,8 +37,7 @@ const TicketSchema = new mongoose.Schema({
     required: true
   },
   quantity: {
-    type: Number,
-    required: true
+    type: Number
   },
   totalPrice: {
     type: Number
