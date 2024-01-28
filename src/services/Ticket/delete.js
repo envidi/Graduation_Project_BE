@@ -1,5 +1,5 @@
 /* eslint-disable no-useless-catch */
-import Ticket from '../../model/Ticket'
+import Ticket, { CANCELLED } from '../../model/Ticket'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../utils/ApiError'
 
@@ -10,8 +10,14 @@ export const removeService = async (reqBody) => {
     const ticket = await Ticket.findById(id);
 
     // Kiểm tra nếu thức ăn không tồn tại hoặc đã được đánh dấu xóa
-    if (!ticket || ticket.isDeleted) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Ticket not found or already deleted!');
+    if (!ticket) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Ticket not found');
+    }
+    if (ticket.isDeleted) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Ticket already deleted!');
+    }
+    if (ticket.status !== CANCELLED) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Ticket cannot be deleted unless it is cancelled!');
     }
 
     // Cập nhật trường isDeleted thành true để đánh dấu xóa mềm
