@@ -80,7 +80,7 @@ export const removeHardService = async (reqBody) => {
           }
         }
       )
-    ]).catch((err)=>{
+    ]).catch((err) => {
       throw new ApiError(StatusCodes.CONFLICT, new Error(err.message))
     })
 

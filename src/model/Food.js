@@ -15,10 +15,7 @@ const foodSchema = new mongoose.Schema(
       type: Number,
       required: true
     },
-    quantity: {
-      type: Number,
-      required: true
-    },
+
     // 0 to many optional
     ticketId: {
       type: [
