@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-catch */
-import Food from '../../model/Food'
+import Ticket from '../../model/Ticket'
 import { StatusCodes } from 'http-status-codes'
-import ApiError from '../../utils/ApiError.js'
+import ApiError from '../../utils/ApiError'
 
 export const getAllService = async (reqBody) => {
   try {
@@ -22,12 +22,12 @@ export const getAllService = async (reqBody) => {
         [_sort]: _order === 'asc' ? 1 : -1
       }
     }
-    // const data = await Food.paginate({}, options)
-    // const data = await Food.paginate({ isDeleted: false }, options); // Chỉ lấy các thực phẩm chưa bị xóa mềm
-    const data = await Food.paginate(queryCondition, options);
+    // const data = await Ticket.paginate({}, options)
+    // const data = await Ticket.paginate({ isDeleted: false }, options); // Chỉ lấy các thực phẩm chưa bị xóa mềm
+    const data = await Ticket.paginate(queryCondition, options);
 
     if (!data || data.docs.length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'No food found!')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No Ticket found!')
     }
     return data
   } catch (error) {
@@ -38,13 +38,13 @@ export const getAllService = async (reqBody) => {
 export const getOneService = async (reqBody) => {
   try {
     const id = reqBody.params.id
-    // const data = await Food.findById(id)
-    // const data = await Food.findOne({ _id: id, isDeleted: false }); // Kiểm tra thêm điều kiện không bị xóa mềm
+    // const data = await Ticket.findById(id)
+    // const data = await Ticket.findOne({ _id: id, isDeleted: false }); // Kiểm tra thêm điều kiện không bị xóa mềm
     const { includeDeleted } = reqBody.query // lấy tham số includeDeleted từ query string
     const queryCondition = includeDeleted === 'true' ? { _id: id } : { _id: id, isDeleted: false };
-    const data = await Food.findOne(queryCondition)
+    const data = await Ticket.findOne(queryCondition)
     if (!data || data.length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Not food found!')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Not Ticket found!')
     }
     return data
   } catch (error) {

@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 
-const limitRoleName=["admin","manager","user"];
+const limitRoleName=['admin', 'manager', 'user'];
 const roleUserSchema = new mongoose.Schema({
   roleName: {
     type: String,
-    default: "user",
+    default: 'user',
     unique:true,
     enum:limitRoleName,
     required: true
@@ -17,9 +17,9 @@ const roleUserSchema = new mongoose.Schema({
   userIds: {
     type: [mongoose.Schema.Types.ObjectId], // Chỉ định kiểu dữ liệu là mảng ObjectId
     default: [], // Đặt giá trị mặc định là một mảng rỗng
-    ref:"User"
-  },
-},{
+    ref:'User'
+  }
+}, {
   timestamps: true
 });
 

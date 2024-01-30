@@ -103,7 +103,7 @@ export const remove = async (req, res, next) => {
     const data = await Cinema.findByIdAndDelete(id)
     if (!data) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete Cinema failed!')
-    }             
+    }
     return res.status(StatusCodes.OK).json({
       message: 'Success!',
       data

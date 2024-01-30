@@ -57,7 +57,8 @@ const productSchema = mongoose.Schema(
     status: {
       type: String,
       required: true,
-      enum: statusProduct
+      enum: statusProduct,
+      default: COMING_SOON
     },
     rate: {
       type: Number,
