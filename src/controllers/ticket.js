@@ -107,3 +107,14 @@ export const remove = async (req, res, next) => {
     next(error);
   }
 };
+export const removeHard = async (req, res, next) => {
+  try {
+    const data = await ticketService.removeHardService(req);
+    return res.status(StatusCodes.OK).json({
+      message: 'Ticket removed successfully',
+      data
+    });
+  } catch (error) {
+    next(error);
+  }
+};

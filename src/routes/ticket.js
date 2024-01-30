@@ -1,5 +1,5 @@
 import express from 'express';
-import { create, getAll, getDetail, remove, update } from '../controllers/ticket';
+import { create, getAll, getDetail, remove, update, removeHard } from '../controllers/ticket';
 const routerTicket = express.Router();
 
 // routerProducts.get('/', verifyAccessToken, getAll);
@@ -13,6 +13,7 @@ routerTicket.get('/:id', getDetail);
 routerTicket.patch('/:id', update);
 routerTicket.post('/', create);
 routerTicket.delete('/:id', remove);
+routerTicket.delete('/delete/:id', removeHard);
 
 
 export default routerTicket;

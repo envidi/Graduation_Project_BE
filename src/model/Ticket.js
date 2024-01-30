@@ -1,60 +1,63 @@
-import { types } from 'joi';
-import mongoose from 'mongoose';
+import { types } from 'joi'
+import mongoose from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
 export const RESERVED = 'RESERVED' //vé đã được đặt chỗ nhưng chưa thanh toán.
 export const PAID = 'PAID' // vé đã thanh toán.
 export const CANCELLED = 'CANCELLED' // vé đã bị hủy
 const statusTicket = [RESERVED, PAID, CANCELLED]
-const TicketSchema = new mongoose.Schema({
-  prices: {
-    type: mongoose.Types.ObjectId,
-    ref: 'MoviePrice'
-  },
-  // seatId: {
-  //   type: mongoose.Types.ObjectId,
-  //   ref: 'Seat',
-  //   required: true
-  // },
-  seatId: [
-    {
+const TicketSchema = new mongoose.Schema(
+  {
+    priceId: {
       type: mongoose.Types.ObjectId,
-      ref: 'Seat',
-      require: true
+      ref: 'MoviePrice'
     },
-  ],
-  foodId: {
-    type: [
+    seatId: [
       {
         type: mongoose.Types.ObjectId,
-        ref: 'Food'
+        ref: 'Seat',
+        require: true
       }
     ],
-    default: []
-  },
-  showtimeId: {
-    type: mongoose.Types.ObjectId,
-    ref: 'Showtimes',
-    required: true
-  },
-  quantity: {
-    type: Number
-  },
-  totalPrice: {
-    type: Number
-  },
-  status: {
-    type: String,
-    enum: statusTicket,
-    default: RESERVED,
-    required: true
-  },
-  // thêm trường isDeleted
-  isDeleted: {
-    type: Boolean,
-    default: false
-  }
-}, { versionKey: false, timestamps: true });
+    foods: [
+      {
+        foodId: {
+          type: String,
+          required :true
+          // ref: 'Food'
 
-TicketSchema.plugin(mongoosePaginate);
+        },
+        quantityFood : {
+          type : Number,
+          required : true
+        }
+      }
+    ],
+    showtimeId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'Showtimes',
+      required: true
+    },
+    quantity: {
+      type: Number
+    },
+    totalPrice: {
+      type: Number
+    },
+    status: {
+      type: String,
+      enum: statusTicket,
+      default: RESERVED,
+      required: true
+    },
+    // thêm trường isDeleted
+    isDeleted: {
+      type: Boolean,
+      default: false
+    }
+  },
+  { versionKey: false, timestamps: true }
+)
 
-export default mongoose.model('Ticket', TicketSchema);
+TicketSchema.plugin(mongoosePaginate)
+
+export default mongoose.model('Ticket', TicketSchema)
