@@ -11,6 +11,8 @@ import {
 } from '../controllers/movie.js'; 
 
 import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js';
+import { upload } from '../middleware/multer.js';
+import { upload2 } from '../middleware/multer2.js';
 // import { checkPermission } from "../middlewares/checkPermission";
 const routerProducts = express.Router();
 
@@ -23,8 +25,8 @@ const routerProducts = express.Router();
 routerProducts.get('/', getAll);
 routerProducts.get('/softdelete', getAllSoftDelete);
 routerProducts.get('/:id', getDetail);
-routerProducts.patch('/:id', update);
-routerProducts.post('/', create);
+routerProducts.patch('/:id',upload2.single('image'), update);
+routerProducts.post('/',upload2.single('image'), create);
 routerProducts.delete('/:id', remove);
 routerProducts.patch('/softdelete/:id', softDelete);
 routerProducts.patch('/restore/:id', restore);

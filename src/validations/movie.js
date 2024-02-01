@@ -4,7 +4,7 @@ import JoiDate from '@joi/date'
 // import { moviePriceSchema } from './MoviePrice'
 
 const JoiExtended = Joi.extend(JoiDate)
-const productSchema = JoiExtended.object({
+const movieSchema = JoiExtended.object({
   name: Joi.string().required().min(6).max(255).label('Name').messages({
     'string.empty': `{{ #label }} is 'required'`
   }),
@@ -16,7 +16,7 @@ const productSchema = JoiExtended.object({
   country: Joi.string().required().min(1).max(100).trim().strict(),
   trailer: Joi.string().required().min(1),
   age_limit: Joi.number().required().min(1).max(100),
-  categoryId: Joi.array().items(Joi.string()).min(1).required(),
+  categoryId: Joi.array().items(Joi.string()).required(),
   fromDate: JoiExtended.date().format(['YYYY/MM/DD HH:mm', 'DD-MM-YYYY HH:mm']).required().min('now'),
   toDate: JoiExtended.date().format(['YYYY/MM/DD HH:mm', 'DD-MM-YYYY HH:mm']).required().greater(Joi.ref('fromDate')),
   status: Joi.string().required().min(1).max(255).valid('COMING_SOON', 'IS_SHOWING', 'PRTMIERED', 'CANCELLED'),
@@ -44,4 +44,4 @@ const productSchema = JoiExtended.object({
 }).options({
   abortEarly: false
 })
-export default productSchema
+export default movieSchema
