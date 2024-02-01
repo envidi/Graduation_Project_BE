@@ -10,6 +10,8 @@ import Movie from '../../model/Movie.js'
 import Showtimes from '../../model/Showtimes.js'
 import Category from '../../model/Category.js'
 import { convertTimeToIsoString } from '../../utils/timeLib.js'
+import { slugify } from '../../utils/stringToSlug.js'
+
 // import { get } from 'mongoose'
 
 
@@ -105,10 +107,7 @@ export const updateService = async (req) => {
         )
       }
       return updateData
-    //   return res.status(StatusCodes.OK).json({
-    //     message: 'Success!',
-    //     datas: updateData
-    //   })
+
     } catch (error) {
     
     throw error

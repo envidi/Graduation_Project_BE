@@ -169,6 +169,7 @@ export const getDetailService = async (reqBody) => {
 
     return newData
   } catch (error) {
-    next(error)
+    // next(error)
+    throw error
   }
 }

@@ -5,20 +5,18 @@
 // import ApiError from '../utils/ApiError.js'
 // import { slugify } from '../utils/stringToSlug.js'
 // import findDifferentElements from '../utils/findDifferent.js'
-// import { moviePriceService } from '../services/moviePrice.js'
 // import Showtimes from '../model/Showtimes.js'
+// import { moviePriceService } from '../services/moviePrice.js'
 
 import { StatusCodes } from 'http-status-codes'
 import Movie from '../../model/Movie.js'
 import movieSchema from '../../validations/movie.js'
-// import {
-//   convertTimeToCurrentZone,
-//   convertTimeToIsoString
-// } from '../utils/timeLib.js'
 import ApiError from '../../utils/ApiError.js'
 import Category from '../../model/Category.js'
 import { convertTimeToIsoString } from '../../utils/timeLib.js'
-// import { get } from 'mongoose'
+import { slugify } from '../../utils/stringToSlug.js'
+import { moviePriceService } from '../moviePrice.js'
+
 
 
 
@@ -34,6 +32,10 @@ export const createService = async (req) => {
     //   if (req.file) {
     //     body.image = req.file.path;
     //   }
+    // thêm đường dẫn ảnh vào body
+    if (req.file) {
+        body.image = req.file.path;
+      }
  
       const { error } = movieSchema.validate(body, { abortEarly: true })
       if (error) {
@@ -72,16 +74,16 @@ export const createService = async (req) => {
           })
         }
       }
-  
-      data._doc = {
-        ...data._doc,
-        prices: prices.map((price) => {
-          return {
-            ...price,
-            movieId: data._id
-          }
-        })
-      }
+      
+    //   data._doc = {
+    //     ...data._doc,
+    //     prices: prices.map((price) => {
+    //       return {
+    //         ...price,
+    //         movieId: data._id
+    //       }
+    //     })
+    //   }
       return data
     //   return res.status(StatusCodes.OK).json({
     //     message: 'Success',

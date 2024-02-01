@@ -39,7 +39,8 @@ export const getAll = async (req, res, next) => {
       data: data.docs
     })
   } catch (error) {
-    next(error)
+    // next(error)
+    throw error
   }
 }
 
