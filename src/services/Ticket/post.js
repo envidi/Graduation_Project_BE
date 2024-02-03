@@ -1,6 +1,5 @@
 /* eslint-disable no-useless-catch */
 import Ticket from '../../model/Ticket'
-import mongoose from 'mongoose'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../utils/ApiError'
 import ticketValidateSchema from '../../validations/ticket.js'
@@ -12,7 +11,6 @@ import Showtimes from '../../model/Showtimes'
 import ScreenRoom from '../../model/ScreenRoom'
 import MoviePrice from '../../model/MoviePrice.js'
 import Food from '../../model/Food.js'
-import { object } from 'joi'
 
 export const createService = async (reqBody) => {
   try {

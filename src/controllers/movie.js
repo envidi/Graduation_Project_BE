@@ -48,8 +48,7 @@ export const getAll = async (req, res, next) => {
           ? price.dayType === 'weekday'
           : price.dayType === 'weekend'
       })
-
-      movie.price = priceObject ? priceObject.price : null
+      movie.price = Object.keys(priceObject).length > 0 ? priceObject : null
     })
 
     return res.status(StatusCodes.OK).json({
@@ -98,7 +97,7 @@ export const getAllSoftDelete = async (req, res, next) => {
           : price.dayType === 'weekend'
       })
 
-      // movie.price = priceObject ? priceObject.price : null
+      movie.price = Object.keys(priceObject).length > 0 ? priceObject : null
     })
 
     return res.status(StatusCodes.OK).json({
