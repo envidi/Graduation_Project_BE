@@ -24,18 +24,8 @@ const storage = new CloudinaryStorage({
 });
 
 
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Invalid file type. Only JPG, PNG, GIF, and WEBP file types are allowed.'), false);
-  }
-};
-
-export const upload = multer({
+export const upload2 = multer({
   storage: storage,
-  fileFilter: fileFilter,
   limits: {
     fileSize: 1024 * 1024 * 5 // Giới hạn file tối đa 5MB
   }
