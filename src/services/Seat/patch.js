@@ -22,9 +22,6 @@ export const updateService = async (reqBody) => {
     const id = reqBody.params.id
     const body = reqBody.body
 
-    if (!id) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Seat id not found')
-    }
     const { error } = seatChema.validate(body, { abortEarly: true })
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
@@ -40,6 +37,9 @@ export const updateService = async (reqBody) => {
     ])
 
     const [dataTimeSlot, dataSeat, dataShowTimes] = resultTimeSlotAndSeat
+    if (!dataSeat || Object.keys(dataSeat).length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Seat id is not foudn')
+    }
     // Nếu như bộ phim chưa công chiếu thì không thể đặt ghế
     if (dataShowTimes.movieId.status !== IS_SHOWING) {
       throw new ApiError(

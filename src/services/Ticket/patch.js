@@ -2,7 +2,7 @@
 import Ticket from '../../model/Ticket'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../utils/ApiError'
-import ticketValidateSchema from '../../validations/Ticket'
+import ticketValidateSchema from '../../validations/ticket.js'
 import Seat from '../../model/Seat'
 import Showtimes from '../../model/Showtimes'
 import ScreenRoom from '../../model/ScreenRoom'
