@@ -9,18 +9,14 @@ import Category from '../../model/Category.js'
 import { convertTimeToIsoString } from '../../utils/timeLib.js'
 import findDifferentElements from '../../utils/findDifferent.js'
 
-
 export const updateService = async (req) => {
   try {
     const id = req.params.id
     const body = req.body
-    if (!id) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Id movie not found')
-    }
-    const { error } = movieSchema.validate(body, { abortEarly: true })
-    if (error) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
-    }
+    // const { error } = movieSchema.validate(body, { abortEarly: true })
+    // if (error) {
+    //   throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
+    // }
     // check suat chieu nếu có thì k sửa dc
     const checkmovie = await Movie.findById(id)
 
@@ -57,18 +53,6 @@ export const updateService = async (req) => {
     // const data = await Movie.findByIdAndUpdate(id, body, { new: true })
     const data = await Movie.findById(id, 'categoryId')
 
-    const result = findDifferentElements(data.categoryId, body.categoryId)
-    // Những id category mới thêm mảng categoryId của movie
-    const newCategory = result.filter((cate) => {
-      if (body.categoryId.includes(cate)) {
-        return cate
-      }
-    })
-    // Những id category bị xóa khỏi mảng categoryId của movie
-    const deletedCategoryfromProduct = findDifferentElements(
-      newCategory,
-      result
-    )
     const updateData = await Movie.updateOne(
       { _id: id },
       {
@@ -81,38 +65,54 @@ export const updateService = async (req) => {
     if (!updateData) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Update movie failed!')
     }
-    if (newCategory && newCategory.length > 0) {
-      await Category.updateMany(
-        {
-          _id: {
-            // tìm ra tất cả những id trong mảng dùng $in
-            $in: newCategory
-          }
-        },
-        {
-          // Thêm productId vào products trong category nếu có rồi thì ko thêm , chưa có thì mới thêm dùng $addToSet
-          $addToSet: {
-            products: id
-          }
+
+    if (body?.categoryId && body.categoryId.length > 0) {
+      const result = findDifferentElements(data.categoryId, body.categoryId)
+      // Những id category mới thêm mảng categoryId của movie
+      const newCategory = result.filter((cate) => {
+        if (body.categoryId.includes(cate)) {
+          return cate
         }
+      })
+      // Những id category bị xóa khỏi mảng categoryId của movie
+      const deletedCategoryfromProduct = findDifferentElements(
+        newCategory,
+        result
       )
-    }
-    if (deletedCategoryfromProduct && deletedCategoryfromProduct.length > 0) {
-      await Category.updateMany(
-        {
-          _id: {
-            // tìm ra tất cả những id trong mảng dùng $in
-            $in: deletedCategoryfromProduct
+      if (newCategory && newCategory.length > 0) {
+        await Category.updateMany(
+          {
+            _id: {
+              // tìm ra tất cả những id trong mảng dùng $in
+              $in: newCategory
+            }
+          },
+          {
+            // Thêm productId vào products trong category nếu có rồi thì ko thêm , chưa có thì mới thêm dùng $addToSet
+            $addToSet: {
+              products: id
+            }
           }
-        },
-        {
-          // Xóa productId khỏi products trong category thì dùng $pull
-          $pull: {
-            products: id
+        )
+      }
+      if (deletedCategoryfromProduct && deletedCategoryfromProduct.length > 0) {
+        await Category.updateMany(
+          {
+            _id: {
+              // tìm ra tất cả những id trong mảng dùng $in
+              $in: deletedCategoryfromProduct
+            }
+          },
+          {
+            // Xóa productId khỏi products trong category thì dùng $pull
+            $pull: {
+              products: id
+            }
           }
-        }
-      )
+        )
+      }
     }
+
     return updateData
   } catch (error) {
     throw error
