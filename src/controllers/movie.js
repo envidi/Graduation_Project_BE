@@ -21,6 +21,18 @@ export const getAll = async (req, res, next) => {
     next(error)
   }
 }
+export const getRelatedMoVie = async (req, res, next) => {
+  try {
+    const data = await movieService.getMovieByCategory(req)
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 export const getAllSoftDelete = async (req, res, next) => {
   try {
     const data = await movieService.getAllSoftDeleteService(req)

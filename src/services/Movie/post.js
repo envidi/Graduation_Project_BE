@@ -12,7 +12,6 @@ import { moviePriceService } from '../moviePrice.js'
 export const createService = async (req) => {
   try {
     const body = req.body
-    console.log(body)
     // thêm đường dẫn ảnh vào body
     if (req.file) {
       body.image = req.file.path

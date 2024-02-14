@@ -8,8 +8,9 @@ const movieSchema = JoiExtended.object({
   name: Joi.string().required().min(6).max(255).label('Name').messages({
     'string.empty': `{{ #label }} is 'required'`
   }),
-  desc: Joi.string().min(3).max(255).trim().strict(),
-
+  desc: Joi.string().min(3).max(1255).trim().strict(),
+  actor: Joi.string().min(3).required(),
+  language: Joi.string().min(3).required(),
   author: Joi.string().required().min(1).max(255).trim().strict(),
   image: Joi.string().required().min(1).max(255).trim().strict(),
   duration: Joi.number().required().min(30).max(300),
