@@ -6,166 +6,55 @@ export const sendMailController = asyncHandler(async (req, res) => {
   const html = `
   <html>
   <head>
-      <style>
-      $grey-light: hsl(200, 10%, 92%);
-      $grey: hsl(200, 10%, 85%);
-      $grey-dark: hsl(200, 10%, 70%);
-      $shadow: hsla(200, 20%, 20%, 0.25);
-      $red: #dc143c;
-      
-      $bg: hsl(200, 0%, 100%);
-      $divider: $grey-light;
-      $border: $grey-dark;
-      
-      $cutout-size: 1rem;
-      
-      *,
-      *::after {
-        box-sizing: border-box;
-        margin: 0;
-      }
-      
-      body {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        color: hsl(200, 10%, 30%);
-        background-color: hsl(200, 10%, 96%);
-        background-image: linear-gradient(to bottom left, $grey-dark, $grey);
-      }
-      
-      .ticket {
-        display: grid;
-        grid-template-rows: auto 1fr auto;
-        max-width: 24rem;
-        &__header,
-        &__body,
-        &__footer {
-          padding: 1.25rem;
-          background-color: $bg;
-          border: 1px solid $border;
-          box-shadow: 0 2px 4px $shadow;
-        }
-        &__header {
-          font-size: 1.5rem;
-          border-top: 0.25rem solid $red;
-          border-bottom: none;
-          box-shadow: none;
-        }
-        &__wrapper {
-          box-shadow: 0 2px 4px $shadow;
-          border-radius: 0.375em 0.375em 0 0;
-          overflow: hidden;
-        }
-        &__divider {
-          position: relative;
-          height: $cutout-size;
-          background-color: $bg;
-          margin-left: ($cutout-size / 2);
-          margin-right: ($cutout-size / 2);
-          &::after {
-            content: '';
-            position: absolute;
-            height: 50%;
-            width: 100%;
-            top: 0;
-            border-bottom: 2px dashed $divider;
-          }
-        }
-        &__notch {
-          position: absolute;
-          left: ($cutout-size / 2) * -1;
-          width: $cutout-size;
-          height: $cutout-size;
-          overflow: hidden;
-          &::after {
-            content: '';
-            position: relative;
-            display: block;
-            width: ($cutout-size * 2);
-            height: ($cutout-size * 2);
-            right: 100%;
-            top: -50%;
-            border: ($cutout-size / 2) solid $bg;
-            border-radius: 50%;
-            box-shadow: inset 0 2px 4px $shadow;
-          }
-          &--right {
-            left: auto;
-            right: ($cutout-size / 2) * -1;
-            &::after {
-              right: 0;
-            }
-          }
-        }
-        &__body {
-            border-bottom: none;
-            border-top: none;
-          & > * + * {
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid $divider;
-          }
-        }
-        &__section {
-          & > * + * {
-            margin-top: 0.25rem;
-          }
-          & > h3 {
-            font-size: 1.125rem;
-            margin-bottom: 0.5rem;
-          }
-        }
-        &__header,
-        &__footer {
-          font-weight: bold;
-          font-size: 1.25rem;
-          display: flex;
-          justify-content: space-between;
-        }
-        &__footer {
-          border-top: 2px dashed $divider;
-          border-radius: 0 0 0.325rem 0.325rem;
-        }
-      }
-      </style>
   </head>
-  <body>
-  <article class="ticket">
-  <header class="ticket__wrapper">
-    <div class="ticket__header">
-      2 🎟
-    </div>
-  </header>
-  <div class="ticket__divider">
-    <div class="ticket__notch"></div>
-    <div class="ticket__notch ticket__notch--right"></div>
-  </div>
-  <div class="ticket__body">
-    <section class="ticket__section">
-      <h3>Your Tickets</h3>
-      <p>Level 1 VIP Club Seats and Bar</p>
-      <p>Block 406   Row Q   Seats 34-35</p>
-      <p>Your seats are together</p>
-    </section>
-    <section class="ticket__section">
-      <h3>Delivery Address</h3>
-      <p>8 Joanne Lane, 2516 AC Den Haag</p>
-      <p>Netherlands</p>
-    </section>
-    <section class="ticket__section">
-      <h3>Payment Method</h3>
-      <p>Mastercard **** 8765</p>
-    </section>
-  </div>
-  <footer class="ticket__footer">
-    <span>Total Paid</span>
-    <span>£173.20</span>
-  </footer>
-</article>
+  <body style="display: flex; align-items: center; justify-content: center ; font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;   min-height: 100vh; color: #333; ">
+    <table style="width: 100%; max-width: 600px; background-color: #fff; border-collapse: collapse; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); border-radius: 8px; overflow: hidden;  ">
+      <tr>
+        <td style="padding: 20px; text-align: center;">
+          <h1 style="color: #dc143c; margin-bottom: 20px;">Your Ticket</h1>
+          <p style="margin: 0;">Thank you for your purchase. Here are the details of your ticket:</p>
+        </td>
+      </tr>
+      <tr>
+        <td style=" text-align:center; padding: 20px; border-top: 1px solid #eee; ">
+          <h2 style="color: #333; margin-bottom: 15px;">Event Details</h2>
+          <p style="margin: 0; font-size: 16px;">Event: Concert Name</p>
+          <p style="margin: 0; font-size: 16px;">Date: January 1, 2024</p>
+          <p style="margin: 0; font-size: 16px;">Location: Venue Name</p>
+        </td>
+      </tr>
+      <tr>
+        <td style= " text-align:center; padding: 20px; border-top: 1px solid #eee;">
+          <h2 style="color: #333; margin-bottom: 15px;">Ticket Information</h2>
+          <p style="margin: 0; font-size: 16px;">Seat: Block 406, Row Q, Seats 34-35</p>
+          <p style="margin: 0; font-size: 16px;">Type: Level 1 VIP Club Seats and Bar</p>
+        </td>
+      </tr>
+      <tr>
+        <td style= "text-align:center; padding: 20px; border-top: 1px solid #eee;">
+          <h2 style="color: #333; margin-bottom: 15px;">Delivery Address</h2>
+          <p style="margin: 0; font-size: 16px;">8 Joanne Lane, 2516 AC Den Haag</p>
+          <p style="margin: 0; font-size: 16px;">Netherlands</p>
+        </td>
+      </tr>
+      <tr>
+        <td style= "text-align:center; padding: 20px; border-top: 1px solid #eee;">
+          <h2 style="color: #333; margin-bottom: 15px;">Payment Method</h2>
+          <p style="margin: 0; font-size: 16px;">Mastercard **** 8765</p>
+        </td>
+      </tr>
+      <tr>
+        <td style= "text-align:center; padding: 20px; border-top: 1px solid #eee;">
+          <h2 style="color: #333; margin-bottom: 15px;">Total Paid</h2>
+          <p style="margin: 0; font-size: 16px; color: #dc143c; font-weight: bold;">£173.20</p>
+        </td>
+      </tr>
+    </table>
   </body>
 </html>
+
+  
+
   `
   const data = {
     email:email,
