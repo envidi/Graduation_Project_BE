@@ -73,24 +73,19 @@ userSchema.pre('save', async function (next) {
 });
 
 
-// userSchema.methods = {
-//   createPasswordChangedToken: function () {
-//     const resetToken = crypto.randomBytes(32).toString('hex')
-//     // Kiểm tra xem 'this' có phải là một đối tượng hợp lệ không
-//     if (this) {
-//       this.passwordResetToken = crypto
-//         .createHash('sha256')
-//         .update(resetToken)
-//         .digest('hex')
-//       this.passwordResetExpires = Date.now() + 15 * 60 * 1000
-//     } else {
-//       // Xử lý khi 'this' không hợp lệ
-//       // eslint-disable-next-line no-console
-//       console.error('Error: \'this\' is undefined or null.')
-//     }
-//     return resetToken
-//   }
-// }
+userSchema.methods = {
+  
+  changePasswordToken : function(){
+    // reset lại token của user . randomBytes là độ dài , hex là hệ cơ số
+    const resetToken = crypto.randomBytes(32).toString("hex")
+    // băm token , 
+      this.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+      this.passwordResetExpires = Date.now() + 5 * 60 *1000
+   
+    return resetToken
+  }
+
+}
 
 //Export the model
 export default mongoose.model('User', userSchema)

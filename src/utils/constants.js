@@ -1,4 +1,4 @@
 export const WHITELIST_DOMAINS = [
-  // domain FE'http://localhost:5173/
+  // domain FE
   'http://localhost:5173'
 ]
