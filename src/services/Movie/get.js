@@ -23,7 +23,6 @@ const checkImageExists = async (public_id) => {
     return false
   }
 }
-
 export const getAllService = async (reqBody) => {
   try {
     const {
@@ -38,7 +37,7 @@ export const getAllService = async (reqBody) => {
       sort: {
         [_sort]: _order === 'asc' ? 1 : -1
       },
-      populate: 'prices'
+      populate: ['prices', 'showTimes']
     }
     const data = await Movie.paginate({ destroy: false }, options)
 
@@ -185,7 +184,7 @@ export const getDetailService = async (reqBody) => {
         },
         projection: {
           screenRoomId: 1,
-          _id : 0
+          _id: 0
         }
       }
     )
