@@ -1,12 +1,14 @@
 import asyncHandler from 'express-async-handler'
 import User from '../model/user.js'
 import bcrypt from 'bcrypt'
-// import crypto from 'crypto'
+import crypto from 'crypto'
 import { StatusCodes } from 'http-status-codes'
 import RoleUser from '../model/RoleUser.js'
 import ApiError from '../utils/ApiError.js'
 import { AccessTokenUser } from '../middleware/jwt.js'
 import userValidate from '../validations/user.js'
+import { sendMailController } from './email.js'
+import { sendEmailPassword } from '../utils/sendMail.js'
 
 export const register = asyncHandler(async (req, res) => {
   const body = req.body
@@ -183,5 +185,62 @@ export const updateUserById = asyncHandler(async (req, res) => {
   return res.status(200).json({
     message: 'Update user thành công',
     response
+  })
+})
+
+
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const {email} = req.query;
+  if(!email) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Missing inputs')
+
+  }
+
+  const user = await User.findOne({email})
+  if(!user) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
+
+  }
+  const resetToken = await user.changePasswordToken()
+
+  await user.save()
+
+  const html = `Copy token sau để thay đổi mật khẩu : ${resetToken} `
+
+  const data = {
+    email:email,
+    html
+  }
+
+  const response = await sendEmailPassword(data)
+  return res.status(200).json({
+    message : "Gửi mail thành công",
+    response
+  })
+
+})
+
+export const resetPassword = asyncHandler(async (req, res) => {
+ const {password, token} = req.body;
+ if(!password && !token ) {
+  throw new ApiError(StatusCodes.NOT_FOUND, 'Missing inputs')
+  
+ }
+
+ const hashPassword = await bcrypt.hash(password, 10)
+
+ const passwordResetToken = crypto.createHash("sha256").update(token).digest("hex")
+
+ const user = await User.findOne({passwordResetToken , passwordResetExpires : {$gt : Date.now()}})
+ if(!user) throw new Error("Token không đúng hoặc đã hết hạn");
+ user.password = hashPassword;
+ user.passwordResetToken = undefined;
+ user.passwordResetExpires = undefined;
+ user.passwordChangedAt = Date.now()
+  await user.save()
+
+  return res.status(StatusCodes.OK).json({
+    success: user ? true : false,
+    message : user ? "Update password success" : " Something wrongs"
   })
 })
