@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import { v2 as cloudinary } from 'cloudinary'
 
 import Movie from '../../model/Movie.js'
+import ShowTime from '../../model/Showtimes.js'
 import { convertTimeToCurrentZone } from '../../utils/timeLib.js'
 import ApiError from '../../utils/ApiError.js'
 import mongoose from 'mongoose'
@@ -166,10 +167,34 @@ export const getDetailService = async (reqBody) => {
         }
       }
     ])
-    const convertShowTime = data[0].showTimeCol.map((showTime) => {
+    const arrayShowTimeId = data[0].showTimeCol.map((showtime) => showtime._id)
+    const populateCinema = await ShowTime.paginate(
+      {
+        _id: {
+          $in: arrayShowTimeId
+        }
+      },
+      {
+        populate: {
+          path: 'screenRoomId',
+          select: 'name CinemaId status destroy ',
+          populate: {
+            path: 'CinemaId',
+            select: '_id CinemaName CinemaAdress'
+          }
+        },
+        projection: {
+          screenRoomId: 1,
+          _id : 0
+        }
+      }
+    )
+
+    const convertShowTime = data[0].showTimeCol.map((showTime, index) => {
       showTime.timeFrom = convertTimeToCurrentZone(showTime.timeFrom)
       showTime.timeTo = convertTimeToCurrentZone(showTime.timeTo)
       showTime.date = convertTimeToCurrentZone(showTime.date)
+      showTime.cinemaId = populateCinema.docs[index].screenRoomId.CinemaId
       return showTime
     })
     const newData = {
