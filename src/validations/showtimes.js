@@ -3,7 +3,6 @@ import Joi from 'joi'
 import JoiDate from '@joi/date';
 import { statusScreen } from '../model/Showtimes'
 // kiểu giờ
-const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9] (AM|PM)$/
 
 
 const JoiExtended = Joi.extend(JoiDate);

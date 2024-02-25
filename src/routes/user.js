@@ -14,7 +14,7 @@ const routerUser = Router();
 
 
 routerUser.post('/register', register)
-routerUser.post('/login', login)
+routerUser.post('/login', login)    
 routerUser.get('/', getAllUser)
 routerUser.get('/userDetail/:id', getDetailUser)
 routerUser.put('/updateUser', verifyAccessToken, updateUser)
