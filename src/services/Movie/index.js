@@ -1,5 +1,12 @@
 import { removeService, restoreService, softDeleteService } from './delete'
-import { getAllService, getAllSoftDeleteService, getDetailService, getMovieByCategory } from './get'
+import {
+  getAllService,
+  getAllSoftDeleteService,
+  getDetailService,
+  getMovieByCategory,
+  getAllMovieHomePage,
+  searchMovie
+} from './get'
 import { updateService } from './patch'
 import { createService } from './post'
 
@@ -12,5 +19,7 @@ export const movieService = {
   softDeleteService,
   restoreService,
   removeService,
-  getMovieByCategory
+  getMovieByCategory,
+  getAllMovieHomePage,
+  searchMovie
 }

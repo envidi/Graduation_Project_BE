@@ -13,16 +13,6 @@ import mongoose from 'mongoose'
 // } from '../utils/timeLib.js'
 // import { get } from 'mongoose'
 
-const checkImageExists = async (public_id) => {
-  // console.log('public_id:', public_id);
-  try {
-    const result = await cloudinary.api.resource(public_id)
-    return result ? true : false
-  } catch (error) {
-    // console.log('Error checking image:', error.message);
-    return false
-  }
-}
 export const getAllService = async (reqBody) => {
   try {
     const {
@@ -59,6 +49,97 @@ export const getAllService = async (reqBody) => {
       })
 
       movie.price = priceObject ? priceObject.price : null
+    })
+    return {
+      ...data,
+      docs: plainDocs
+    }
+  } catch (error) {
+    throw error
+  }
+}
+export const getAllMovieHomePage = async (reqBody) => {
+  try {
+    const {
+      _page = 1,
+      _limit = 10,
+      _sort = 'createdAt',
+      _order = 'asc'
+    } = reqBody.query
+    const options = {
+      page: _page,
+      limit: _limit,
+      sort: {
+        [_sort]: _order === 'asc' ? 1 : -1
+      },
+      populate: {
+        path: 'categoryId',
+        select: 'name _id isDeleteable '
+      }
+    }
+    const data = await Movie.paginate({ destroy: false }, options)
+
+    if (!data || data.docs.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
+    }
+    // Convert Mongoose documents to plain JavaScript objects
+    const plainDocs = data.docs.map((doc) => doc.toObject())
+
+    // Add the 'price' field to each movie based on the current day type
+    plainDocs.forEach((movie) => {
+      movie.fromDate = convertTimeToCurrentZone(movie.fromDate)
+      movie.toDate = convertTimeToCurrentZone(movie.toDate)
+    })
+    return {
+      ...data,
+      docs: plainDocs
+    }
+  } catch (error) {
+    throw error
+  }
+}
+export const searchMovie = async (reqBody) => {
+  try {
+    const {
+      _page = 1,
+      _limit = 10,
+      _sort = 'createdAt',
+      _order = 'asc',
+      q = ''
+    } = reqBody.query
+    const options = {
+      page: _page,
+      limit: _limit,
+      sort: {
+        [_sort]: _order === 'asc' ? 1 : -1
+      },
+      populate: {
+        path: 'categoryId',
+        select: 'name _id isDeleteable '
+      }
+    }
+    const data = await Movie.paginate(
+      {
+        destroy: false,
+        $or: [
+          { name: { $regex: q, $options: 'i' } },
+          { author: { $regex: q, $options: 'i' } },
+          { actor: { $regex: q, $options: 'i' } }
+        ]
+      },
+      options
+    )
+
+    if (!data || data.docs.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
+    }
+    // Convert Mongoose documents to plain JavaScript objects
+    const plainDocs = data.docs.map((doc) => doc.toObject())
+
+    // Add the 'price' field to each movie based on the current day type
+    plainDocs.forEach((movie) => {
+      movie.fromDate = convertTimeToCurrentZone(movie.fromDate)
+      movie.toDate = convertTimeToCurrentZone(movie.toDate)
     })
     return {
       ...data,
