@@ -11,13 +11,18 @@ const userValidate = Joi.object({
   password: Joi.string().required().min(6).max(255).label('password').messages({
     'string.empty': `{{ #label }} is 'required'`
   }),
-  mobile: Joi.string().required().label('mobile').messages({
+  confirmPassword: Joi.string().required().min(6).max(255).label('confirmPassword').messages({
     'string.empty': `{{ #label }} is 'required'`
+  }),
+  mobile: Joi.number().required().label('mobile').messages({
+    'number.empty': `{{ #label }} is 'required'`
   }),
   address: Joi.string().required().min(6).max(255).label('address').messages({
     'string.empty': `{{ #label }} is 'required'`
   }),
-  roleIds: Joi.string().min(6).max(255)
+  roleIds: Joi.string().min(6).max(255),
+  avatar: Joi.string(),
+  oldPassword: Joi.string()
 }).options({
   abortEarly: false
 })
