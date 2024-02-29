@@ -2,7 +2,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { v2 as cloudinary } from 'cloudinary'
 
-import Movie from '../../model/Movie.js'
+import Movie, { COMING_SOON, IS_SHOWING } from '../../model/Movie.js'
 import ShowTime from '../../model/Showtimes.js'
 import { convertTimeToCurrentZone } from '../../utils/timeLib.js'
 import ApiError from '../../utils/ApiError.js'
@@ -98,6 +98,50 @@ export const getAllMovieHomePage = async (reqBody) => {
     throw error
   }
 }
+export const getMovieStatus = async (reqBody) => {
+  try {
+    const {
+      _page = 1,
+      _limit = 10,
+      _sort = 'createdAt',
+      _order = 'asc',
+      status = IS_SHOWING
+    } = reqBody.query
+    const options = {
+      page: _page,
+      limit: _limit,
+      sort: {
+        [_sort]: _order === 'asc' ? 1 : -1
+      },
+      populate: {
+        path: 'categoryId',
+        select: 'name _id isDeleteable '
+      }
+    }
+    const data = await Movie.paginate(
+      { destroy: false, status: status },
+      options
+    )
+
+    if (!data || data.docs.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
+    }
+    // Convert Mongoose documents to plain JavaScript objects
+    const plainDocs = data.docs.map((doc) => doc.toObject())
+
+    // Add the 'price' field to each movie based on the current day type
+    plainDocs.forEach((movie) => {
+      movie.fromDate = convertTimeToCurrentZone(movie.fromDate)
+      movie.toDate = convertTimeToCurrentZone(movie.toDate)
+    })
+    return {
+      ...data,
+      docs: plainDocs
+    }
+  } catch (error) {
+    throw error
+  }
+}
 export const searchMovie = async (reqBody) => {
   try {
     const {
@@ -118,6 +162,7 @@ export const searchMovie = async (reqBody) => {
         select: 'name _id isDeleteable '
       }
     }
+
     const data = await Movie.paginate(
       {
         destroy: false,

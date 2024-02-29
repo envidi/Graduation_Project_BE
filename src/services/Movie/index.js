@@ -5,7 +5,8 @@ import {
   getDetailService,
   getMovieByCategory,
   getAllMovieHomePage,
-  searchMovie
+  searchMovie,
+  getMovieStatus
 } from './get'
 import { updateService } from './patch'
 import { createService } from './post'
@@ -21,5 +22,6 @@ export const movieService = {
   removeService,
   getMovieByCategory,
   getAllMovieHomePage,
-  searchMovie
+  searchMovie,
+  getMovieStatus
 }
