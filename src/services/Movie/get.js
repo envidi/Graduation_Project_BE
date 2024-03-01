@@ -116,6 +116,17 @@ export const getMovieStatus = async (reqBody) => {
       populate: {
         path: 'categoryId',
         select: 'name _id isDeleteable '
+      },
+      projection: {
+        name: 1,
+        categoryId: 1,
+        duration: 1,
+        author: 1,
+        rate: 1,
+        status: 1,
+        slug: 1,
+        image: 1,
+        fromDate: 1
       }
     }
     const data = await Movie.paginate(
@@ -146,7 +157,7 @@ export const searchMovie = async (reqBody) => {
   try {
     const {
       _page = 1,
-      _limit = 10,
+      _limit = 9,
       _sort = 'createdAt',
       _order = 'asc',
       q = ''
@@ -160,6 +171,13 @@ export const searchMovie = async (reqBody) => {
       populate: {
         path: 'categoryId',
         select: 'name _id isDeleteable '
+      },
+      projection: {
+        name: 1,
+        categoryId: 1,
+        status: 1,
+        slug: 1,
+        image: 1
       }
     }
 
@@ -178,17 +196,10 @@ export const searchMovie = async (reqBody) => {
     if (!data || data.docs.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
     }
-    // Convert Mongoose documents to plain JavaScript objects
-    const plainDocs = data.docs.map((doc) => doc.toObject())
 
-    // Add the 'price' field to each movie based on the current day type
-    plainDocs.forEach((movie) => {
-      movie.fromDate = convertTimeToCurrentZone(movie.fromDate)
-      movie.toDate = convertTimeToCurrentZone(movie.toDate)
-    })
+
     return {
-      ...data,
-      docs: plainDocs
+      ...data
     }
   } catch (error) {
     throw error
