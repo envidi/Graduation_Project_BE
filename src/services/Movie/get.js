@@ -197,7 +197,6 @@ export const searchMovie = async (reqBody) => {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
     }
 
-
     return {
       ...data
     }
@@ -331,6 +330,8 @@ export const getDetailService = async (reqBody) => {
       showTime.timeTo = convertTimeToCurrentZone(showTime.timeTo)
       showTime.date = convertTimeToCurrentZone(showTime.date)
       showTime.cinemaId = populateCinema.docs[index].screenRoomId.CinemaId
+      showTime.screenRoomId = populateCinema.docs[index].screenRoomId
+
       return showTime
     })
     const newData = {
