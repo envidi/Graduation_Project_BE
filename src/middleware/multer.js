@@ -23,6 +23,21 @@ const storage = new CloudinaryStorage({
   }
 });
 
+const storage2 = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    // Tạo public_id tùy chỉnh, ví dụ: sử dụng tên file gốc (bỏ đuôi file) và thêm timestamp
+    const public_id = `food_Image/${Date.now()}-${file.originalname.split('.')[0]}`;
+    console.log('Generated public_id:', public_id); // kiểm tra giá trị public_id
+    return {
+      folder: 'AVATAR', // Thư mục lưu file trên Cloudinary
+      allowedFormats: ['jpeg', 'png', 'jpg', 'gif', 'webp'],
+      transformation: [{ width: 500, height: 500, crop: 'limit' }],
+      public_id: public_id
+    };
+  }
+});
+
 
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
@@ -40,4 +55,12 @@ export const upload = multer({
     fileSize: 1024 * 1024 * 5 // Giới hạn file tối đa 5MB
   }
 });
+export const upload2 = multer({
+  storage: storage2,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 1024 * 1024 * 5 // Giới hạn file tối đa 5MB
+  }
+});
 
+export default cloudinary
