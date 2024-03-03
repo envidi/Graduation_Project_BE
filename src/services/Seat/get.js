@@ -27,6 +27,7 @@ export const getAllService = async (reqBody) => {
         select: 'status'
       }
     }
+
     // Lấy ra cả dữ liệu của bảng screenroom
     const data = await Seat.paginate(
       {
