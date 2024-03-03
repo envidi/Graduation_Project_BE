@@ -2,7 +2,7 @@
 import Joi from 'joi'
 import { statusSeat } from '../model/Seat'
 const seatSchema = Joi.object({
-  typeSeat: Joi.string().required().min(6).max(255).label('typeSeat').trim().strict().messages({
+  typeSeat: Joi.string().required().min(1).max(255).label('typeSeat').trim().strict().messages({
     'string.empty': `{{ #label }} is 'required'`
   }),
   price: Joi.number().min(1).max(255),

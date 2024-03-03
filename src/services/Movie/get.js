@@ -296,6 +296,22 @@ export const getDetailService = async (reqBody) => {
         }
       },
       {
+        $lookup: {
+          from: 'movieprices',
+          localField: 'prices',
+          foreignField: '_id',
+          pipeline: [
+            {
+              $project: {
+                price: 1,
+                dayType: 1
+              }
+            }
+          ],
+          as: 'moviePriceCol'
+        }
+      },
+      {
         $project: {
           categoryId: 0,
           showTimes: 0
@@ -325,6 +341,15 @@ export const getDetailService = async (reqBody) => {
       }
     )
 
+    const currentDate = new Date()
+    const currentDay = currentDate.getDay() // Sunday is 0, Monday is 1, ..., Saturday is 6
+
+    const getPriceByDay = data[0].moviePriceCol.filter((price) => {
+      return currentDay >= 1 && currentDay <= 5
+        ? price.dayType === 'weekday'
+        : price.dayType === 'weekend'
+    })
+
     const convertShowTime = data[0].showTimeCol.map((showTime, index) => {
       showTime.timeFrom = convertTimeToCurrentZone(showTime.timeFrom)
       showTime.timeTo = convertTimeToCurrentZone(showTime.timeTo)
@@ -336,6 +361,7 @@ export const getDetailService = async (reqBody) => {
     })
     const newData = {
       ...data[0],
+      moviePriceCol: getPriceByDay,
       showTimeCol: convertShowTime,
       fromDate: convertTimeToCurrentZone(data[0].fromDate),
       toDate: convertTimeToCurrentZone(data[0].toDate)
