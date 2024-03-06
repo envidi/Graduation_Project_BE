@@ -5,7 +5,7 @@ import ScreeningRoom from '../../model/ScreenRoom.js'
 import ApiError from '../../utils/ApiError.js'
 import Showtimes from '../../model/Showtimes.js'
 import showtimesValidate from '../../validations/showtimes.js'
-import Movie from '../../model/Movie.js'
+import Movie, { COMING_SOON, IS_SHOWING } from '../../model/Movie.js'
 import { timeSlotService } from '../TimeSlot/index.js'
 import mongoose from 'mongoose'
 import {
@@ -119,7 +119,7 @@ export const createService = async (req) => {
     if (!data || Object.keys(data).length == 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Create showtime failed')
     }
-    await Promise.all([
+    const promises = [
       timeSlotService.createService({
         ScreenRoomId: body.screenRoomId,
         Show_scheduleId: data._id.toString()
@@ -127,11 +127,21 @@ export const createService = async (req) => {
       Movie.findByIdAndUpdate(body.movieId, {
         $push: { showTimes: data._id }
       })
-    ]).catch((error) => {
+    ]
+    if (resultMovieAndScreenRoom[0].status === COMING_SOON) {
+      promises.push(
+        Movie.findByIdAndUpdate(body.movieId, {
+          $set: {
+            status: IS_SHOWING
+          }
+        })
+      )
+    }
+    await Promise.all(promises).catch((error) => {
       throw new ApiError(StatusCodes.CONFLICT, new Error(error.message))
     })
 
-    return data
+    return body
   } catch (error) {
     throw error
   }
