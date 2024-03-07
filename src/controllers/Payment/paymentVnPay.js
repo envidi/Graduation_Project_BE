@@ -45,7 +45,7 @@ export const createPayment = (req, res, next) => {
     let returnUrl = vnpayConfig.vnp_ReturnUrl
     let orderId = dayjs(date).format('YYYYMMDDHHmmss')
     // let orderId = 20240121112902
-    let amount = req.body.amount
+    let amount = req.body.amount * 100
     let bankCode = req.body.bankCode
 
     let locale = req.body.language
@@ -62,7 +62,7 @@ export const createPayment = (req, res, next) => {
     vnp_Params['vnp_TxnRef'] = orderId
     vnp_Params['vnp_OrderInfo'] = 'Thanh_toan_cho_ma_GD:' + orderId
     vnp_Params['vnp_OrderType'] = 'other'
-    vnp_Params['vnp_Amount'] = amount * 100
+    vnp_Params['vnp_Amount'] = amount
     vnp_Params['vnp_ReturnUrl'] = returnUrl
     vnp_Params['vnp_IpAddr'] = ipAddr
     vnp_Params['vnp_CreateDate'] = createDate
@@ -108,7 +108,7 @@ export const returnResultPayment = async (req, res, next) => {
     if (secureHash === signed) {
       //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
       const payment = await paymentService.createService({
-        amount : vnp_Params['vnp_Amount'],
+        amount : vnp_Params['vnp_Amount'] / 100,
         typePayment : 'VNPAY',
         typeBank : vnp_Params['vnp_BankCode'],
         cardType : vnp_Params['vnp_CardType']
