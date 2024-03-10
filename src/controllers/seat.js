@@ -84,6 +84,7 @@ export const getAll = async (req, res, next) => {
   }
 }
 
+
 export const getDetail = async (req, res, next) => {
   try {
     const data = await seatService.getOneService(req)

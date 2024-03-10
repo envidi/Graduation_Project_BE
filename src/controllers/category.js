@@ -109,8 +109,7 @@ export const update = async (req, res, next) => {
         return pro
       }
     })
-    console.log('product', newProduct);
-    console.log('result', result);
+
 
     // Những id category bị xóa khỏi mảng categoryId của movie
     const deletedProductfromCategory = findDifferentElements(
