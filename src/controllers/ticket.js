@@ -86,35 +86,48 @@ export const create = async (req, res, next) => {
 
 export const update = async (req, res, next) => {
   try {
-    const data = await ticketService.updateService(req);
+    const data = await ticketService.updateService(req)
     return res.status(StatusCodes.OK).json({
       message: 'Ticket updated successfully', // Thành công
       data: data
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
+
+export const checkoutPaymentSeat = async (req, res, next) => {
+  try {
+    const updateData = await ticketService.updatePaymentTicketService(req)
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Success!',
+      datas: updateData
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const remove = async (req, res, next) => {
   try {
-    const data = await ticketService.removeService(req);
+    const data = await ticketService.removeService(req)
     return res.status(StatusCodes.OK).json({
       message: 'Ticket removed successfully',
       data
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 export const removeHard = async (req, res, next) => {
   try {
-    const data = await ticketService.removeHardService(req);
+    const data = await ticketService.removeHardService(req)
     return res.status(StatusCodes.OK).json({
       message: 'Ticket removed successfully',
       data
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
