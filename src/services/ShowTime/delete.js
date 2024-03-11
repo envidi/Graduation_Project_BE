@@ -8,6 +8,8 @@ import ApiError from '../../utils/ApiError.js'
 import Showtimes from '../../model/Showtimes.js'
 import { timeSlotService } from '../TimeSlot/index.js'
 import Movie from '../../model/Movie.js'
+import ScreenRoom from '../../model/ScreenRoom.js'
+import Seat from '../../model/Seat.js'
 
 export const removeService = async (req) => {
   try {
@@ -19,24 +21,6 @@ export const removeService = async (req) => {
       throw new ApiError(StatusCodes.NOT_FOUND, ' Show not found!')
     }
 
-    const timeSlot = await timeSlotService.getTimeSlotIdWithScreenRoomId({
-      showTimeId: response._id,
-      screenRoomId: response.screenRoomId
-    })
-
-    if (!timeSlot || Object.keys(timeSlot).length === 0) {
-      throw new ApiError(
-        StatusCodes.NOT_FOUND,
-        'This showtime dont have a timeslot in this room'
-      )
-    }
-    const deleteTimeSlot = await timeSlotService.removeService(timeSlot._id)
-    if (!deleteTimeSlot || deleteTimeSlot.length === 0) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'Delete timeslot failed when delete show'
-      )
-    }
     try {
       await Promise.all([
         Showtimes.deleteOne({ _id: id }),
@@ -49,7 +33,20 @@ export const removeService = async (req) => {
               showTimes: response._id
             }
           }
-        )
+        ),
+        ScreenRoom.updateOne(
+          { _id: response.screenRoomId },
+          {
+            $pull: {
+              ShowtimesId: response._id
+            }
+          }
+        ),
+        Seat.deleteMany({
+          _id: {
+            $in: response.SeatId
+          }
+        })
       ])
     } catch (error) {
       throw new ApiError(StatusCodes.CONFLICT, new Error(error.message))

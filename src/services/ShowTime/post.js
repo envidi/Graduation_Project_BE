@@ -12,6 +12,8 @@ import {
   convertTimeToIsoString,
   minutesToMilliseconds
 } from '../../utils/timeLib.js'
+import { insertSeatIntoScreen } from '../Seat/post.js'
+import ScreenRoom from '../../model/ScreenRoom.js'
 
 export const validateDurationMovie = (body, movie) => {
   const currentTimeFrom = new Date(convertTimeToIsoString(body.timeFrom))
@@ -119,15 +121,23 @@ export const createService = async (req) => {
     if (!data || Object.keys(data).length == 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Create showtime failed')
     }
+
     const promises = [
-      timeSlotService.createService({
-        ScreenRoomId: body.screenRoomId,
-        Show_scheduleId: data._id.toString()
-      }),
+      ScreenRoom.updateOne(
+        { _id: body.screenRoomId },
+        {
+          $addToSet: {
+            ShowtimesId: data._id
+          }
+        }
+      ),
+      insertSeatIntoScreen(2, 2, data),
       Movie.findByIdAndUpdate(body.movieId, {
         $push: { showTimes: data._id }
       })
     ]
+    // Nếu như khi thêm lịch chiếu một bộ phim thì bộ
+    // phim sẽ chuyển sang trạng thái công chiếu
     if (resultMovieAndScreenRoom[0].status === COMING_SOON) {
       promises.push(
         Movie.findByIdAndUpdate(body.movieId, {
@@ -141,7 +151,7 @@ export const createService = async (req) => {
       throw new ApiError(StatusCodes.CONFLICT, new Error(error.message))
     })
 
-    return body
+    return data
   } catch (error) {
     throw error
   }

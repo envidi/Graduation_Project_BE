@@ -10,13 +10,13 @@ export const removeService = async (reqBody) => {
     if (!id) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Seat id is not found!')
     }
-    const oldSeat = await Seat.findById(id)
-    if ([UNAVAILABLE, SOLD].includes(oldSeat.status)) {
-      throw new ApiError(
-        StatusCodes.CONFLICT,
-        'This seat is sold or unavailable. Can not delete it!'
-      )
-    }
+    // const oldSeat = await Seat.findById(id)
+    // if ([UNAVAILABLE, SOLD].includes(oldSeat.status)) {
+    //   throw new ApiError(
+    //     StatusCodes.CONFLICT,
+    //     'This seat is sold or unavailable. Can not delete it!'
+    //   )
+    // }
     const data = await Seat.deleteOne({ _id: id })
     if (!data) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete seat failed!')

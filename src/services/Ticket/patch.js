@@ -1,12 +1,18 @@
 /* eslint-disable no-useless-catch */
 import Ticket, { PAID } from '../../model/Ticket'
+import dayjs from '../../utils/timeLib.js'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../utils/ApiError'
 import ticketValidateSchema from '../../validations/ticket.js'
 import Seat, { AVAILABLE, RESERVED, SOLD } from '../../model/Seat'
-import Showtimes, { AVAILABLE_SCHEDULE } from '../../model/Showtimes'
+import Showtimes, {
+  AVAILABLE_SCHEDULE,
+  FULL_SCHEDULE
+} from '../../model/Showtimes'
 import { seatService } from '../Seat/index.js'
 import findDifferentElements from '../../utils/findDifferent.js'
+import { IS_SHOWING } from '../../model/Movie.js'
+import { scheduleService } from '../ShowTime/index.js'
 
 export const updateService = async (reqBody) => {
   try {
@@ -106,6 +112,24 @@ export const updatePaymentTicketService = async (reqBody) => {
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, error.message) // Nếu lỗi, trả về lỗi BAD_REQUEST
     }
+    const dataShowTime = await Showtimes.findOne(
+      { _id: updateData.showtimeId },
+      'timeFrom timeTo'
+    ).populate('movieId', 'status')
+
+    if (dataShowTime.movieId.status !== IS_SHOWING) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'The movie is not released. Cannot order the seat'
+      )
+    }
+    const now = dayjs()
+    if (now > dataShowTime.timeFrom) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'The seat reservation time has expired'
+      )
+    }
     // Kiểm tra xem Ghế có đang trống hay không
     const seat = await Seat.find({
       _id: {
@@ -139,20 +163,33 @@ export const updatePaymentTicketService = async (reqBody) => {
     const promises = []
 
     updateData.seatId.forEach((element) => {
-      const reqBody = {
-        body: {
-          status: SOLD
-        },
-        params: {
-          id: element
-        }
-      }
-      promises.push(seatService.updateStatusService(reqBody))
+      promises.push(
+        Seat.updateOne({ _id: element }, { $set: { status: SOLD } })
+      )
     })
 
     await Promise.all(promises).catch((err) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, err.message)
     })
+    const seatUpdated = await Seat.find({
+      _id: {
+        $in: updateData.seatId
+      }
+    })
+
+    const allSeatIsSold = seatUpdated.every((seat) => {
+      return seat.status === SOLD
+    })
+    if (allSeatIsSold) {
+      await Promise.all([
+        scheduleService.updateStatusFull(dataShowTime._id.toString(), {
+          status: FULL_SCHEDULE
+        })
+      ]).catch((error) => {
+        throw new ApiError(StatusCodes.CONFLICT, new Error(error.message))
+      })
+    }
+
     return data
   } catch (error) {
     throw error
