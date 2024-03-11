@@ -12,7 +12,9 @@ export const getAllService = async (reqBody) => {
       _page = 1,
       _limit = 50,
       _sort = 'createdAt',
-      _order = 'asc'
+      _order = 'asc',
+      _hallId = '',
+      _showId = ''
     } = reqBody.query
     const options = {
       page: _page,
@@ -25,8 +27,47 @@ export const getAllService = async (reqBody) => {
         select: 'status'
       }
     }
+
     // Lấy ra cả dữ liệu của bảng screenroom
     const data = await Seat.paginate({}, options)
+    if (!data || data.docs.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No seats found!')
+    }
+    return data
+  } catch (error) {
+    throw error
+  }
+}
+export const getAllServiceByShowTime = async (reqBody) => {
+  try {
+    const {
+      _page = 1,
+      _limit = 50,
+      _sort = 'createdAt',
+      _order = 'asc',
+      _hallId = '',
+      _showId = ''
+    } = reqBody.query
+    const options = {
+      page: _page,
+      limit: _limit,
+      sort: {
+        [_sort]: _order === 'asc' ? 1 : -1
+      },
+      populate: {
+        path: 'ScreeningRoomId',
+        select: 'status'
+      }
+    }
+
+    // Lấy ra cả dữ liệu của bảng screenroom
+    const data = await Seat.paginate(
+      {
+        ScreeningRoomId: _hallId,
+        ShowScheduleId: _showId
+      },
+      options
+    )
     if (!data || data.docs.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No seats found!')
     }

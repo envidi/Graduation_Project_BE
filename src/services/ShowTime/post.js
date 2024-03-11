@@ -5,13 +5,15 @@ import ScreeningRoom from '../../model/ScreenRoom.js'
 import ApiError from '../../utils/ApiError.js'
 import Showtimes from '../../model/Showtimes.js'
 import showtimesValidate from '../../validations/showtimes.js'
-import Movie from '../../model/Movie.js'
+import Movie, { COMING_SOON, IS_SHOWING } from '../../model/Movie.js'
 import { timeSlotService } from '../TimeSlot/index.js'
 import mongoose from 'mongoose'
 import {
   convertTimeToIsoString,
   minutesToMilliseconds
 } from '../../utils/timeLib.js'
+import { insertSeatIntoScreen } from '../Seat/post.js'
+import ScreenRoom from '../../model/ScreenRoom.js'
 
 export const validateDurationMovie = (body, movie) => {
   const currentTimeFrom = new Date(convertTimeToIsoString(body.timeFrom))
@@ -119,15 +121,33 @@ export const createService = async (req) => {
     if (!data || Object.keys(data).length == 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Create showtime failed')
     }
-    await Promise.all([
-      timeSlotService.createService({
-        ScreenRoomId: body.screenRoomId,
-        Show_scheduleId: data._id.toString()
-      }),
+
+    const promises = [
+      ScreenRoom.updateOne(
+        { _id: body.screenRoomId },
+        {
+          $addToSet: {
+            ShowtimesId: data._id
+          }
+        }
+      ),
+      insertSeatIntoScreen(2, 2, data),
       Movie.findByIdAndUpdate(body.movieId, {
         $push: { showTimes: data._id }
       })
-    ]).catch((error) => {
+    ]
+    // Nếu như khi thêm lịch chiếu một bộ phim thì bộ
+    // phim sẽ chuyển sang trạng thái công chiếu
+    if (resultMovieAndScreenRoom[0].status === COMING_SOON) {
+      promises.push(
+        Movie.findByIdAndUpdate(body.movieId, {
+          $set: {
+            status: IS_SHOWING
+          }
+        })
+      )
+    }
+    await Promise.all(promises).catch((error) => {
       throw new ApiError(StatusCodes.CONFLICT, new Error(error.message))
     })
 

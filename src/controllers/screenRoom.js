@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
 import { screenRoomService } from '../services/ScreenRoom/index.js'
+import { populate } from 'dotenv'
 
 export const getAll = async (req, res, next) => {
   try {
@@ -9,6 +10,7 @@ export const getAll = async (req, res, next) => {
       message: 'Success',
       datas: data
     })
+   
   } catch (error) {
     next(error)
   }

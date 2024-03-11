@@ -39,6 +39,7 @@ export const createService = async (reqBody) => {
       )
     }
     const [seats, priceMovie, foods] = await Promise.all(promises)
+
     const result = seats.some((seat_availble) => {
       return seat_availble.status !== AVAILABLE
     })
@@ -50,7 +51,11 @@ export const createService = async (reqBody) => {
       return (accu += seat.price)
     }, 0)
     const totalFoodPrice =
-      foods.length > 0 ? foods.reduce((accu, food) => { return (accu += food.price)}, 0): 0
+      foods && foods.length > 0
+        ? foods.reduce((accu, food) => {
+          return (accu += food.price)
+        }, 0)
+        : 0
     // const totalFoodPrice = 0
     const totalPriceMovie = priceMovie.price
 
