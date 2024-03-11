@@ -18,31 +18,31 @@ export const getAllService = async (reqBody) => {
       limit: _limit,
       sort: {
         [_sort]: _order === 'asc' ? 1 : -1
-      },
-      populate: {
-        path: 'TimeSlotId',
-        populate: {
-          path: 'SeatId',
-          select: 'status'
-        }
       }
+      // populate: {
+      //   path: 'TimeSlotId',
+      //   populate: {
+      //     path: 'SeatId',
+      //     select: 'status'
+      //   }
+      // }
     }
     const data = await ScreeningRoom.paginate({ destroy: false }, options)
 
-    const timeSlotNotDeletedSoft = data.docs.map((screen) => {
-      const arrayTimeSlotNotDeleted = screen.TimeSlotId.map((timeslot) => {
-        if (timeslot.destroy === false) {
-          return timeslot
-        }
-        return
-      })
-      screen.TimeSlotId = [...arrayTimeSlotNotDeleted]
-      return screen
-    })
+    // const timeSlotNotDeletedSoft = data.docs.map((screen) => {
+    //   const arrayTimeSlotNotDeleted = screen.TimeSlotId.map((timeslot) => {
+    //     if (timeslot.destroy === false) {
+    //       return timeslot
+    //     }
+    //     return
+    //   })
+    //   screen.TimeSlotId = [...arrayTimeSlotNotDeleted]
+    //   return screen
+    // })
     if (!data || data.docs.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No screening rooms found!')
     }
-    return timeSlotNotDeletedSoft
+    return data
   } catch (error) {
     throw error
   }

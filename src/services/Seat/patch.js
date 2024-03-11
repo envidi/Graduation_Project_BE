@@ -7,7 +7,6 @@ import Seat, {
 } from '../../model/Seat.js'
 import { FULL_SCHEDULE, AVAILABLE_SCHEDULE } from '../../model/Showtimes.js'
 import { AVAILABLE_TIMESLOT, FULL_TIMESLOT } from '../../model/TimeSlot.js'
-import seatChema from '../../validations/seat.js'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../utils/ApiError.js'
 import { checkAndUpdateTimeSlot } from '../../controllers/seat.js'
@@ -134,15 +133,13 @@ export const updateStatusService = async (reqBody) => {
     const dataSeat = await Seat.findOne({ _id: id })
 
     const resultTimeSlotAndSeat = await Promise.all([
-      TimeSlot.findOne({ _id: dataSeat?.TimeSlotId }).populate('SeatId'),
-
       Showtimes.findOne(
         { _id: dataSeat?.ShowScheduleId },
         'timeFrom timeTo'
       ).populate('movieId', 'status')
     ])
 
-    const [dataTimeSlot, dataShowTimes] = resultTimeSlotAndSeat
+    const [dataShowTimes] = resultTimeSlotAndSeat
     if (!dataSeat || Object.keys(dataSeat).length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Seat id is not found')
     }
@@ -162,35 +159,22 @@ export const updateStatusService = async (reqBody) => {
         'The seat reservation time has expired'
       )
     }
-    // Nếu như bảng timeslot mà ghế đang tồn tại bên trong đó đã bị xóa mềm
-    // và ghế đang muốn sửa có trạng thái là unavailable thì không thể cập nhật
-    if (dataTimeSlot.destroy || dataSeat.status === UNAVAILABLE) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'This seat is unavailable to edit'
-      )
-    }
 
     const updateData = await Seat.updateOne(
       { _id: id },
       { $set: { status: body.status } }
     )
 
-    const isTimeSlotFull = dataTimeSlot.status === FULL_TIMESLOT
+    const isTimeSlotFull = dataShowTimes.status === FULL_SCHEDULE
     const isBodyStatusValid = [AVAILABLE, RESERVED].includes(body.status)
     // Nếu như tất cả ghế có trạng thái là SOLD thì timeslot tất cả
     // ghế đó sẽ chuyển thành trạng thái là full
     if (body.status === SOLD) {
-      const allSeatIsSold = dataTimeSlot.SeatId.every((seat) => {
+      const allSeatIsSold = dataShowTimes.SeatId.every((seat) => {
         return seat._id.toString() === id || seat.status === SOLD
       })
       if (allSeatIsSold) {
         await Promise.all([
-          checkAndUpdateTimeSlot(
-            dataTimeSlot._id,
-            FULL_TIMESLOT,
-            dataTimeSlot.ScreenRoomId
-          ),
           scheduleService.updateStatusFull(dataShowTimes._id.toString(), {
             status: FULL_SCHEDULE
           })
@@ -206,11 +190,6 @@ export const updateStatusService = async (reqBody) => {
     if (isTimeSlotFull) {
       if (isBodyStatusValid) {
         await Promise.all([
-          checkAndUpdateTimeSlot(
-            dataTimeSlot._id,
-            AVAILABLE_TIMESLOT,
-            dataTimeSlot.ScreenRoomId
-          ),
           scheduleService.updateStatusFull(dataShowTimes._id.toString(), {
             status: AVAILABLE_SCHEDULE
           })

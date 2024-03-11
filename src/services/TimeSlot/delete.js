@@ -20,13 +20,13 @@ export const removeService = async (timeSlotId) => {
     }
     // Nếu như một số ghế trong timeslot có trạng thái là SOLD
     // thì ko cho tiếp tục
-    const isSeatSold = data.SeatId.some((seat) => seat.status === SOLD)
-    if (isSeatSold) {
-      throw new ApiError(
-        StatusCodes.CONFLICT,
-        'This seat in this timeslot has already sold!'
-      )
-    }
+    // const isSeatSold = data.SeatId.some((seat) => seat.status === SOLD)
+    // if (isSeatSold) {
+    //   throw new ApiError(
+    //     StatusCodes.CONFLICT,
+    //     'This seat in this timeslot has already sold!'
+    //   )
+    // }
     let promises = [TimeSlot.deleteOne({ _id: data._id })]
     // Xóa timeslot hiện tại khỏi mảng TimeSlotId trong model screenroom
     if (data.ScreenRoomId) {

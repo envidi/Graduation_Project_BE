@@ -31,6 +31,7 @@ const showtimesValidate = JoiExtended.object({
     'string.empty': '{{ #label }} is required',
     'any.required': '{{ #label }} is required'
   }),
+  SeatId: Joi.array().items(Joi.string().trim().strict()),
 
   movieId: Joi.string().required().min(1).max(255).label('movieId').messages({
     'string.empty': '{{ #label }} is required',

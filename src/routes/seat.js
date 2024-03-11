@@ -1,8 +1,8 @@
 import express from 'express';
 import {
-  checkoutPaymentSeat,
   create,
   getAll,
+  getAllByShowTime,
   getDetail,
   remove,
   update
@@ -17,7 +17,8 @@ const routerSeat = express.Router();
 // routerProducts.post('/', verifyAccessToken, isAdmin, create);
 // routerProducts.delete('/:id', verifyAccessToken, isAdmin, remove);
 
-routerSeat.get('/', getAll);
+routerSeat.get('/all', getAll);
+routerSeat.get('/', getAllByShowTime);
 routerSeat.get('/:id', getDetail);
 routerSeat.patch('/:id', update);
 routerSeat.post('/', create);
