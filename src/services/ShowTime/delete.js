@@ -81,7 +81,6 @@ export const deleteSoftService = async (req) => {
     if (!updateShowTime || Object.keys(updateShowTime).length === 0) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete soft showtime failed')
     }
-    await timeSlotService.deleteSoftService(id)
 
     return updateShowTime
   } catch (error) {
@@ -103,7 +102,7 @@ export const restoreService = async (req) => {
     if (!updateShowTime || Object.keys(updateShowTime).length === 0) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete soft showtime failed')
     }
-    await timeSlotService.restoreService(id)
+
 
     return updateShowTime
   } catch (error) {
