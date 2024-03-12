@@ -286,7 +286,6 @@ export const getDetailService = async (reqBody) => {
             {
               $project: {
                 movieId: 0,
-                destroy: 0,
                 createdAt: 0,
                 updatedAt: 0
               }
@@ -350,15 +349,18 @@ export const getDetailService = async (reqBody) => {
         : price.dayType === 'weekend'
     })
 
-    const convertShowTime = data[0].showTimeCol.map((showTime, index) => {
-      showTime.timeFrom = convertTimeToCurrentZone(showTime.timeFrom)
-      showTime.timeTo = convertTimeToCurrentZone(showTime.timeTo)
-      showTime.date = convertTimeToCurrentZone(showTime.date)
-      showTime.cinemaId = populateCinema.docs[index].screenRoomId.CinemaId
-      showTime.screenRoomId = populateCinema.docs[index].screenRoomId
+    const convertShowTime = data[0].showTimeCol
+      .map((showTime, index) => {
+        if (showTime.destroy) return
+        showTime.timeFrom = convertTimeToCurrentZone(showTime.timeFrom)
+        showTime.timeTo = convertTimeToCurrentZone(showTime.timeTo)
+        showTime.date = convertTimeToCurrentZone(showTime.date)
+        showTime.cinemaId = populateCinema.docs[index].screenRoomId.CinemaId
+        showTime.screenRoomId = populateCinema.docs[index].screenRoomId
 
-      return showTime
-    })
+        return showTime
+      })
+      .filter((showtime) => showtime != null)
     const newData = {
       ...data[0],
       moviePriceCol: getPriceByDay,
@@ -396,6 +398,7 @@ export const getMovieByCategory = async (reqBody) => {
         $ne: id
       }
     }).populate('categoryId', '_id name')
+
     if (!relateMovie || relateMovie.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No movie found!')
     }
