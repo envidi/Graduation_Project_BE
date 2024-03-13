@@ -14,10 +14,10 @@ const userValidate = Joi.object({
   confirmPassword: Joi.string().required().min(6).max(255).label('confirmPassword').messages({
     'string.empty': `{{ #label }} is 'required'`
   }),
-  mobile: Joi.number().required().label('mobile').messages({
+  mobile: Joi.number().label('mobile').messages({
     'number.empty': `{{ #label }} is 'required'`
   }),
-  address: Joi.string().required().min(6).max(255).label('address').messages({
+  address: Joi.string().min(6).max(255).label('address').messages({
     'string.empty': `{{ #label }} is 'required'`
   }),
   roleIds: Joi.string().min(6).max(255),

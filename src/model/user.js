@@ -16,7 +16,6 @@ var userSchema = new mongoose.Schema(
     },
     mobile: {
       type: Number,
-      required: true,
       unique: true
     },
     password: {
@@ -28,11 +27,11 @@ var userSchema = new mongoose.Schema(
       required: true
     },
     oldPassword: {
-      type: String,
+      type: String
     },
     avatar: {
-      type : String,
-      default : ''
+      type: String,
+      default: ''
     },
     cart: [
       {
@@ -60,7 +59,7 @@ var userSchema = new mongoose.Schema(
     passwordResetExpires: {
       type: String
     },
-    roleIds:  {
+    roleIds: {
       type: mongoose.Schema.Types.ObjectId, // Chỉ định kiểu dữ liệu là mảng ObjectId
       ref: 'RoleUser'
     }
@@ -74,41 +73,39 @@ var userSchema = new mongoose.Schema(
 userSchema.pre('save', async function (next) {
   if (!this.roleIds) {
     // Nếu roleIds không tồn tại, đặt giá trị mặc định là 'user'
-    const defaultRole = await RoleUser.findOne({ roleName: 'user' }); // Đặt giá trị mặc định từ RoleUser
-    this.roleIds = defaultRole._id;
+    const defaultRole = await RoleUser.findOne({ roleName: 'user' }) // Đặt giá trị mặc định từ RoleUser
+    this.roleIds = defaultRole._id
   }
 
   // Tiếp tục quá trình lưu
-  next();
-});
-
+  next()
+})
 
 // userSchema.methods = {
-  
+
 //   changePasswordToken : function(){
 //     // reset lại token của user . randomBytes là độ dài , hex là hệ cơ số
 //     const resetToken = crypto.randomBytes(32).toString("hex")
-//     // băm token , 
+//     // băm token ,
 //       this.passwordResetToken = crypto.createHash("sha256").update(resetToken).digest("hex");
 //       this.passwordResetExpires = Date.now() + 5 * 60 *1000
-   
+
 //     return resetToken
 //   }
 
 // }
 
 userSchema.methods = {
-  changePasswordToken: function() {
+  changePasswordToken: function () {
     // Sinh một số ngẫu nhiên từ 10000 đến 99999 (5 số)
-    const randomToken = Math.floor(10000 + Math.random() * 90000);
+    const randomToken = Math.floor(10000 + Math.random() * 90000)
     // Lưu token vào trường passwordResetToken
-    this.passwordResetToken = randomToken.toString(); // Chuyển số thành chuỗi
-    this.passwordResetExpires = Date.now() + 5 * 60 * 1000; // Thời gian hết hạn: hiện tại + 5 phút
+    this.passwordResetToken = randomToken.toString() // Chuyển số thành chuỗi
+    this.passwordResetExpires = Date.now() + 5 * 60 * 1000 // Thời gian hết hạn: hiện tại + 5 phút
 
-    return randomToken.toString(); // Trả về token 5 số dưới dạng chuỗi
+    return randomToken.toString() // Trả về token 5 số dưới dạng chuỗi
   }
-};
-
+}
 
 //Export the model
 export default mongoose.model('User', userSchema)
