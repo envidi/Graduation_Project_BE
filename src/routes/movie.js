@@ -8,7 +8,7 @@ import {
   restore,
   softDelete,
   update
-} from '../controllers/movie.js'; 
+} from '../controllers/movie.js';
 
 import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js';
 import { upload } from '../middleware/multer.js';

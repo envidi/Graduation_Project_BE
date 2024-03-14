@@ -1,7 +1,7 @@
 import mongoose from 'mongoose' // Erase if already required
 import { ObjectId } from 'mongodb'
 // import bcrypt from 'bcrypt'
-import RoleUser from "./RoleUser.js"
+import RoleUser from './RoleUser.js'
 import crypto from 'crypto'
 // Declare the Schema of the Mongo model
 var userSchema = new mongoose.Schema(
@@ -54,7 +54,7 @@ var userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId, // Chỉ định kiểu dữ liệu là mảng ObjectId
       ref: 'RoleUser'
     }
-  } ,
+  },
   {
     timestamps: true
   }
