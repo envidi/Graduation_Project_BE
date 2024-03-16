@@ -20,7 +20,7 @@ const userValidate = Joi.object({
   address: Joi.string().min(6).max(255).label('address').messages({
     'string.empty': `{{ #label }} is 'required'`
   }),
-  roleIds: Joi.string().min(6).max(255),
+  roleIds: Joi.string().max(255),
   avatar: Joi.string(),
   oldPassword: Joi.string()
 }).options({

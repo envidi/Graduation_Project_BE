@@ -13,6 +13,7 @@ import { seatService } from '../Seat/index.js'
 import findDifferentElements from '../../utils/findDifferent.js'
 import { IS_SHOWING } from '../../model/Movie.js'
 import { scheduleService } from '../ShowTime/index.js'
+import { paymentService } from '../Payment/index.js'
 
 export const updateService = async (reqBody) => {
   try {
@@ -147,10 +148,16 @@ export const updatePaymentTicketService = async (reqBody) => {
     if (!showtime || showtime.status !== AVAILABLE_SCHEDULE) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Lịch chiếu không khả dụng.')
     }
+    const payment = await paymentService.createService({
+      amount: updateData.amount,
+      typePayment: updateData.typePayment,
+      typeBank: updateData.typeBank,
+      ticketId: id
+    })
 
     const data = await Ticket.findOneAndUpdate(
       { _id: id, isDeleted: false }, // Tìm vé theo ID và chưa bị xóa
-      { $set: { ...updateData, status: PAID } }, // Cập nhật dữ liệu
+      { $set: { ...updateData, status: PAID, paymentId : payment._id } }, // Cập nhật dữ liệu
       { new: true } // Trả về vé sau khi đã cập nhật
     )
     if (!data) {
@@ -172,14 +179,13 @@ export const updatePaymentTicketService = async (reqBody) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, err.message)
     })
     const seatUpdated = await Seat.find({
-      _id: {
-        $in: updateData.seatId
-      }
+      ShowScheduleId: updateData.showtimeId
     })
 
     const allSeatIsSold = seatUpdated.every((seat) => {
       return seat.status === SOLD
     })
+
     if (allSeatIsSold) {
       await Promise.all([
         scheduleService.updateStatusFull(dataShowTime._id.toString(), {

@@ -131,7 +131,7 @@ export const createService = async (req) => {
           }
         }
       ),
-      insertSeatIntoScreen(2, 2, data),
+      insertSeatIntoScreen(8, 8, data),
       Movie.findByIdAndUpdate(body.movieId, {
         $push: { showTimes: data._id }
       })

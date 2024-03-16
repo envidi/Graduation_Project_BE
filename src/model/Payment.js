@@ -15,8 +15,8 @@ const paymentSchema = mongoose.Schema(
       type: String,
       required: true
     },
-    cardType: {
-      type: String,
+    ticketId: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true
     }
   },

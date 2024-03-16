@@ -10,13 +10,7 @@ export const getAll = async (req, res, next) => {
       message: 'Success',
       data
     })
-    // return res.status(StatusCodes.OK).json({
-    //   message: 'Success',
-    //   datas: {
-    //     ...data,
-    //     docs: plainDocs
-    //   }
-    // })
+  
   } catch (error) {
     next(error)
   }
@@ -29,13 +23,7 @@ export const getAllMovieHomePage = async (req, res, next) => {
       message: 'Success',
       data
     })
-    // return res.status(StatusCodes.OK).json({
-    //   message: 'Success',
-    //   datas: {
-    //     ...data,
-    //     docs: plainDocs
-    //   }
-    // })
+  
   } catch (error) {
     next(error)
   }
