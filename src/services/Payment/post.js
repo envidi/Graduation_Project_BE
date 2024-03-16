@@ -7,7 +7,7 @@ export const createService = async (req) => {
       amount: req.amount,
       typePayment: req.typePayment,
       typeBank:req.typeBank,
-      cardType: req.cardType
+      ticketId: req.ticketId
     })
 
     return payment

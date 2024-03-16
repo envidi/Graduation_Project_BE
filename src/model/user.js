@@ -41,7 +41,10 @@ var userSchema = new mongoose.Schema(
         total: Number
       }
     ],
-    address: { type: Array, default: [] },
+    address: {
+      type: String,
+      default : ''
+    },
     wishlist: [{ type: mongoose.Types.ObjectId, ref: 'Movie' }],
     isBlocked: {
       type: Boolean,

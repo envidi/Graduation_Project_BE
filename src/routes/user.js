@@ -8,7 +8,8 @@ import {
   updateUser,
   updateUserById,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  updateClient
 } from '../controllers/user.js'
 import { Router } from 'express'
 import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js'
@@ -31,11 +32,17 @@ routerUser.post('/register', upload.single('avatar'), register)
 routerUser.post('/login', login)
 routerUser.get('/', getAllUser)
 routerUser.get('/userDetail', verifyAccessToken, getDetailUser)
-routerUser.put(
+routerUser.patch(
   '/updateUser',
   upload.single('avatar'),
   verifyAccessToken,
   updateUser
+)
+routerUser.patch(
+  '/updateClient',
+  upload.single('avatar'),
+  verifyAccessToken,
+  updateClient
 )
 routerUser.post('/forgotPassword', forgotPassword)
 routerUser.put('/resetPassword', resetPassword)
