@@ -157,7 +157,7 @@ export const updatePaymentTicketService = async (reqBody) => {
 
     const data = await Ticket.findOneAndUpdate(
       { _id: id, isDeleted: false }, // Tìm vé theo ID và chưa bị xóa
-      { $set: { ...updateData, status: PAID, paymentId : payment._id } }, // Cập nhật dữ liệu
+      { $set: { ...updateData, status: PAID, paymentId : payment._id, totalPrice: updateData.amount } }, // Cập nhật dữ liệu
       { new: true } // Trả về vé sau khi đã cập nhật
     )
     if (!data) {

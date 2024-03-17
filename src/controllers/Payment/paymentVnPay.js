@@ -63,7 +63,7 @@ export const createPayment = (req, res, next) => {
     vnp_Params['vnp_OrderInfo'] = 'Thanh_toan_cho_ma_GD:' + orderId
     vnp_Params['vnp_OrderType'] = 'other'
     vnp_Params['vnp_Amount'] = amount
-    vnp_Params['vnp_ReturnUrl'] = returnUrl+ `?partnerCode=${'VNPAY'}`
+    vnp_Params['vnp_ReturnUrl'] = returnUrl+ `?partnerCode=${'VNPAY'}` + `&amount=${req.body.amount}`
     vnp_Params['vnp_IpAddr'] = ipAddr
     vnp_Params['vnp_CreateDate'] = createDate
     // vnp_Params['partnerCode'] = 'VNPay'
