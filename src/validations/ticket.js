@@ -6,7 +6,10 @@ const ticketValidateSchema = Joi.object({
   typePayment: Joi.string(),
   amount: Joi.string(),
   seatId: Joi.array().items(Joi.string()).required().min(1),
-  userId: Joi.string().required().min(1),
+  userId: Joi.string(),
+  movieId: Joi.string(),
+  screenRoomId: Joi.string(),
+  cinemaId: Joi.string(),
   paymentId: Joi.string(),
   foods: Joi.array().items(
     Joi.object({
