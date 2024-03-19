@@ -31,6 +31,12 @@ const ShowtimesSchema = mongoose.Schema(
       enum : statusSchedule,
       default: AVAILABLE_SCHEDULE
     },
+    SeatId: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Seat'
+      }
+    ],
     destroy: {
       type: Boolean,
       default: false

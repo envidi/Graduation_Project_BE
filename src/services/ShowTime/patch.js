@@ -27,7 +27,10 @@ export const updateService = async (req) => {
       Showtimes.findById(id).populate('screenRoomId'),
       ScreenRoom.findById(body.screenRoomId)
     ])
-
+    // Không thể chuyển lịch chiếu sang rạp khác
+    if (!show || Object.keys(show).length === 0) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Showtime id not found')
+    }
     if (show.screenRoomId.CinemaId !== currentCinema) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,

@@ -19,48 +19,46 @@ export const statusSeat = [AVAILABLE, SOLD, RESERVED, UNAVAILABLE]
 export const NORMAL = 'normal'
 export const VIP = 'VIP'
 
-const seatChema = new mongoose.Schema({
-  typeSeat: {
-    type: String,
-    enum: [NORMAL, VIP],
-    required: true
+const seatChema = new mongoose.Schema(
+  {
+    typeSeat: {
+      type: String,
+      enum: [NORMAL, VIP],
+      required: true
+    },
+    price: {
+      type: Number,
+      required: true
+    },
+    row: {
+      type: Number,
+      required: true
+    },
+    column: {
+      type: Number,
+      required: true
+    },
+    status: {
+      type: String,
+      enum: statusSeat,
+      default: AVAILABLE
+    },
+    ScreeningRoomId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ScreeningRoom',
+      required: true
+    },
+    ShowScheduleId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'ShowSchedule',
+      required: true
+    }
   },
-  price: {
-    type: Number,
-    required: true
-  },
-  row: {
-    type: Number,
-    required: true
-  },
-  column: {
-    type: Number,
-    required: true
-  },
-  status: {
-    type: String,
-    enum: statusSeat,
-    default : AVAILABLE
-  },
-  ScreeningRoomId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref : 'ScreeningRoom',
-    required: true
-  },
-  ShowScheduleId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref : 'ShowSchedule',
-    required: true
+  {
+    timestamps: true,
+    versionKey: false
   }
-  ,
-  TimeSlotId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref : 'TimeSlot',
-    required: true
-  }
-}, {
-  timestamps: true, versionKey: false
-})
+)
 seatChema.plugin(mongoosePaginate)
 
 export default mongoose.model('Seat', seatChema)

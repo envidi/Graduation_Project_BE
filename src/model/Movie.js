@@ -40,6 +40,14 @@ const productSchema = mongoose.Schema(
       type: String,
       required: true
     },
+    language: {
+      type:String,
+      required:true
+    },
+    actor : {
+      type:String,
+      required:true
+    },
     trailer: {
       type: String,
       required: true

@@ -17,16 +17,16 @@ export const removeService = async (reqBody) => {
       { _id: id },
       {
         populate: {
-          path: 'TimeSlotId',
+          path: 'ShowtimesId',
           populate: 'SeatId'
         }
       }
     )
-    const timeSlots = data.docs[0].TimeSlotId
+    const showTimes = data.docs[0].ShowtimesId
     // Kiểm tra xem tất cả ghế trong khung giờ có trạng thái là sold không
     // Nếu có thì không cho xóa
-    timeSlots.forEach((timeSlots) => {
-      const isSeatSold = timeSlots.SeatId.some((seat) => seat.status === SOLD)
+    showTimes.forEach((showTime) => {
+      const isSeatSold = showTime.SeatId.some((seat) => seat.status === SOLD)
       if (isSeatSold) {
         throw new ApiError(
           StatusCodes.BAD_REQUEST,
@@ -56,11 +56,11 @@ export const removeService = async (reqBody) => {
       )
     ]
     // Xóa hết các timeslot trong screen room
-    if (timeSlots.length > 0) {
-      timeSlots.forEach((timeslot) => {
+    if (showTimes.length > 0) {
+      showTimes.forEach((timeslot) => {
         const req = {
           params: {
-            id: timeslot.Show_scheduleId.toString()
+            id: timeslot._id.toString()
           }
         }
 
@@ -82,26 +82,15 @@ export const deleteSoftService = async (reqBody) => {
   try {
     const id = reqBody.params.id
 
-    const [checkScreenRoom, timeSlotIds] = await Promise.all([
+    const [checkScreenRoom] = await Promise.all([
       ScreeningRoom.paginate(
         { _id: id },
         {
           populate: {
-            path: 'TimeSlotId',
+            path: 'ShowtimesId',
             populate: {
               path: 'SeatId'
             }
-          }
-        }
-      ),
-      ScreeningRoom.paginate(
-        {
-          _id: id
-        },
-        {
-          populate: {
-            path: 'TimeSlotId',
-            select: '_id SeatId'
           }
         }
       )
@@ -110,17 +99,12 @@ export const deleteSoftService = async (reqBody) => {
     })
     // Tìm kiếm trong tất cả timeslot xem có ghế nào ở trạng thái được bán không
     // Nếu có thì không cho xóa
-    const timeSlots = checkScreenRoom.docs[0].TimeSlotId
-    const arrayShowTime = timeSlots.map((timeslot) => timeslot.Show_scheduleId)
-    timeSlots.forEach((timeSlot) => {
-      const isSeatSold = timeSlot.SeatId.some((seat) => seat.status === SOLD)
-      if (isSeatSold) {
-        throw new ApiError(
-          StatusCodes.CONFLICT,
-          'Some seat in this screen is already sold'
-        )
+    const showTimeIds = checkScreenRoom.docs[0].ShowtimesId.map(
+      (showTimeId) => {
+        return showTimeId._id
       }
-    })
+    )
+
     // Cập nhật screen room thành đã bị xóa mềm
     const data = await ScreeningRoom.findByIdAndUpdate(
       { _id: id },
@@ -139,25 +123,12 @@ export const deleteSoftService = async (reqBody) => {
     }
     let promises = []
     // Cập nhật tất cả timeslot trong screen thành đã bị xóa mềm
-    if (
-      timeSlotIds.docs[0].TimeSlotId ||
-      timeSlotIds.docs[0].TimeSlotId.length > 0
-    ) {
+    if (showTimeIds || showTimeIds.length > 0) {
       promises.push(
-        TimeSlot.updateMany(
-          {
-            _id: {
-              $in: checkScreenRoom.docs[0].TimeSlotId
-            }
-          },
-          {
-            destroy: true
-          }
-        ),
         Showtimes.updateMany(
           {
             _id: {
-              $in: arrayShowTime
+              $in: showTimeIds
             }
           },
           {
@@ -166,22 +137,6 @@ export const deleteSoftService = async (reqBody) => {
         )
       )
     }
-    // Cập nhật tất cả ghế trong tất cả timeslot
-    // trong screen thành trạng thái unavailable
-    timeSlotIds.docs[0].TimeSlotId.forEach((timeSlot) => {
-      promises.push(
-        Seat.updateMany(
-          {
-            _id: {
-              $in: timeSlot.SeatId
-            }
-          },
-          {
-            status: UNAVAILABLE
-          }
-        )
-      )
-    })
 
     await Promise.all(promises).catch((error) => {
       throw new Error(StatusCodes.CONFLICT, new Error(error.message))
@@ -199,21 +154,21 @@ export const restoreService = async (reqBody) => {
     const id = reqBody.params.id
     // const body = reqBody.body
 
-    const timeSlotIds = await ScreeningRoom.paginate(
+    const screenRoom = await ScreeningRoom.paginate(
       {
         _id: id
       },
       {
         populate: {
-          path: 'TimeSlotId',
-          select: '_id SeatId Show_scheduleId'
+          path: 'ShowtimesId',
+          select: '_id SeatId '
         }
       }
     )
+    const showTimeIds = screenRoom.docs[0].ShowtimesId.map((showTimeId) => {
+      return showTimeId._id
+    })
 
-    const arrayShowTime = timeSlotIds.docs[0].TimeSlotId.map(
-      (timeslot) => timeslot.Show_scheduleId
-    )
     const data = await ScreeningRoom.findByIdAndUpdate(
       { _id: id },
       {
@@ -230,25 +185,12 @@ export const restoreService = async (reqBody) => {
       )
     }
     let promises = []
-    if (
-      timeSlotIds.docs[0].TimeSlotId &&
-      timeSlotIds.docs[0].TimeSlotId.length > 0
-    ) {
+    if (showTimeIds && showTimeIds.length > 0) {
       promises.push(
-        TimeSlot.updateMany(
-          {
-            _id: {
-              $in: timeSlotIds.docs[0].TimeSlotId
-            }
-          },
-          {
-            destroy: false
-          }
-        ),
         Showtimes.updateMany(
           {
             _id: {
-              $in: arrayShowTime
+              $in: showTimeIds
             }
           },
           {
@@ -257,21 +199,6 @@ export const restoreService = async (reqBody) => {
         )
       )
     }
-
-    timeSlotIds.docs[0].TimeSlotId.forEach((timeSlot) => {
-      promises.push(
-        Seat.updateMany(
-          {
-            _id: {
-              $in: timeSlot.SeatId
-            }
-          },
-          {
-            status: AVAILABLE
-          }
-        )
-      )
-    })
 
     await Promise.all(promises).catch((error) => {
       throw new Error(StatusCodes.CONFLICT, new Error(error.message))

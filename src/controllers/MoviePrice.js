@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 // import Movie from '../model/Movie.js'
 import Movie from '../model/Movie.js'
 import MoviePrice from '../model/MoviePrice.js'
@@ -14,8 +15,6 @@ import {
 import { StatusCodes } from 'http-status-codes'
 
 export const getAll = async (req, res, next) => {
-  // console.log(1)
-  // return 1
   try {
     const {
       _page = 1,
@@ -131,7 +130,10 @@ export const remove = async (req, res, next) => {
     const movie = await Movie.findById(moviePrice.movieId)
 
     if (movie.status === 'IS_SHOWING') {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Movie is released. Cannot delete this price!')
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Movie is released. Cannot delete this price!'
+      )
     }
 
     // Kiểm tra xem có chỗ nào được đặt trước cho bộ phim không

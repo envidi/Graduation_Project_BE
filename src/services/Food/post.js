@@ -11,7 +11,6 @@ export const createService = async (reqBody) => {
     if (reqBody.file) {
       body.image = reqBody.file.path;
     }
-    console.log(body);
 
     const { error } = foodValidationSchema.validate(body, { abortEarly: true })
     if (error) {
