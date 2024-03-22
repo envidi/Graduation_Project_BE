@@ -17,7 +17,7 @@ export function searchByFields(objects, query) {
     for (const key of Object.keys(obj)) {
       // Nếu trường là name, author hoặc actor và giá trị của trường chứa query
       if (
-        (key === 'movieName' || key === 'screenName' || key === 'cinemaName') &&
+        (key === 'movieName' || key === 'screenName' || key === 'cinemaName'|| key === 'status' ) &&
         obj[key].toLowerCase().includes(query.toLowerCase())
       ) {
         result.push(obj)

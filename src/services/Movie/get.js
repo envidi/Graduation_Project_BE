@@ -62,7 +62,7 @@ export const getAllMovieHomePage = async (reqBody) => {
   try {
     const {
       _page = 1,
-      _limit = 10,
+      _limit = 50,
       _sort = 'createdAt',
       _order = 'asc'
     } = reqBody.query
@@ -102,10 +102,13 @@ export const getMovieStatus = async (reqBody) => {
   try {
     const {
       _page = 1,
-      _limit = 10,
+      _limit = 50,
       _sort = 'createdAt',
       _order = 'asc',
-      status = IS_SHOWING
+      status = IS_SHOWING,
+      _country = '0',
+      _rate = '0',
+      _age = '0'
     } = reqBody.query
     const options = {
       page: _page,
@@ -126,13 +129,36 @@ export const getMovieStatus = async (reqBody) => {
         status: 1,
         slug: 1,
         image: 1,
+        country: 1,
+        age_limit: 1,
         fromDate: 1
       }
     }
-    const data = await Movie.paginate(
-      { destroy: false, status: status },
-      options
-    )
+    let query = {
+      destroy: false,
+      status: status
+    }
+    if (_country !== '0') {
+      query = {
+        ...query,
+        country: _country
+      }
+    }
+    if (_rate != 0 || _rate != '0') {
+      query = {
+        ...query,
+        rate: _rate
+      }
+    }
+    if (_age != 0 || _age != '0') {
+      query = {
+        ...query,
+        age_limit: {
+          $lte: _age
+        }
+      }
+    }
+    const data = await Movie.paginate(query, options)
 
     if (!data || data.docs.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
