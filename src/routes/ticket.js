@@ -1,6 +1,15 @@
-import express from 'express';
-import { create, getAll, getDetail, remove, update, removeHard } from '../controllers/ticket';
-const routerTicket = express.Router();
+import express from 'express'
+import {
+  create,
+  getAll,
+  getDetail,
+  remove,
+  update,
+  removeHard,
+  checkoutPaymentSeat,
+  getAllTicketByUser
+} from '../controllers/ticket'
+const routerTicket = express.Router()
 
 // routerProducts.get('/', verifyAccessToken, getAll);
 // routerProducts.get('/:id', verifyAccessToken, getDetail);
@@ -8,12 +17,13 @@ const routerTicket = express.Router();
 // routerProducts.post('/', verifyAccessToken, isAdmin, create);
 // routerProducts.delete('/:id', verifyAccessToken, isAdmin, remove);
 
-routerTicket.get('/', getAll);
-routerTicket.get('/:id', getDetail);
-routerTicket.patch('/:id', update);
-routerTicket.post('/', create);
-routerTicket.delete('/:id', remove);
-routerTicket.delete('/delete/:id', removeHard);
+routerTicket.get('/', getAll)
+routerTicket.get('/user', getAllTicketByUser)
+routerTicket.get('/:id', getDetail)
+routerTicket.patch('/:id', update)
+routerTicket.patch('/status/:id', checkoutPaymentSeat)
+routerTicket.post('/', create)
+routerTicket.delete('/:id', remove)
+routerTicket.delete('/delete/:id', removeHard)
 
-
-export default routerTicket;
+export default routerTicket

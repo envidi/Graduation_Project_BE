@@ -29,9 +29,9 @@ const ScreenRoomSchema = mongoose.Schema(
       ref: 'Cinema',
       required: true
     },
-    TimeSlotId: [{
+    ShowtimesId: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'TimeSlot'
+      ref: 'Showtimes'
     }],
     status: {
       type: String,

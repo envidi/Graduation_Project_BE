@@ -1,5 +1,6 @@
 /* eslint-disable no-useless-catch */
 import Ticket from '../../model/Ticket'
+import dayjs from '../../utils/timeLib.js'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../utils/ApiError'
 import ticketValidateSchema from '../../validations/ticket.js'
@@ -23,6 +24,10 @@ export const createService = async (reqBody) => {
 
     // Check if Seat is AVAILABLE
     const promises = [
+      Showtimes.findOne({ _id: body.showtimeId }, 'timeFrom timeTo').populate(
+        'movieId',
+        'status'
+      ),
       Seat.find({
         _id: { $in: body.seatId }
       }),
@@ -38,7 +43,15 @@ export const createService = async (reqBody) => {
         })
       )
     }
-    const [seats, priceMovie, foods] = await Promise.all(promises)
+    const [dataShowTime, seats, priceMovie, foods] = await Promise.all(promises)
+    const now = dayjs()
+    if (now > dataShowTime.timeFrom) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'The seat reservation time has expired'
+      )
+    }
+
     const result = seats.some((seat_availble) => {
       return seat_availble.status !== AVAILABLE
     })
@@ -50,7 +63,11 @@ export const createService = async (reqBody) => {
       return (accu += seat.price)
     }, 0)
     const totalFoodPrice =
-      foods.length > 0 ? foods.reduce((accu, food) => { return (accu += food.price)}, 0): 0
+      foods && foods.length > 0
+        ? foods.reduce((accu, food) => {
+            return (accu += food.price)
+          }, 0)
+        : 0
     // const totalFoodPrice = 0
     const totalPriceMovie = priceMovie.price
 

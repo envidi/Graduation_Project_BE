@@ -22,26 +22,28 @@ export const updateService = async (req) => {
 
     const checkshowtimes = await Showtimes.find({ movieId: id })
     const showtime = await checkshowtimes[0]
-    if (showtime != undefined) {
-      // if (checkmovie.duration != req.body.duration) {
-      //   throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang xuất chiếu không thể sửa duration !')
-      // }
-      throw new ApiError(
-        StatusCodes.NOT_FOUND,
-        'Movies that are currently playing cannot be Update!'
-      )
-    }
+    // if (showtime != undefined) {
+    //   // if (checkmovie.duration != req.body.duration) {
+    //   //   throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang xuất chiếu không thể sửa duration !')
+    //   // }
+    //   throw new ApiError(
+    //     StatusCodes.NOT_FOUND,
+    //     'Movies that are currently playing cannot be Update!'
+    //   )
+    // }
 
     // check status nếu đang công chiếu thì k sửa dc 1 số trường
-    if (checkmovie.status == 'IS_SHOWING') {
-      // if (checkmovie.duration != req.body.duration) {
-      //   throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang công chiếu không thể sửa duration !')
-      // }
-      throw new ApiError(
-        StatusCodes.NOT_FOUND,
-        'Movies currently being released cannot be edited !'
-      )
-    }
+
+    // if (checkmovie.status == 'IS_SHOWING') {
+    //   // if (checkmovie.duration != req.body.duration) {
+    //   //   throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang công chiếu không thể sửa duration !')
+    //   // }
+    //   throw new ApiError(
+    //     StatusCodes.NOT_FOUND,
+    //     'Movies currently being released cannot be edited !'
+    //   )
+    // }
+
     // check destroy nếu đang xóa mềm thì không thể sửa được bất cứ trường nào
     if (checkmovie.destroy == true) {
       throw new ApiError(

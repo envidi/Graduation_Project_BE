@@ -2,7 +2,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { v2 as cloudinary } from 'cloudinary'
 
-import Movie from '../../model/Movie.js'
+import Movie, { COMING_SOON, IS_SHOWING } from '../../model/Movie.js'
 import ShowTime from '../../model/Showtimes.js'
 import { convertTimeToCurrentZone } from '../../utils/timeLib.js'
 import ApiError from '../../utils/ApiError.js'
@@ -12,17 +12,6 @@ import mongoose from 'mongoose'
 //   convertTimeToIsoString
 // } from '../utils/timeLib.js'
 // import { get } from 'mongoose'
-
-const checkImageExists = async (public_id) => {
-  // console.log('public_id:', public_id);
-  try {
-    const result = await cloudinary.api.resource(public_id)
-    return result ? true : false
-  } catch (error) {
-    // console.log('Error checking image:', error.message);
-    return false
-  }
-}
 
 export const getAllService = async (reqBody) => {
   try {
@@ -38,7 +27,7 @@ export const getAllService = async (reqBody) => {
       sort: {
         [_sort]: _order === 'asc' ? 1 : -1
       },
-      populate: 'prices'
+      populate: ['prices', 'showTimes']
     }
     const data = await Movie.paginate({ destroy: false }, options)
 
@@ -64,6 +53,178 @@ export const getAllService = async (reqBody) => {
     return {
       ...data,
       docs: plainDocs
+    }
+  } catch (error) {
+    throw error
+  }
+}
+export const getAllMovieHomePage = async (reqBody) => {
+  try {
+    const {
+      _page = 1,
+      _limit = 50,
+      _sort = 'createdAt',
+      _order = 'asc'
+    } = reqBody.query
+    const options = {
+      page: _page,
+      limit: _limit,
+      sort: {
+        [_sort]: _order === 'asc' ? 1 : -1
+      },
+      populate: {
+        path: 'categoryId',
+        select: 'name _id isDeleteable '
+      }
+    }
+    const data = await Movie.paginate({ destroy: false }, options)
+
+    if (!data || data.docs.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
+    }
+    // Convert Mongoose documents to plain JavaScript objects
+    const plainDocs = data.docs.map((doc) => doc.toObject())
+
+    // Add the 'price' field to each movie based on the current day type
+    plainDocs.forEach((movie) => {
+      movie.fromDate = convertTimeToCurrentZone(movie.fromDate)
+      movie.toDate = convertTimeToCurrentZone(movie.toDate)
+    })
+    return {
+      ...data,
+      docs: plainDocs
+    }
+  } catch (error) {
+    throw error
+  }
+}
+export const getMovieStatus = async (reqBody) => {
+  try {
+    const {
+      _page = 1,
+      _limit = 50,
+      _sort = 'createdAt',
+      _order = 'asc',
+      status = IS_SHOWING,
+      _country = '0',
+      _rate = '0',
+      _age = '0'
+    } = reqBody.query
+    const options = {
+      page: _page,
+      limit: _limit,
+      sort: {
+        [_sort]: _order === 'asc' ? 1 : -1
+      },
+      populate: {
+        path: 'categoryId',
+        select: 'name _id isDeleteable '
+      },
+      projection: {
+        name: 1,
+        categoryId: 1,
+        duration: 1,
+        author: 1,
+        rate: 1,
+        status: 1,
+        slug: 1,
+        image: 1,
+        country: 1,
+        age_limit: 1,
+        fromDate: 1
+      }
+    }
+    let query = {
+      destroy: false,
+      status: status
+    }
+    if (_country !== '0') {
+      query = {
+        ...query,
+        country: _country
+      }
+    }
+    if (_rate != 0 || _rate != '0') {
+      query = {
+        ...query,
+        rate: _rate
+      }
+    }
+    if (_age != 0 || _age != '0') {
+      query = {
+        ...query,
+        age_limit: {
+          $lte: _age
+        }
+      }
+    }
+    const data = await Movie.paginate(query, options)
+
+    if (!data || data.docs.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
+    }
+    // Convert Mongoose documents to plain JavaScript objects
+    const plainDocs = data.docs.map((doc) => doc.toObject())
+
+    // Add the 'price' field to each movie based on the current day type
+    plainDocs.forEach((movie) => {
+      movie.fromDate = convertTimeToCurrentZone(movie.fromDate)
+      movie.toDate = convertTimeToCurrentZone(movie.toDate)
+    })
+    return {
+      ...data,
+      docs: plainDocs
+    }
+  } catch (error) {
+    throw error
+  }
+}
+export const searchMovie = async (reqBody) => {
+  try {
+    const {
+      _page = 1,
+      _limit = 9,
+      _sort = 'createdAt',
+      _order = 'asc',
+      q = ''
+    } = reqBody.query
+    const options = {
+      page: _page,
+      limit: _limit,
+      sort: {
+        [_sort]: _order === 'asc' ? 1 : -1
+      },
+      populate: {
+        path: 'categoryId',
+        select: 'name _id isDeleteable '
+      },
+      projection: {
+        name: 1,
+        categoryId: 1,
+        status: 1,
+        slug: 1,
+        image: 1
+      }
+    }
+
+    const data = await Movie.paginate(
+      {
+        destroy: false,
+        $or: [
+          { name: { $regex: q, $options: 'i' } },
+          { author: { $regex: q, $options: 'i' } },
+          { actor: { $regex: q, $options: 'i' } }
+        ]
+      },
+      options
+    )
+
+    if (!data || data.docs.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
+    }
+
+    return {
+      ...data
     }
   } catch (error) {
     throw error
@@ -151,13 +312,28 @@ export const getDetailService = async (reqBody) => {
             {
               $project: {
                 movieId: 0,
-                destroy: 0,
                 createdAt: 0,
                 updatedAt: 0
               }
             }
           ],
           as: 'showTimeCol'
+        }
+      },
+      {
+        $lookup: {
+          from: 'movieprices',
+          localField: 'prices',
+          foreignField: '_id',
+          pipeline: [
+            {
+              $project: {
+                price: 1,
+                dayType: 1
+              }
+            }
+          ],
+          as: 'moviePriceCol'
         }
       },
       {
@@ -185,20 +361,35 @@ export const getDetailService = async (reqBody) => {
         },
         projection: {
           screenRoomId: 1,
-          _id : 0
+          _id: 0
         }
       }
     )
 
-    const convertShowTime = data[0].showTimeCol.map((showTime, index) => {
-      showTime.timeFrom = convertTimeToCurrentZone(showTime.timeFrom)
-      showTime.timeTo = convertTimeToCurrentZone(showTime.timeTo)
-      showTime.date = convertTimeToCurrentZone(showTime.date)
-      showTime.cinemaId = populateCinema.docs[index].screenRoomId.CinemaId
-      return showTime
+    const currentDate = new Date()
+    const currentDay = currentDate.getDay() // Sunday is 0, Monday is 1, ..., Saturday is 6
+
+    const getPriceByDay = data[0].moviePriceCol.filter((price) => {
+      return currentDay >= 1 && currentDay <= 5
+        ? price.dayType === 'weekday'
+        : price.dayType === 'weekend'
     })
+
+    const convertShowTime = data[0].showTimeCol
+      .map((showTime, index) => {
+        if (showTime.destroy) return
+        showTime.timeFrom = convertTimeToCurrentZone(showTime.timeFrom)
+        showTime.timeTo = convertTimeToCurrentZone(showTime.timeTo)
+        showTime.date = convertTimeToCurrentZone(showTime.date)
+        showTime.cinemaId = populateCinema.docs[index].screenRoomId.CinemaId
+        showTime.screenRoomId = populateCinema.docs[index].screenRoomId
+
+        return showTime
+      })
+      .filter((showtime) => showtime != null)
     const newData = {
       ...data[0],
+      moviePriceCol: getPriceByDay,
       showTimeCol: convertShowTime,
       fromDate: convertTimeToCurrentZone(data[0].fromDate),
       toDate: convertTimeToCurrentZone(data[0].toDate)
@@ -233,6 +424,7 @@ export const getMovieByCategory = async (reqBody) => {
         $ne: id
       }
     }).populate('categoryId', '_id name')
+
     if (!relateMovie || relateMovie.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No movie found!')
     }

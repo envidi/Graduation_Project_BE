@@ -17,7 +17,7 @@ const userValidate = Joi.object({
   mobile: Joi.number().required().label('mobile').messages({
     'number.empty': `{{ #label }} is 'required'`
   }),
-  address: Joi.string().required().min(6).max(255).label('address').messages({
+  address: Joi.string().required().min(6).max(255).label('Address').messages({
     'string.empty': `{{ #label }} is 'required'`
   }),
   roleIds: Joi.string().min(6).max(255),

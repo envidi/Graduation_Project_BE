@@ -18,7 +18,7 @@ export const getAll = async (req, res, next) => {
     const { id: categoryId } = req.params
     const {
       _page = 1,
-      _limit = 10,
+      _limit = 50,
       _sort = 'createdAt',
       _order = 'asc'
     } = req.query
@@ -109,8 +109,7 @@ export const update = async (req, res, next) => {
         return pro
       }
     })
-    console.log('product', newProduct);
-    console.log('result', result);
+
 
     // Những id category bị xóa khỏi mảng categoryId của movie
     const deletedProductfromCategory = findDifferentElements(

@@ -10,13 +10,33 @@ export const getAll = async (req, res, next) => {
       message: 'Success',
       data
     })
-    // return res.status(StatusCodes.OK).json({
-    //   message: 'Success',
-    //   datas: {
-    //     ...data,
-    //     docs: plainDocs
-    //   }
-    // })
+  
+  } catch (error) {
+    next(error)
+  }
+}
+export const getAllMovieHomePage = async (req, res, next) => {
+  try {
+    const data = await movieService.getAllMovieHomePage(req)
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      data
+    })
+  
+  } catch (error) {
+    next(error)
+  }
+}
+export const searchMovie = async (req, res, next) => {
+  try {
+    const data = await movieService.searchMovie(req)
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      data
+    })
+
   } catch (error) {
     next(error)
   }
@@ -24,6 +44,18 @@ export const getAll = async (req, res, next) => {
 export const getRelatedMoVie = async (req, res, next) => {
   try {
     const data = await movieService.getMovieByCategory(req)
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+export const getMovieStatus = async (req, res, next) => {
+  try {
+    const data = await movieService.getMovieStatus(req)
 
     return res.status(StatusCodes.OK).json({
       message: 'Success',

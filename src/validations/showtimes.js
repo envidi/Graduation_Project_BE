@@ -3,19 +3,17 @@ import Joi from 'joi';
 
 // Remove JoiDate import if not used
 import JoiDate from '@joi/date';
+import { statusScreen } from '../model/Showtimes'
+// kiểu giờ
+const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9] (AM|PM)$/
 
-// Remove if not used
-// import { statusScreen } from '../model/Showtimes';
 
-// Define time regex
-const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9] (AM|PM)$/;
-
-// Use regular Joi for consistency
 const JoiExtended = Joi.extend(JoiDate);
 
 const showtimesValidate = JoiExtended.object({
   date: JoiExtended.date().format(['YYYY/MM/DD HH:mm', 'DD-MM-YYYY HH:mm']).min('now').required().label('date').messages({
     'date.empty': '{{ #label }} is required'
+
   }),
 
   timeFrom: JoiExtended.date().format('DD-MM-YYYY HH:mm').min('now').required().label('timeFrom').messages({
@@ -33,6 +31,7 @@ const showtimesValidate = JoiExtended.object({
     'string.empty': '{{ #label }} is required',
     'any.required': '{{ #label }} is required'
   }),
+  SeatId: Joi.array().items(Joi.string().trim().strict()),
 
   movieId: Joi.string().required().min(1).max(255).label('movieId').messages({
     'string.empty': '{{ #label }} is required',
@@ -43,3 +42,4 @@ const showtimesValidate = JoiExtended.object({
 });
 
 export default showtimesValidate;
+

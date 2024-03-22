@@ -18,17 +18,37 @@ const TicketSchema = new mongoose.Schema(
         require: true
       }
     ],
+    userId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'User',
+      require: true
+    },
+    movieId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'Movie'
+    },
+    cinemaId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'Cinema'
+    },
+    screenRoomId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'ScreeningRoom'
+    },
+    paymentId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'Payment'
+    },
     foods: [
       {
         foodId: {
           type: String,
-          required :true
+          required: true
           // ref: 'Food'
-
         },
-        quantityFood : {
-          type : Number,
-          required : true
+        quantityFood: {
+          type: Number,
+          required: true
         }
       }
     ],

@@ -1,0 +1,252 @@
+[33mcommit 400cac4d59bbe6bcea00f2eae2e7338f3d137aab[m[33m ([m[1;36mHEAD -> [m[1;32mnam21[m[33m)[m
+Author: toilanome <namntph26878@fpt.edu.vn>
+Date:   Fri Mar 22 17:52:01 2024 +0700
+
+    update user
+
+[33mcommit 452bd35317a109b5480aacba003699770cce5763[m[33m ([m[1;31morigin/nam21[m[33m, [m[1;32mdevelop[m[33m)[m
+Author: toilanome <namntph26878@fpt.edu.vn>
+Date:   Wed Feb 28 08:58:47 2024 +0700
+
+    update
+
+[33mcommit c745144d7d96f0f0bbe9a49b53f969b626236fe7[m
+Merge: 0bdbbdc dddd989
+Author: toilanome <namntph26878@fpt.edu.vn>
+Date:   Wed Feb 21 20:47:17 2024 +0700
+
+    Merge branch 'develop' of https://github.com/envidi/Graduation_Project_BE into develop
+
+[33mcommit 0bdbbdc87db5dc49f344662105660a40e9be28ce[m
+Author: toilanome <namntph26878@fpt.edu.vn>
+Date:   Wed Feb 21 20:47:12 2024 +0700
+
+    m
+
+[33mcommit dddd989f17405d87b7ef7be43896584826f33548[m
+Merge: 6371693 04ad69f
+Author: envidi <118465859+envidi@users.noreply.github.com>
+Date:   Wed Feb 21 20:43:41 2024 +0700
+
+    Merge pull request #34 from envidi/featMail
+    
+    feat : Mail change
+
+[33mcommit 04ad69f531de745563f97dd1e21823e3701198ba[m[33m ([m[1;31morigin/featMail[m[33m)[m
+Author: envidi <phanm711996@gmail.com>
+Date:   Wed Feb 21 20:42:14 2024 +0700
+
+    feat : Mail change
+
+[33mcommit 6371693bf23acd8e1200b694439d7965f0bf3348[m
+Merge: 93c79c2 ae00ba2
+Author: envidi <118465859+envidi@users.noreply.github.com>
+Date:   Wed Feb 21 20:33:53 2024 +0700
+
+    Merge pull request #33 from envidi/cinemaFeat
+    
+    feat : select cinema
+
+[33mcommit ae00ba2c9c37b575c6211d4e058df2ff15eb6d77[m[33m ([m[1;31morigin/cinemaFeat[m[33m)[m
+Author: envidi <phanm711996@gmail.com>
+Date:   Mon Feb 19 19:26:53 2024 +0700
+
+    feat : select cinema
+
+[33mcommit 93c79c251b4d6f4ea64cd9b552e5f84753014883[m
+Merge: 4fed36a 004a1fa
+Author: envidi <118465859+envidi@users.noreply.github.com>
+Date:   Wed Feb 14 15:19:23 2024 +0700
+
+    Merge pull request #32 from envidi/newFeatMovieDetail
+    
+    feat ( movie detail ) : thêm lấy phim có cùng thể loại
+
+[33mcommit 004a1faa0e66f730a23cd2248130ddfdb4688675[m
+Author: envidi <phanm711996@gmail.com>
+Date:   Wed Feb 14 15:17:20 2024 +0700
+
+    feat ( movie detail ) : thêm lấy phim có cùng thể loại
+
+[33mcommit 4fed36aa0b9a793558ae6fb2db6f84597b9c53bf[m
+Merge: 46b5579 1c19063
+Author: envidi <118465859+envidi@users.noreply.github.com>
+Date:   Sat Feb 3 21:14:09 2024 +0700
+
+    Merge pull request #31 from envidi/fix_movie_upload_image
+    
+    Fix movie upload image
+
+[33mcommit 1c19063edd5db28204cf9242f240fc016763ac24[m
+Merge: 4e96d91 eea2c61
+Author: envidi <phanm711996@gmail.com>
+Date:   Sat Feb 3 21:12:34 2024 +0700
+
+    fix (movie) : upload image movie
+
+[33mcommit 4e96d9143d133ac31dd9bd406d2d0ed7d277ae8f[m
+Author: envidi <phanm711996@gmail.com>
+Date:   Sat Feb 3 15:16:39 2024 +0700
+
+    chore: sửa lại logic phần sửa của ticket
+
+[33mcommit eea2c610910c96718fc3a495787ebe41c88e3f7c[m[33m ([m[1;31morigin/quang-dev[m[33m)[m
+Author: quagsulu <quangnvph24106@fpt.edu.vn>
+Date:   Thu Feb 1 20:04:22 2024 +0700
+
+    refactor: refactor CRUD movie về mô hình sevices
+
+[33mcommit 86a1147bf2dfbebabae228ef846b405c329bd8ae[m
+Author: quagsulu <quangnvph24106@fpt.edu.vn>
+Date:   Thu Feb 1 18:59:54 2024 +0700
+
+    refactor: refactor CRUD movie về mô hình sevices
+
+[33mcommit 46b55794293a99206995f803b39bc5c74ccbb811[m
+Merge: b705712 9d2be40
+Author: envidi <118465859+envidi@users.noreply.github.com>
+Date:   Tue Jan 30 15:01:49 2024 +0700
+
+    Merge pull request #30 from envidi/featTicket
+    
+    chore ( ticket ) : Thêm ràng buộc khi xóa một food
+
+[33mcommit 9d2be40f8fbff26e9c21a977c6d7e5ffba073a1b[m
+Author: envidi <phanm711996@gmail.com>
+Date:   Tue Jan 30 15:01:00 2024 +0700
+
+    chore ( ticket ) : Thêm ràng buộc khi xóa một food
+
+[33mcommit b705712006e9dcadbd3a8ab6b985aa61c9f7e52a[m
+Merge: dbdabc0 a981705
+Author: envidi <118465859+envidi@users.noreply.github.com>
+Date:   Tue Jan 30 13:21:22 2024 +0700
+
+    Merge pull request #29 from envidi/featTicket
+    
+    Feat ticket
+
+[33mcommit a9817053fa0f4628d494550b3c3844705356a20b[m
+Author: envidi <phanm711996@gmail.com>
+Date:   Tue Jan 30 13:19:40 2024 +0700
+
+    fix ( ticket ) : Xử lý khi đặt vé thì ghế ngồi được đặt
+
+[33mcommit 45c113ab1c96449d8beff670aeeff79e3e116aca[m[33m ([m[1;31morigin/Nanh[m[33m)[m
+Author: nanh02 <anhnhi04102003@gmail.com>
+Date:   Sun Jan 28 15:01:32 2024 +0700
+
+    fix(ticket)
+
+[33mcommit 438bb7513eedab68f7281a47ef2ce8e76ecdc1a9[m
+Author: nanh02 <anhnhi04102003@gmail.com>
+Date:   Sun Jan 28 13:17:15 2024 +0700
+
+    fix(post, patch, delete service ticket)
+
+[33mcommit 767a9db7930053350b9fa46764f19b5085092aee[m
+Author: nanh02 <anhnhi04102003@gmail.com>
+Date:   Fri Jan 26 23:33:19 2024 +0700
+
+    chore(eslint-fix)
+
+[33mcommit 7a5c067ea921a62d01e88252c45b9a76696eba7a[m
+Author: nanh02 <anhnhi04102003@gmail.com>
+Date:   Fri Jan 26 23:30:59 2024 +0700
+
+    feat(CRUD vé). fix(remove, getDetail, update đồ ăn)
+
+[33mcommit 1a7c7437b7c8b005e682702f548bc471a74b153c[m
+Merge: 10bc1a4 dbdabc0
+Author: quagsulu <quangnvph24106@fpt.edu.vn>
+Date:   Fri Jan 26 19:32:05 2024 +0700
+
+    docs: sửa lại thông báo tiếng việt thành tiếng anh
+
+[33mcommit 10bc1a4e21ea9ecdd3aea3d1a8a3e0f6cbe972b5[m
+Author: quagsulu <quangnvph24106@fpt.edu.vn>
+Date:   Fri Jan 26 17:23:02 2024 +0700
+
+    Committing changes before switching branches
+
+[33mcommit dbdabc0681023e3786363e58ea75b4f3641df4be[m
+Merge: 25ed4e5 7e7d51f
+Author: envidi <118465859+envidi@users.noreply.github.com>
+Date:   Mon Jan 22 20:18:35 2024 +0700
+
+    Merge pull request #28 from envidi/fixModelScreen
+    
+    fix (screen) : Thêm 2 trường projector và number seat
+
+[33mcommit 7e7d51f23c619eec69de81178f226e36ac4b7f45[m
+Author: envidi <phanm711996@gmail.com>
+Date:   Mon Jan 22 20:17:45 2024 +0700
+
+    fix (screen) : Thêm 2 trường projector và number seat
+
+[33mcommit 25ed4e53fb416382bafc4461ff49b389341fe3eb[m
+Merge: f6e27b3 6e0d6a8
+Author: envidi <118465859+envidi@users.noreply.github.com>
+Date:   Mon Jan 22 18:54:47 2024 +0700
+
+    Merge pull request #27 from envidi/featDeleteMoviePrice
+    
+    Feat delete movie price
+
+[33mcommit 6e0d6a89a9f5116805cd7e7e4fefea9e12752dff[m
+Author: envidi <phanm711996@gmail.com>
+Date:   Mon Jan 22 18:53:41 2024 +0700
+
+    fix (movieprice): Sửa logic khi xóa một giá của bộ phim
+
+[33mcommit 6ec590ca060b39e605b4c35d7788289d200b8d7d[m[33m ([m[1;31morigin/minhvu[m[33m)[m
+Merge: 673bc7a f6e27b3
+Author: minhvhph27206 <minhvhph27206@fpt.edu.vn>
+Date:   Mon Jan 22 14:09:26 2024 +0700
+
+    update:delete movieprice check seat && check movie
+
+[33mcommit 673bc7a5fbe530bed394b82368a6bf932f187483[m
+Author: minhvhph27206 <minhvhph27206@fpt.edu.vn>
+Date:   Mon Jan 22 13:56:46 2024 +0700
+
+    update:delete movieprice check seat
+
+[33mcommit f6e27b36d807d3376440de2d1fd26199af4f6978[m
+Merge: de0c388 97f9727
+Author: envidi <118465859+envidi@users.noreply.github.com>
+Date:   Mon Jan 22 13:27:02 2024 +0700
+
+    Merge pull request #26 from envidi/featMoviePrice
+    
+    Thêm điều kiện khi sửa giá của bộ phim
+
+[33mcommit 0211cdea68a6ba50ab90f03f22a9a07b5c719bba[m
+Author: minhvhph27206 <minhvhph27206@fpt.edu.vn>
+Date:   Mon Jan 22 11:56:20 2024 +0700
+
+    update:delete movieprice check seat có tồn tại trong Movie đó không ?
+
+[33mcommit 97f97278feb7c1848aafa0bf4ec133dda0767117[m
+Merge: de0c388 87629bd
+Author: envidi <phanm711996@gmail.com>
+Date:   Mon Jan 22 11:20:14 2024 +0700
+
+    feat ( movie price ) : Thêm điều kiện khi sửa giá
+
+[33mcommit de0c38895d6f41e36744f18e223be9db454fc9ab[m
+Merge: 8afb6a5 33c7efc
+Author: envidi <118465859+envidi@users.noreply.github.com>
+Date:   Mon Jan 22 10:30:53 2024 +0700
+
+    Merge pull request #25 from envidi/featMovieConditionEdit
+    
+    Điều kiện để sửa một bộ phim
+
+[33mcommit 33c7efcfa3dd0a0e4dfb091b8256660dd40ddbd4[m
+Author: envidi <phanm711996@gmail.com>
+Date:   Mon Jan 22 10:29:13 2024 +0700
+
+    feat ( movie ) : Thêm điều kiện khi sửa bộ phim
+
+[33mcommit 4e04e5a453b8cba0add5cbbe99
