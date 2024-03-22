@@ -67,16 +67,10 @@ export const getAllByUser = async (reqBody) => {
         updatedAt: 0
       }
     }
-    // let query = [
-    //   { 'movieId.name': { $regex: _q, $options: 'i' } },
-    //   { 'cinemaId.CinemaName': { $regex: _q, $options: 'i' } },
-    //   { 'screenRoomId.name': { $regex: _q, $options: 'i' } },
-    //   { status: { $regex: _q, $options: 'i' } }
-    // ]
-    // if (mongoose.Types.ObjectId.isValid(_q)) {
-    //   query = [{ _id: _q }]
-    // }
-    // console.log(query)
+    let query = [{}]
+    if (mongoose.Types.ObjectId.isValid(_q)) {
+      query = [{ _id: _q }]
+    }
     const data = await Ticket.paginate(
       {
         isDeleted: false,
@@ -85,7 +79,7 @@ export const getAllByUser = async (reqBody) => {
           $gte: _start, // Lớn hơn hoặc bằng ngày bắt đầu
           $lte: _end // Nhỏ hơn hoặc bằng ngày kết thúc
         },
-        // $or: [{ status: { $regex: _q, $options: 'i' } }]
+        $or: query
       },
       options
     )
@@ -136,7 +130,9 @@ export const getAllByUser = async (reqBody) => {
         }
       })
     )
-    let searchData = searchByFields(newData, _q)
+    let searchData = mongoose.Types.ObjectId.isValid(_q)
+      ? newData
+      : searchByFields(newData, _q)
     if (!newData || newData.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No Ticket found!')
     }
