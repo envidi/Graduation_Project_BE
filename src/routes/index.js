@@ -13,6 +13,7 @@ import ShowtimesRouter from './showtimes.js';
 import routerEmail from './email.js'
 import routerPay from './payment.js'
 import routerTicket from './ticket.js'
+import routerWatchList from './watchList.js'
 const routerInit = Router()
 
 routerInit.use('/user', routerUser)
@@ -29,5 +30,6 @@ routerInit.use('/showtimes', ShowtimesRouter)
 routerInit.use('/email', routerEmail)
 routerInit.use('/payment', routerPay)
 routerInit.use('/ticket', routerTicket)
+routerInit.use('/watchlist', routerWatchList)
 
 export default routerInit;
