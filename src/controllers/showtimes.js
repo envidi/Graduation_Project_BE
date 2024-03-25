@@ -32,6 +32,19 @@ export const getAllShow = async (req, res, next) => {
     next(error)
   }
 }
+export const getAllShowByMovie = async (req, res, next) => {
+  try {
+
+    const response = await scheduleService.getAllServiceByMovie(req)
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Gọi danh sách lịch chiếu thành công',
+      response
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const getDetailShow = async (req, res, next) => {
   try {
