@@ -10,59 +10,62 @@ import userValidate from '../validations/user.js'
 import { sendMailController } from './email.js'
 import { sendEmailPassword } from '../utils/sendMail.js'
 import cloudinary from '../middleware/multer.js'
-export const register = asyncHandler(async (req, res) => {
-  const body = req.body
+export const register = asyncHandler(async (req, res, next) => {
+  try {
+    const body = req.body
+    const { error } = userValidate.validate(body, { abortEarly: true })
 
-  const { error } = userValidate.validate(body, { abortEarly: true })
+    if (error) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
+    }
+    if (body.password !== body.confirmPassword) {
+      res.status(400).json({
+        message: 'Password không khớp nhau , thử lại !!!'
+      })
+    }
+    const user = await User.findOne({ email: body.email })
+    if (user) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Email đã được đăng ký!')
+    }
 
-  if (error) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
-  }
-  if (body.password !== body.confirmPassword) {
-    res.status(400).json({
-      message: 'Password không khớp nhau , thử lại !!!'
+    const hashPassword = await bcrypt.hash(body.password, 10)
+    // const hashConfirmPassword = await bcrypt.hash(body.confirmPassword, 10)
+
+    let avatarUrl
+    if (req.file) {
+      const cloudGetUrl = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'AVATAR',
+        allowed_formats: ['jpg', 'png', 'jpeg'],
+        transformation: [{ width: 500, height: 500, crop: 'limit' }]
+      })
+      avatarUrl = cloudGetUrl.secure_url
+    } else {
+      avatarUrl =
+        'https://phongreviews.com/wp-content/uploads/2022/11/avatar-facebook-mac-dinh-19.jpg'
+    }
+    const response = await User.create({
+      ...body,
+      password: hashPassword,
+      // confirmPassword: hashConfirmPassword,
+      avatar: avatarUrl
     })
-  }
-  const user = await User.findOne({ email: body.email })
-  if (user) {
-    throw new ApiError(StatusCodes.NOT_FOUND, 'Email đã được đăng ký!')
-  }
-  const hashPassword = await bcrypt.hash(body.password, 10)
-  const hashConfirmPassword = await bcrypt.hash(body.confirmPassword, 10)
 
-  let avatarUrl
-  if (req.file) {
-    const cloudGetUrl = await cloudinary.uploader.upload(req.file.path, {
-      folder: 'AVATAR',
-      allowed_formats: ['jpg', 'png', 'jpeg'],
-      transformation: [{ width: 500, height: 500, crop: 'limit' }]
+    const newUser = await response.populate('roleIds', 'roleName')
+
+    // thêm user vào bảng role user
+    await RoleUser.findOneAndUpdate(
+      { roleName: 'user' },
+      { $push: { userIds: newUser._id } },
+      { new: true }
+    )
+
+    return res.status(200).json({
+      message: newUser ? 'Đăng kí thành công' : 'Đăng kí thất bại',
+      newUser
     })
-    avatarUrl = cloudGetUrl.secure_url
-  } else {
-    avatarUrl =
-      'https://phongreviews.com/wp-content/uploads/2022/11/avatar-facebook-mac-dinh-19.jpg'
+  } catch (error) {
+    next(error)
   }
-
-  const response = await User.create({
-    ...body,
-    password: hashPassword,
-    confirmPassword: hashConfirmPassword,
-    avatar: avatarUrl
-  })
-
-  const newUser = await response.populate('roleIds', 'roleName')
-
-  // thêm user vào bảng role user
-  await RoleUser.findOneAndUpdate(
-    { roleName: 'user' },
-    { $push: { userIds: newUser._id } },
-    { new: true }
-  )
-
-  return res.status(200).json({
-    message: newUser ? 'Đăng kí thành công' : 'Đăng kí thất bại',
-    newUser
-  })
 })
 
 export const login = asyncHandler(async (req, res) => {

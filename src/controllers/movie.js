@@ -10,7 +10,18 @@ export const getAll = async (req, res, next) => {
       message: 'Success',
       data
     })
-  
+  } catch (error) {
+    next(error)
+  }
+}
+export const getAllMovieHasShow = async (req, res, next) => {
+  try {
+    const data = await movieService.getAllHasShow(req)
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      data
+    })
   } catch (error) {
     next(error)
   }
@@ -23,7 +34,6 @@ export const getAllMovieHomePage = async (req, res, next) => {
       message: 'Success',
       data
     })
-  
   } catch (error) {
     next(error)
   }
@@ -36,7 +46,6 @@ export const searchMovie = async (req, res, next) => {
       message: 'Success',
       data
     })
-
   } catch (error) {
     next(error)
   }

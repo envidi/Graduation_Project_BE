@@ -41,6 +41,35 @@ export const getAll = async (req, res, next) => {
     next(error)
   }
 }
+export const getCategoryByShowtime = async (req, res, next) => {
+  try {
+    // const categoryId = req.params.id;
+    const { id: categoryId } = req.params
+    const {
+      _page = 1,
+      _limit = 50,
+      _sort = 'createdAt',
+      _order = 'asc'
+    } = req.query
+    const options = {
+      page: _page,
+      limit: _limit,
+      sort: {
+        [_sort]: _order === 'asc' ? 1 : -1
+      }
+    }
+    const data = await Category.paginate({ categoryId }, options)
+    if (!data || data.docs.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No categories found!')
+    }
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      data: data.docs
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const getDetail = async (req, res, next) => {
   try {
