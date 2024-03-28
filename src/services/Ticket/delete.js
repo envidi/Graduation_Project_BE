@@ -55,11 +55,12 @@ export const removeHardService = async (reqBody) => {
 
     // Cập nhật trường isDeleted thành true để đánh dấu xóa mềm
     const data = await Ticket.findByIdAndDelete(id)
+    const seatIds = data.seatId.map((seat) => seat._id)
     await Promise.all([
       Seat.updateMany(
         {
           _id: {
-            $in: data.seatId
+            $in: seatIds
           }
         },
         {
