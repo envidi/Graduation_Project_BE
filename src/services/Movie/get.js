@@ -408,31 +408,6 @@ export const getDetailService = async (reqBody) => {
       }
     ])
     // console.log(data[0].showTimeCol)
-    let condition = false
-    const arrayDemension = []
-    const showTimeDimension = data[0].showTimeCol
-      .map((showTime) => {
-        if (condition) return
-        const currentShowtime = showTime.timeFrom
-        const currentArray = data[0].showTimeCol.filter((showTimeDemension) => {
-          if (
-            showTimeDemension.timeFrom.getDate() ===
-              currentShowtime.getDate() &&
-            showTimeDemension.status == AVAILABLE_SCHEDULE &&
-            !showTimeDemension.destroy
-          ) {
-            return showTimeDemension
-          }
-        })
-        arrayDemension.push([...currentArray])
-        const currentLength = arrayDemension.flatMap((element) => element)
-        if (currentLength.length === data[0].showTimeCol.length) {
-          condition = true
-        }
-
-        return [...currentArray]
-      })
-      .filter((showTime) => showTime != null)
 
     const arrayShowTimeId = data[0].showTimeCol.map((showtime) => showtime._id)
     const populateCinema = await ShowTime.paginate(
@@ -470,15 +445,50 @@ export const getDetailService = async (reqBody) => {
     convertShowTime = convertShowTime
       .map((showTime, index) => {
         if (showTime.destroy) return
-        showTime.timeFrom = convertTimeToCurrentZone(showTime.timeFrom)
-        showTime.timeTo = convertTimeToCurrentZone(showTime.timeTo)
+        // showTime.timeFrom = convertTimeToCurrentZone(showTime.timeFrom)
+        // showTime.timeTo = convertTimeToCurrentZone(showTime.timeTo)
         return {
           date: showTime.date,
+          timeFrom: convertTimeToCurrentZone(showTime.timeFrom),
+          timeTo: convertTimeToCurrentZone(showTime.timeTo),
           cinemaId: populateCinema.docs[index]?.screenRoomId?.CinemaId,
-          screenRoomId: populateCinema.docs[index].screenRoomId
+          screenRoomId: populateCinema.docs[index].screenRoomId,
+          status: showTime.status
         }
       })
       .filter((showtime) => showtime != null)
+
+    let condition = false
+    const arrayDemension = []
+    const showTimeDimension = data[0].showTimeCol
+      .map((showTime) => {
+        if (condition) return
+        const currentShowtime = showTime.timeFrom
+        const currentArray = data[0].showTimeCol
+          .map((showTimeDemension) => {
+            if (
+              showTimeDemension.timeFrom.getDate() ===
+                currentShowtime.getDate() &&
+              showTimeDemension.status == AVAILABLE_SCHEDULE &&
+              !showTimeDemension.destroy
+            ) {
+              return {
+                ...showTimeDemension,
+                timeFrom: convertTimeToCurrentZone(showTimeDemension.timeFrom),
+                date: showTimeDemension.date
+              }
+            }
+          })
+          .filter((showTime) => showTime != null)
+        arrayDemension.push([...currentArray])
+        const currentLength = arrayDemension.flatMap((element) => element)
+        if (currentLength.length === data[0].showTimeCol.length) {
+          condition = true
+        }
+
+        return [...currentArray]
+      })
+      .filter((showTime) => showTime != null)
 
     const newData = {
       ...data[0],

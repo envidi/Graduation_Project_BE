@@ -12,6 +12,7 @@ import Showtimes from '../../model/Showtimes'
 import ScreenRoom from '../../model/ScreenRoom'
 import MoviePrice from '../../model/MoviePrice.js'
 import Food from '../../model/Food.js'
+import { accessPaymentToken } from '../../middleware/jwt.js'
 
 export const createService = async (reqBody) => {
   try {
@@ -97,6 +98,7 @@ export const createService = async (reqBody) => {
     if (!data || Object.keys(data).length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Create ticket failed!')
     }
+    const paymentToken = accessPaymentToken(data._id)
     await Promise.all([
       Seat.updateMany(
         {
@@ -126,7 +128,7 @@ export const createService = async (reqBody) => {
       throw new ApiError(StatusCodes.CONFLICT, new Error(err.message))
     })
 
-    return data
+    return { ...data._doc, paymentToken }
   } catch (error) {
     throw error
   }
