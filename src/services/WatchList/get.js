@@ -19,10 +19,11 @@ export const getAllService = async (req) => {
       },
       populate: {
         path: 'movieId',
-        select: 'name image duration country age_limit categoryId desc rate slug',
-        populate : {
-          path : 'categoryId',
-          select : 'name'
+        select:
+          'name image duration country age_limit categoryId desc rate slug',
+        populate: {
+          path: 'categoryId',
+          select: 'name'
         }
       }
     }
@@ -31,7 +32,9 @@ export const getAllService = async (req) => {
       options
     )
     if (!data || data.docs.length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'No watch list show found!')
+      return {
+        docs : []
+      }
     }
     return data
   } catch (error) {

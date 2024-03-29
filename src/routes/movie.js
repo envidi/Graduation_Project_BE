@@ -11,7 +11,8 @@ import {
   getRelatedMoVie,
   getAllMovieHomePage,
   searchMovie,
-  getMovieStatus
+  getMovieStatus,
+  getAllMovieHasShow
 } from '../controllers/movie.js'
 
 import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js'
@@ -27,6 +28,7 @@ const routerProducts = express.Router()
 // routerProducts.delete('/:id', verifyAccessToken, isAdmin, remove);
 
 routerProducts.get('/', getAll)
+routerProducts.get('/showtime', getAllMovieHasShow)
 routerProducts.get('/sta', getMovieStatus)
 routerProducts.get('/home', getAllMovieHomePage)
 routerProducts.get('/search', searchMovie)

@@ -47,7 +47,7 @@ export const getAllByUser = async (reqBody) => {
       _order = 'asc',
       _userId = '1',
       _start = new Date('2024-03-01'),
-      _end = new Date('2024-03-28'),
+      _end = new Date('2024-09-26'),
       _q = ''
     } = reqBody.query // Sử dụng req.query thay vì req.body để nhận tham số từ query string
 
@@ -102,6 +102,7 @@ export const getAllByUser = async (reqBody) => {
           },
           'name price'
         )
+
         const newFood = d.foods.map((food, index) => {
           return {
             _id: food._id,

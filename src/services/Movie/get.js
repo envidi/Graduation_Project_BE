@@ -2,9 +2,12 @@
 import { StatusCodes } from 'http-status-codes'
 import { v2 as cloudinary } from 'cloudinary'
 
-import Movie, { COMING_SOON, IS_SHOWING } from '../../model/Movie.js'
-import ShowTime from '../../model/Showtimes.js'
-import { convertTimeToCurrentZone } from '../../utils/timeLib.js'
+import Movie, { IS_SHOWING } from '../../model/Movie.js'
+import ShowTime, { AVAILABLE_SCHEDULE } from '../../model/Showtimes.js'
+import {
+  convertTimeToCurrentZone,
+  convertTimeToIsoString
+} from '../../utils/timeLib.js'
 import ApiError from '../../utils/ApiError.js'
 import mongoose from 'mongoose'
 // import {
@@ -17,7 +20,7 @@ export const getAllService = async (reqBody) => {
   try {
     const {
       _page = 1,
-      _limit = 10,
+      _limit = 50,
       _sort = 'createdAt',
       _order = 'asc'
     } = reqBody.query
@@ -52,6 +55,66 @@ export const getAllService = async (reqBody) => {
     })
     return {
       ...data,
+      docs: plainDocs
+    }
+  } catch (error) {
+    throw error
+  }
+}
+export const getAllHasShow = async (reqBody) => {
+  try {
+    const {
+      _page = 1,
+      _limit = 50,
+      _sort = 'createdAt',
+      _order = 'asc',
+      _cate = ''
+    } = reqBody.query
+    const options = {
+      page: _page,
+      limit: _limit,
+      sort: {
+        [_sort]: _order === 'asc' ? 1 : -1
+      },
+      populate: {
+        path: 'showTimes',
+        select: 'timeFrom status '
+      },
+      projection: 'name image showTimes status slug categoryId'
+    }
+    let query = {
+      destroy: false,
+      status: IS_SHOWING,
+      $expr: { $gt: [{ $size: '$showTimes' }, 0] }
+    }
+    if (_cate !== '') {
+      query = {
+        destroy: false,
+        status: IS_SHOWING,
+        $expr: { $gt: [{ $size: '$showTimes' }, 0] },
+        categoryId: {
+          $in: [_cate]
+        }
+      }
+    }
+    const data = await Movie.paginate(query, options)
+
+    if (!data || data.docs.length === 0) {
+      return []
+    }
+    // Convert Mongoose documents to plain JavaScript objects
+    const plainDocs = data.docs.map((doc) => doc.toObject())
+
+    // const currentDate = new Date()
+    // const currentDay = currentDate.getDay() // Sunday is 0, Monday is 1, ..., Saturday is 6
+
+    // Add the 'price' field to each movie based on the current day type
+    plainDocs.forEach((movie) => {
+      movie.showTimes = movie.showTimes.filter(
+        (show) => show.timeFrom > new Date()
+      )
+    })
+    return {
       docs: plainDocs
     }
   } catch (error) {
@@ -311,6 +374,7 @@ export const getDetailService = async (reqBody) => {
           pipeline: [
             {
               $project: {
+                SeatId: 0,
                 movieId: 0,
                 createdAt: 0,
                 updatedAt: 0
@@ -343,6 +407,8 @@ export const getDetailService = async (reqBody) => {
         }
       }
     ])
+    // console.log(data[0].showTimeCol)
+
     const arrayShowTimeId = data[0].showTimeCol.map((showtime) => showtime._id)
     const populateCinema = await ShowTime.paginate(
       {
@@ -375,32 +441,70 @@ export const getDetailService = async (reqBody) => {
         : price.dayType === 'weekend'
     })
 
-    const convertShowTime = data[0].showTimeCol
+    let convertShowTime = data[0].showTimeCol
+    convertShowTime = convertShowTime
       .map((showTime, index) => {
         if (showTime.destroy) return
-        showTime.timeFrom = convertTimeToCurrentZone(showTime.timeFrom)
-        showTime.timeTo = convertTimeToCurrentZone(showTime.timeTo)
-        showTime.date = convertTimeToCurrentZone(showTime.date)
-        showTime.cinemaId = populateCinema.docs[index].screenRoomId.CinemaId
-        showTime.screenRoomId = populateCinema.docs[index].screenRoomId
-
-        return showTime
+        // showTime.timeFrom = convertTimeToCurrentZone(showTime.timeFrom)
+        // showTime.timeTo = convertTimeToCurrentZone(showTime.timeTo)
+        return {
+          date: showTime.date,
+          timeFrom: convertTimeToCurrentZone(showTime.timeFrom),
+          timeTo: convertTimeToCurrentZone(showTime.timeTo),
+          cinemaId: populateCinema.docs[index]?.screenRoomId?.CinemaId,
+          screenRoomId: populateCinema.docs[index].screenRoomId,
+          status: showTime.status
+        }
       })
       .filter((showtime) => showtime != null)
+
+    let condition = false
+    const arrayDemension = []
+    const showTimeDimension = data[0].showTimeCol
+      .map((showTime) => {
+        if (condition) return
+        const currentShowtime = showTime.timeFrom
+        const currentArray = data[0].showTimeCol
+          .map((showTimeDemension) => {
+            if (
+              showTimeDemension.timeFrom.getDate() ===
+                currentShowtime.getDate() &&
+              showTimeDemension.status == AVAILABLE_SCHEDULE &&
+              !showTimeDemension.destroy
+            ) {
+              return {
+                ...showTimeDemension,
+                timeFrom: convertTimeToCurrentZone(showTimeDemension.timeFrom),
+                date: showTimeDemension.date
+              }
+            }
+          })
+          .filter((showTime) => showTime != null)
+        arrayDemension.push([...currentArray])
+        const currentLength = arrayDemension.flatMap((element) => element)
+        if (currentLength.length === data[0].showTimeCol.length) {
+          condition = true
+        }
+
+        return [...currentArray]
+      })
+      .filter((showTime) => showTime != null)
+
     const newData = {
       ...data[0],
       moviePriceCol: getPriceByDay,
       showTimeCol: convertShowTime,
+      showTimeDimension,
       fromDate: convertTimeToCurrentZone(data[0].fromDate),
       toDate: convertTimeToCurrentZone(data[0].toDate)
     }
+
     if (!data || data.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No movie found!')
     }
 
     return newData
   } catch (error) {
-    // next(error)
     throw error
   }
 }

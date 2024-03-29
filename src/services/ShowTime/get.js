@@ -37,6 +37,33 @@ export const getAllService = async (req) => {
     throw error
   }
 }
+export const getAllServiceByMovie = async (req) => {
+  try {
+    const {
+      _page = 1,
+      _limit = 10,
+      _sort = 'createdAt',
+      _order = 'asc'
+    } = req.query
+    const options = {
+      page: _page,
+      limit: _limit,
+      sort: {
+        [_sort]: _order === 'asc' ? 1 : -1
+      }
+    }
+    const data = await Showtimes.paginate(
+      { destroy: false, _id: req.params.id, timeFrom: { $gt: new Date() } },
+      options
+    )
+    if (!data || data.docs.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No list show found!')
+    }
+    return data
+  } catch (error) {
+    throw error
+  }
+}
 
 export const getOneService = async (req) => {
   try {
