@@ -14,6 +14,8 @@ import findDifferentElements from '../../utils/findDifferent.js'
 import { IS_SHOWING } from '../../model/Movie.js'
 import { scheduleService } from '../ShowTime/index.js'
 import { paymentService } from '../Payment/index.js'
+import { accessResultToken } from '../../middleware/jwt.js'
+import { sendMailController, sendMailTicket } from '../../controllers/email.js'
 
 export const updateService = async (reqBody) => {
   try {
@@ -157,9 +159,17 @@ export const updatePaymentTicketService = async (reqBody) => {
 
     const data = await Ticket.findOneAndUpdate(
       { _id: id, isDeleted: false }, // Tìm vé theo ID và chưa bị xóa
-      { $set: { ...updateData, status: PAID, paymentId : payment._id, totalPrice: updateData.amount } }, // Cập nhật dữ liệu
+      {
+        $set: {
+          ...updateData,
+          status: PAID,
+          paymentId: payment._id,
+          totalPrice: updateData.amount
+        }
+      }, // Cập nhật dữ liệu
       { new: true } // Trả về vé sau khi đã cập nhật
     )
+    const resultToken = accessResultToken(data._id, payment._id)
     if (!data) {
       throw new ApiError(
         StatusCodes.NOT_FOUND,
@@ -195,8 +205,67 @@ export const updatePaymentTicketService = async (reqBody) => {
         throw new ApiError(StatusCodes.CONFLICT, new Error(error.message))
       })
     }
+    const {
+      _page = 1,
+      _limit = 10,
+      _sort = 'createdAt',
+      _order = 'asc'
+    } = reqBody.query // Sử dụng req.query thay vì req.body để nhận tham số từ query string
 
-    return data
+    const options = {
+      page: _page,
+      limit: _limit,
+      sort: {
+        [_sort]: _order === 'asc' ? 1 : -1
+      },
+      populate: {
+        path: 'showtimeId paymentId screenRoomId movieId cinemaId userId',
+        select:
+          'CinemaName CinemaAdress price row column typeSeat name email timeFrom screenRoomId movieId typeBank typePayment name image categoryId'
+      },
+      select: {
+        isDeleted: 0,
+        updatedAt: 0
+      }
+    }
+
+    const dataReturn = await Ticket.paginate(
+      {
+        _id: data._id
+      },
+      options
+    )
+
+    const {
+      userId,
+      seatId,
+      movieId,
+      cinemaId,
+      screenRoomId,
+      foods,
+      showtimeId,
+      quantity,
+      totalPrice,
+      paymentId
+    } = dataReturn.docs[0]
+    const req = {
+      body: {
+        _id: data._id,
+        email: userId.email,
+        seatId,
+        date: data.createdAt,
+        movieName: movieId.name,
+        screenName: screenRoomId.name,
+        typeBank: paymentId.typeBank,
+        foods,
+        showtimeTimeFrom: showtimeId.timeFrom,
+        cinemaId,
+        quantityTicket: quantity,
+        totalPrice
+      }
+    }
+    await sendMailTicket(req)
+    return resultToken
   } catch (error) {
     throw error
   }
