@@ -18,12 +18,16 @@ export const createService = async (reqBody, newComment) => {
         'Create comment recursive failed!'
       )
     }
-    await CommentRecursive.findOneAndUpdate({
-      _id: data._id,
-      $push: {
-        comments: newComment
+    await CommentRecursive.updateOne(
+      {
+        _id: data._id
+      },
+      {
+        $push: {
+          comments: newComment
+        }
       }
-    })
+    )
     return data
   } catch (error) {
     throw error

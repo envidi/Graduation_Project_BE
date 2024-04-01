@@ -9,12 +9,16 @@ export const updateService = async (reqBody, newComment) => {
     // if (error) {
     //   throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     // }
-    const data = await CommentRecursive.findOneAndUpdate({
-      movieId: reqBody.movieId,
-      $push: {
-        comments: newComment
+    const data = await CommentRecursive.updateOne(
+      {
+        movieId: reqBody.movieId
+      },
+      {
+        $push: {
+          comments: newComment
+        }
       }
-    })
+    )
     if (!data) {
       throw new ApiError(
         StatusCodes.NOT_FOUND,
