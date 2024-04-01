@@ -16,20 +16,28 @@ export const removeService = async (reqBody) => {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Delete comment failed')
     }
     if (data.parentId !== null) {
-      await Comment.findOneAndUpdate({
-        _id: data.parentId,
+      await Comment.updateOne(
+        {
+          _id: data.parentId
+        },
+        {
+          $pull: {
+            comments: data._id
+          }
+        }
+      )
+      return data
+    }
+    await commentRecursive.updateOne(
+      {
+        movieId: data.movieId
+      },
+      {
         $pull: {
           comments: data._id
         }
-      })
-      return data
-    }
-    await commentRecursive.findOneAndUpdate({
-      movieId: data.movieId,
-      $pull: {
-        comments: data._id
       }
-    })
+    )
     return data
   } catch (error) {
     throw error

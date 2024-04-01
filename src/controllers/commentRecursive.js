@@ -12,6 +12,17 @@ export const getAll = async (req, res, next) => {
     next(error)
   }
 }
+export const getAllByMovie = async (req, res, next) => {
+  try {
+    const data = await commentRecursiveService.getAllByMovieService(req)
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      datas: data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 export const deleteCommentRecursive = async (req, res, next) => {
   try {
     const data = await commentRecursiveService.removeService(req)

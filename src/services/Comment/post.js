@@ -9,8 +9,7 @@ import commentValidationSchema, {
 
 export const createService = async (reqBody) => {
   try {
-    const body = reqBody.body
-    const { empty = false } = reqBody.query
+    const { empty = false, ...body } = reqBody.body
 
     const { error } = commentValidationSchema.validate(body, {
       abortEarly: true

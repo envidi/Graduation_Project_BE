@@ -6,7 +6,8 @@ const commentValidationSchema = Joi.object({
   parentId: Joi.string(),
   like: Joi.number().min(0),
   comments: Joi.array().empty(Joi.array().length(0)),
-  content: Joi.string().min(0).required()
+  content: Joi.string().min(0).required(),
+  // empty: Joi.boolean().required()
 }).options({
   abortEarly: false
 })
