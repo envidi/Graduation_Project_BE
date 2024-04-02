@@ -17,7 +17,7 @@ const movieSchema = JoiExtended.object({
   country: Joi.string().required().min(1).max(100).trim().strict(),
   trailer: Joi.string().required().min(1),
   age_limit: Joi.number().required().min(1).max(100),
-  categoryId: Joi.array().items(Joi.string()).required(),
+  // categoryId: Joi.array().items(Joi.string()).required(),
   fromDate: JoiExtended.date()
     .format(['YYYY/MM/DD HH:mm', 'DD-MM-YYYY HH:mm'])
     .required()
@@ -33,17 +33,31 @@ const movieSchema = JoiExtended.object({
     .valid('COMING_SOON', 'IS_SHOWING', 'PRTMIERED', 'CANCELLED'),
   rate: Joi.number().required().min(1).max(5),
   // Trong array của show_schedule thêm một object có trường id và name
-  showTimes: Joi.array().items(Joi.string()).min(0),
-  // Movie Price
-  prices: Joi.array()
+  prices: Joi.alternatives().try(
+    Joi.array()
     .items(
       Joi.object({
         price: Joi.number().required().min(0),
         dayType: Joi.string().required().valid('weekday', 'weekend')
       })
-    )
-    .min(0)
-    .required()
+      )
+    , Joi.string().min(1).required()
+    ),
+
+    showTimes: Joi.alternatives().try(Joi.array().items(Joi.string()), Joi.string().required()),
+    categoryId: Joi.alternatives().try(Joi.array().items(Joi.string()), Joi.string().required()),
+
+  // showTimes: Joi.array().items(Joi.string()).min(0),
+  // // Movie Price
+  // prices: Joi.array()
+  //   .items(
+  //     Joi.object({
+  //       price: Joi.number().required().min(0),
+  //       dayType: Joi.string().required().valid('weekday', 'weekend')
+  //     })
+  //   )
+  //   .min(0)
+  //   .required()
 }).options({
   abortEarly: false
 })

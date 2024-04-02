@@ -117,6 +117,6 @@ export const updateService = async (req) => {
 
     return updateData
   } catch (error) {
-    throw error
+    // throw error
   }
 }

@@ -57,6 +57,6 @@ export const createService = async (req) => {
 
     return data
   } catch (error) {
-    throw error
+    // throw error
   }
 }
