@@ -8,27 +8,79 @@ const statusTicket = [RESERVED, PAID, CANCELLED]
 const TicketSchema = new mongoose.Schema(
   {
     priceId: {
-      type: mongoose.Types.ObjectId,
-      ref: 'MoviePrice'
+      _id: {
+        type: mongoose.Types.ObjectId,
+        ref: 'MoviePrice'
+      },
+      price: {
+        type: Number,
+        require: true
+      }
     },
     seatId: [
       {
-        type: mongoose.Types.ObjectId,
-        ref: 'Seat',
-        require: true
+        _id: {
+          type: mongoose.Types.ObjectId,
+          ref: 'Seat',
+          require: true
+        },
+        typeSeat: {
+          type: String,
+          require: true
+        },
+        price: {
+          type: Number,
+          require: true
+        },
+        row: {
+          type: Number,
+          require: true
+        },
+        column: {
+          type: Number,
+          require: true
+        }
       }
     ],
+    userId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'User',
+      require: true
+    },
+    movieId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'Movie'
+    },
+    cinemaId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'Cinema'
+    },
+    screenRoomId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'ScreeningRoom'
+    },
+    paymentId: {
+      type: mongoose.Types.ObjectId,
+      ref: 'Payment'
+    },
     foods: [
       {
         foodId: {
           type: String,
-          required :true
+          required: true
           // ref: 'Food'
-
         },
-        quantityFood : {
-          type : Number,
-          required : true
+        quantityFood: {
+          type: Number,
+          required: true
+        },
+        name: {
+          type: String,
+          required: true
+        },
+        price : {
+          type : String,
+          required: true
         }
       }
     ],

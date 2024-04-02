@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-catch */
 import Ticket from '../../model/Ticket'
-import mongoose from 'mongoose'
+import dayjs from '../../utils/timeLib.js'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../utils/ApiError'
 import ticketValidateSchema from '../../validations/ticket.js'
@@ -12,7 +12,7 @@ import Showtimes from '../../model/Showtimes'
 import ScreenRoom from '../../model/ScreenRoom'
 import MoviePrice from '../../model/MoviePrice.js'
 import Food from '../../model/Food.js'
-import { object } from 'joi'
+import { accessPaymentToken } from '../../middleware/jwt.js'
 
 export const createService = async (reqBody) => {
   try {
@@ -25,6 +25,10 @@ export const createService = async (reqBody) => {
 
     // Check if Seat is AVAILABLE
     const promises = [
+      Showtimes.findOne({ _id: body.showtimeId }, 'timeFrom timeTo').populate(
+        'movieId',
+        'status'
+      ),
       Seat.find({
         _id: { $in: body.seatId }
       }),
@@ -40,7 +44,15 @@ export const createService = async (reqBody) => {
         })
       )
     }
-    const [seats, priceMovie, foods] = await Promise.all(promises)
+    const [dataShowTime, seats, priceMovie, foods] = await Promise.all(promises)
+    const now = dayjs()
+    if (now > dataShowTime.timeFrom) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'The seat reservation time has expired'
+      )
+    }
+
     const result = seats.some((seat_availble) => {
       return seat_availble.status !== AVAILABLE
     })
@@ -52,7 +64,11 @@ export const createService = async (reqBody) => {
       return (accu += seat.price)
     }, 0)
     const totalFoodPrice =
-      foods.length > 0 ? foods.reduce((accu, food) => { return (accu += food.price)}, 0): 0
+      foods && foods.length > 0
+        ? foods.reduce((accu, food) => {
+            return (accu += food.price)
+          }, 0)
+        : 0
     // const totalFoodPrice = 0
     const totalPriceMovie = priceMovie.price
 
@@ -82,6 +98,7 @@ export const createService = async (reqBody) => {
     if (!data || Object.keys(data).length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Create ticket failed!')
     }
+    const paymentToken = accessPaymentToken(data._id)
     await Promise.all([
       Seat.updateMany(
         {
@@ -111,7 +128,7 @@ export const createService = async (reqBody) => {
       throw new ApiError(StatusCodes.CONFLICT, new Error(err.message))
     })
 
-    return data
+    return { ...data._doc, paymentToken }
   } catch (error) {
     throw error
   }

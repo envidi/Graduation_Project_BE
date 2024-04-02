@@ -46,20 +46,21 @@ export const removeHardService = async (reqBody) => {
     if (!ticket) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Ticket not found')
     }
-    if (ticket.status === PAID) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'Ticket is sold. Cannot delete it'
-      )
-    }
+    // if (ticket.status === PAID) {
+    //   throw new ApiError(
+    //     StatusCodes.BAD_REQUEST,
+    //     'Ticket is sold. Cannot delete it'
+    //   )
+    // }
 
     // Cập nhật trường isDeleted thành true để đánh dấu xóa mềm
     const data = await Ticket.findByIdAndDelete(id)
+    const seatIds = data.seatId.map((seat) => seat._id)
     await Promise.all([
       Seat.updateMany(
         {
           _id: {
-            $in: data.seatId
+            $in: seatIds
           }
         },
         {

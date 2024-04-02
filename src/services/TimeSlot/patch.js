@@ -5,6 +5,7 @@ import TimeSlotSchema from '../../validations/timeSlot.js'
 import TimeSlot from '../../model/TimeSlot.js'
 import ApiError from '../../utils/ApiError.js'
 import Seat, { SOLD } from '../../model/Seat.js'
+import Showtimes from '../../model/Showtimes.js'
 
 export const updateService = async (reqBody) => {
   // "ScreenRoomId": "659a4e2c7c13f6f0eb258ba2",
@@ -114,9 +115,9 @@ export const updateStatus = async (id, data) => {
 export const checkSomeSeatSold = async (timeslotId) => {
   try {
     const currentTimeSlot =
-      await TimeSlot.findById(timeslotId).populate('SeatId')
+      await Showtimes.findById(timeslotId).populate('SeatId')
 
-    // // Kiểm tra xem timeslot hiện tại có ghế nào ở trạng thái đã bán chưa
+    // // Kiểm tra xem showtime hiện tại có ghế nào ở trạng thái đã bán chưa
     const currentTimeSlotSeats = currentTimeSlot.SeatId.some(
       (seat) => seat.status === SOLD
     )

@@ -17,11 +17,36 @@ export const getAllService = async (req) => {
       limit: _limit,
       sort: {
         [_sort]: _order === 'asc' ? 1 : -1
-
       }
-
     }
     const data = await Showtimes.paginate({ destroy: false }, options)
+    if (!data || data.docs.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No list show found!')
+    }
+    return data
+  } catch (error) {
+    throw error
+  }
+}
+export const getAllServiceByMovie = async (req) => {
+  try {
+    const {
+      _page = 1,
+      _limit = 10,
+      _sort = 'createdAt',
+      _order = 'asc'
+    } = req.query
+    const options = {
+      page: _page,
+      limit: _limit,
+      sort: {
+        [_sort]: _order === 'asc' ? 1 : -1
+      }
+    }
+    const data = await Showtimes.paginate(
+      { destroy: false, _id: req.params.id, timeFrom: { $gt: new Date() } },
+      options
+    )
     if (!data || data.docs.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No list show found!')
     }
@@ -34,17 +59,29 @@ export const getAllService = async (req) => {
 export const getOneService = async (req) => {
   try {
     const { id } = req.params
-    const response = await Showtimes.findById(id)
+    const response = await Showtimes.paginate(
+      { _id: id },
+      {
+        populate: {
+          path: 'screenRoomId',
+          select: 'name status'
+        }
+      }
+    )
+    const plainDocs = response.docs.map((doc) => doc.toObject())
 
-    const newData = {
-      ...response._doc,
-      timeFrom : convertTimeToCurrentZone(response.timeFrom),
-      timeTo : convertTimeToCurrentZone(response.timeTo)
-    }
+    // Add the 'price' field to each movie based on the current day type
+    plainDocs.forEach((showtime) => {
+      showtime.timeFrom = convertTimeToCurrentZone(showtime.timeFrom)
+      showtime.timeTo = convertTimeToCurrentZone(showtime.timeTo)
+    })
     if (!response) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No list Show found!')
     }
-    return newData
+    return {
+      ...response,
+      docs: plainDocs
+    }
   } catch (error) {
     throw error
   }
@@ -64,7 +101,6 @@ export const getAllIncludeDestroyService = async (reqBody) => {
       sort: {
         [_sort]: _order === 'asc' ? 1 : -1
       }
-
     }
     const data = await Showtimes.paginate({}, options)
     if (!data || data.docs.length === 0) {

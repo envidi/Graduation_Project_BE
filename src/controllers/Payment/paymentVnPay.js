@@ -8,7 +8,7 @@ import QueryString from 'qs'
 import dayjs from '../../utils/timeLib'
 import crypto from 'crypto'
 import { StatusCodes } from 'http-status-codes'
-import { paymentService } from '../../services/Payment'
+// import { paymentService } from '../../services/Payment'
 import { vnpayConfig } from '../../config/Payment/vnpay'
 
 // router.get('/', function (req, res, next) {
@@ -45,7 +45,7 @@ export const createPayment = (req, res, next) => {
     let returnUrl = vnpayConfig.vnp_ReturnUrl
     let orderId = dayjs(date).format('YYYYMMDDHHmmss')
     // let orderId = 20240121112902
-    let amount = req.body.amount
+    let amount = req.body.amount * 100
     let bankCode = req.body.bankCode
 
     let locale = req.body.language
@@ -62,10 +62,11 @@ export const createPayment = (req, res, next) => {
     vnp_Params['vnp_TxnRef'] = orderId
     vnp_Params['vnp_OrderInfo'] = 'Thanh_toan_cho_ma_GD:' + orderId
     vnp_Params['vnp_OrderType'] = 'other'
-    vnp_Params['vnp_Amount'] = amount * 100
-    vnp_Params['vnp_ReturnUrl'] = returnUrl
+    vnp_Params['vnp_Amount'] = amount
+    vnp_Params['vnp_ReturnUrl'] = returnUrl+ `?partnerCode=${'VNPAY'}` + `&amount=${req.body.amount}`
     vnp_Params['vnp_IpAddr'] = ipAddr
     vnp_Params['vnp_CreateDate'] = createDate
+    // vnp_Params['partnerCode'] = 'VNPay'
     if (bankCode !== null && bankCode !== '') {
       vnp_Params['vnp_BankCode'] = bankCode
     }
@@ -79,7 +80,6 @@ export const createPayment = (req, res, next) => {
     let signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex')
     vnp_Params['vnp_SecureHash'] = signed
     vnpUrl += '?' + QueryString.stringify(vnp_Params, { encode: false })
-
     return res.status(StatusCodes.OK).json(vnpUrl)
   } catch (error) {
     next(error)
@@ -94,6 +94,7 @@ export const returnResultPayment = async (req, res, next) => {
 
     delete vnp_Params['vnp_SecureHash']
     delete vnp_Params['vnp_SecureHashType']
+    vnp_Params['vnp_Amount'] = vnp_Params['vnp_Amount'] / 100
 
     vnp_Params = sortObject(vnp_Params)
 
@@ -107,20 +108,18 @@ export const returnResultPayment = async (req, res, next) => {
 
     if (secureHash === signed) {
       //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
-      const payment = await paymentService.createService({
-        amount : vnp_Params['vnp_Amount'],
-        typePayment : 'VNPAY',
-        typeBank : vnp_Params['vnp_BankCode'],
-        cardType : vnp_Params['vnp_CardType']
-      })
+      // const payment = await paymentService.createService({
+      //   amount : vnp_Params['vnp_Amount'] / 100,
+      //   typePayment : 'VNPAY',
+      //   typeBank : vnp_Params['vnp_BankCode'],
+      //   cardType : vnp_Params['vnp_CardType']
+      // })
 
       return res
         .status(StatusCodes.OK)
-        .json({ code: vnp_Params['vnp_ResponseCode'], vnp_Params : vnp_Params, payment })
+        .json({ code: vnp_Params['vnp_ResponseCode'], vnp_Params: vnp_Params })
     } else {
-      res
-        .status(StatusCodes.OK)
-        .json({ code: '97' })
+      res.status(StatusCodes.OK).json({ code: '97' })
     }
   } catch (error) {
     next(error)

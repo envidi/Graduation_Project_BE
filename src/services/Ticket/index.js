@@ -1,6 +1,6 @@
-import { getAllService, getOneService } from './get';
+import { getAllService, getOneService, getAllByUser } from './get';
 import { createService } from './post';
-import { updateService } from './patch';
+import { updateService, updatePaymentTicketService } from './patch';
 import { removeService, removeHardService } from './delete'
 
 export const ticketService = {
@@ -9,5 +9,7 @@ export const ticketService = {
   createService,
   updateService,
   removeService,
-  removeHardService
+  removeHardService,
+  updatePaymentTicketService,
+  getAllByUser
 }

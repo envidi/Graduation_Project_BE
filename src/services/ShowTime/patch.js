@@ -17,6 +17,7 @@ import { validateDurationMovie, validateTime } from './post.js'
 import { checkSomeSeatSold } from '../TimeSlot/patch.js'
 import { CANCELLED_TIMESLOT } from '../../model/TimeSlot.js'
 import ScreenRoom from '../../model/ScreenRoom.js'
+import Seat from '../../model/Seat.js'
 
 export const updateService = async (req) => {
   try {
@@ -28,26 +29,31 @@ export const updateService = async (req) => {
       ScreenRoom.findById(body.screenRoomId)
     ])
 
-    if (show.screenRoomId.CinemaId !== currentCinema) {
+    if (!show || Object.keys(show).length === 0) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Showtime id not found')
+    }
+    // Không thể chuyển lịch chiếu sang rạp khác
+
+    if (show.screenRoomId.CinemaId.toString() != currentCinema.toString()) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
         'Cannot change showtime into another cinema'
       )
     }
-    const timeSlot = await timeSlotService.getTimeSlotIdWithScreenRoomId({
-      showTimeId: show._id,
-      screenRoomId: show.screenRoomId
-    })
+    // const timeSlot = await timeSlotService.getTimeSlotIdWithScreenRoomId({
+    //   showTimeId: show._id,
+    //   screenRoomId: show.screenRoomId
+    // })
 
-    const reqBody = {
-      body: {
-        ScreenRoomId: body.screenRoomId.toString(),
-        Show_scheduleId: show._id.toString()
-      },
-      params: {
-        id: timeSlot._id.toString()
-      }
-    }
+    // const reqBody = {
+    //   body: {
+    //     ScreenRoomId: body.screenRoomId.toString(),
+    //     Show_scheduleId: show._id.toString()
+    //   },
+    //   params: {
+    //     id: timeSlot._id.toString()
+    //   }
+    // }
 
     if (!show || Object.keys(show).length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Lịch chiếu không tồn tại')
@@ -58,6 +64,7 @@ export const updateService = async (req) => {
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, error.message)
     }
+
     if (body.movieId !== show.movieId.toString()) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Cannot change the movie id')
     }
@@ -109,39 +116,84 @@ export const updateService = async (req) => {
     ]
     // nếu như muốn hủy lịch chiếu thì phải kiểm tra xem tất cả ghế
     // trong lịch chiếu đã được đặt chưa
-    if (
-      body.status === CANCELLED_SCHEDULE &&
-      !(await checkSomeSeatSold(timeSlot._id))
-    ) {
-      const updateTimeSlotCancelled = await timeSlotService.updateStatus(
-        timeSlot._id,
-        { status: CANCELLED_TIMESLOT }
+    if (body.status === CANCELLED_SCHEDULE && !(await checkSomeSeatSold(id))) {
+      const updateShowtimetCancelled = await Showtimes.findOneAndUpdate(
+        { _id: id },
+        { status: CANCELLED_SCHEDULE },
+        { new: true }
       )
       if (
-        !updateTimeSlotCancelled ||
-        Object.keys(updateTimeSlotCancelled).length === 0
+        !updateShowtimetCancelled ||
+        Object.keys(updateShowtimetCancelled).length === 0
       ) {
         throw new ApiError(
           StatusCodes.BAD_REQUEST,
-          'Update timeslot status to cancelled failed'
+          'Update showtime status to cancelled failed'
         )
       }
     }
     // Nếu như status hiện tại khác khi sửa và khác trạng thái đã hủy
     if (body.status !== show.status && body.status !== CANCELLED_SCHEDULE) {
       promises.push(
-        timeSlotService.updateStatus(timeSlot._id, {
-          status: AVAILABLE_SCHEDULE
-        })
+        Showtimes.findOneAndUpdate(
+          { _id: id },
+          {
+            status: body.status
+          },
+          { new: true }
+        )
       )
     }
     //  Thay đổi lịch chiếu sang phòng khác
     if (body.screenRoomId !== show.screenRoomId) {
-      const updateTimeSlot = await timeSlotService.updateService(reqBody)
-      if (!updateTimeSlot || updateTimeSlot.length === 0) {
+      // Lấy ra screen cũ
+      const screenRoomOld = await ScreenRoom.findById(show.screenRoomId)
+      // Lấy ra screen mới
+      const screenRoomNew = await ScreenRoom.findById(body.screenRoomId)
+
+      // Cập nhật screen mới , thêm timeslot hiện tại vào screen mới
+      // Cập nhật screen cũ , xóa timeslot hiện tại khỏi screen cũ
+      // Đặt lại screen id trong tất cả ghế của timeslot hiện tại
+      promises.push(
+        ScreenRoom.updateOne(
+          { _id: screenRoomNew._id },
+          {
+            $addToSet: {
+              ShowtimesId: id
+            }
+          }
+        )
+      )
+      promises.push(
+        ScreenRoom.updateOne(
+          { _id: screenRoomOld._id },
+          {
+            $pull: {
+              ShowtimesId: id
+            }
+          }
+        )
+      )
+      promises.push(
+        Seat.updateMany(
+          {
+            _id: {
+              $in: show.SeatId
+            }
+          },
+          {
+            $set: {
+              ScreeningRoomId: body.screenRoomId
+            }
+          }
+        )
+      )
+
+      // // Nếu như screen id mới không tồn tại trong database thì không cho phép sửa
+      if (!screenRoomNew || Object.keys(screenRoomNew).length === 0) {
         throw new ApiError(
-          StatusCodes.BAD_REQUEST,
-          'Update timeslot failed when update showtime'
+          StatusCodes.NOT_FOUND,
+          'This new screen room is not exist in database'
         )
       }
     }

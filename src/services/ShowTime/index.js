@@ -2,7 +2,7 @@
 import { createService } from './post.js'
 import { deleteSoftService, removeService, restoreService, deleteShowTime } from './delete.js'
 import { updateService, updateStatusFull } from './patch.js'
-import { getAllService, getOneService, getAllIncludeDestroyService } from './get.js'
+import { getAllService, getOneService, getAllIncludeDestroyService,getAllServiceByMovie } from './get.js'
 
 
 export const scheduleService = {
@@ -15,6 +15,6 @@ export const scheduleService = {
   getOneService,
   getAllService,
   updateStatusFull,
-  deleteShowTime
-
+  deleteShowTime,
+  getAllServiceByMovie
 }

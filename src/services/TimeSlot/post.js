@@ -19,6 +19,8 @@ export const insertSeatIntoScreen = async (rowCount, columnCount, data) => {
         row === 1 ||
         row === rowCount ||
         column === 1 ||
+        column === columnCount - 1 ||
+        column === 2 ||
         column === columnCount
       ) {
         seatTypeToUse = NORMAL

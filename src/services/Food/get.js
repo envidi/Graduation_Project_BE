@@ -2,7 +2,6 @@
 import Food from '../../model/Food'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../utils/ApiError.js'
-<<<<<<< HEAD
 import { v2 as cloudinary } from 'cloudinary';
 
 const checkImageExists = async (public_id) => {
@@ -15,8 +14,6 @@ const checkImageExists = async (public_id) => {
     return false;
   }
 };
-=======
->>>>>>> develop
 
 export const getAllService = async (reqBody) => {
   try {
