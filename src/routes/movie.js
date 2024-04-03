@@ -16,7 +16,8 @@ import {
 } from '../controllers/movie.js'
 
 import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js'
-import { upload } from '../middleware/multer.js'
+import cloudinary, { upload } from '../middleware/multer.js'
+import { CloudinaryStorage } from 'multer-storage-cloudinary'
 
 // import { checkPermission } from "../middlewares/checkPermission";
 const routerProducts = express.Router()
@@ -27,6 +28,16 @@ const routerProducts = express.Router()
 // routerProducts.post('/', verifyAccessToken, isAdmin, create);
 // routerProducts.delete('/:id', verifyAccessToken, isAdmin, remove);
 
+// const storage = new CloudinaryStorage({
+//   cloudinary: cloudinary,
+//   folder: 'AVATAR',
+//   allowedFormats: ['jpg', 'png', 'jpeg'],
+//   transformation: [{ with: 500, height: 500, crop: 'limit' }]
+// })
+// const upload = multer({
+//   storage: storage
+// })
+
 routerProducts.get('/', getAll)
 routerProducts.get('/showtime', getAllMovieHasShow)
 routerProducts.get('/sta', getMovieStatus)
@@ -35,8 +46,8 @@ routerProducts.get('/search', searchMovie)
 routerProducts.get('/movieByCate/:id', getRelatedMoVie)
 routerProducts.get('/softdelete', getAllSoftDelete)
 routerProducts.get('/:id', getDetail)
-routerProducts.patch('/:id', upload.single('image'), update)
-routerProducts.post('/', upload.single('image'), create)
+routerProducts.patch('/:id', upload.single('avatar'), update)
+routerProducts.post('/', upload.single('avatar'), create)
 routerProducts.delete('/:id', remove)
 routerProducts.patch('/softdelete/:id', softDelete)
 routerProducts.patch('/restore/:id', restore)
