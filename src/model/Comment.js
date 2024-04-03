@@ -12,10 +12,12 @@ const commentSchema = mongoose.Schema(
       type: Array,
       default: []
     },
-    like: {
-      type: Number,
-      required: true
-    },
+    like: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ],
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
