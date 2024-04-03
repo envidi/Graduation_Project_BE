@@ -139,7 +139,6 @@ export const updateUser = asyncHandler(async (req, res) => {
   const { _id, password, oldPassword } = req.user
   if (!_id || Object.keys(req.body).length === 0)
     throw new ApiError(StatusCodes.NOT_FOUND, 'Missing inputs')
-
   const body = req.body
 
   const { error } = userValidate.validate(body, { abortEarly: true })

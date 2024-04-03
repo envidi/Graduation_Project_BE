@@ -13,9 +13,25 @@ export const createService = async (req) => {
   try {
     const body = req.body
     // thêm đường dẫn ảnh vào body
-    if (req.file) {
-      body.image = req.file.path
-    }
+    // if (req.file) {
+    //   body.image = req.file.path
+    // }
+        // thêm ảnh 
+    // let imageUrl
+    // let cloudGetUrl
+    // if (req.file) {
+    //   cloudGetUrl = await cloudinary.uploader.upload(req.file.path, {
+    //     folder: 'AVATAR',
+    //     allowed_formats: ['jpg', 'png', 'jpeg'],
+    //     transformation: [{ width: 500, height: 500, crop: 'limit' }]
+    //   })
+    //   imageUrl = cloudGetUrl.secure_url
+    // }
+    // body.image = imageUrl
+    // const newProfile = {
+    //   ...body,
+    //   ...(cloudGetUrl && { image: imageUrl })
+    // }
 
     const { error } = movieSchema.validate(body, { abortEarly: true })
     if (error) {
@@ -28,6 +44,8 @@ export const createService = async (req) => {
       ...restBody,
       fromDate: new Date(convertTimeToIsoString(body.fromDate)),
       toDate: new Date(convertTimeToIsoString(body.toDate)),
+            // ...(cloudGetUrl && { image: imageUrl }),
+      // image: imageUrl,
       slug: slugify(body.name)
     })
 
