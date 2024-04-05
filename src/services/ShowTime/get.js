@@ -102,7 +102,7 @@ export const getAllIncludeDestroyService = async (reqBody) => {
         [_sort]: _order === 'asc' ? 1 : -1
       }
     }
-    const data = await Showtimes.paginate({}, options)
+    const data = await Showtimes.paginate({ destroy: true }, options)
     if (!data || data.docs.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No screening rooms found!')
     }

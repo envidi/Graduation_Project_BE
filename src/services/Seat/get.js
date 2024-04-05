@@ -154,7 +154,7 @@ export const getAllServiceByShowTime = async (reqBody) => {
       populate: [
         {
           path: 'ScreeningRoomId',
-          select: 'name CinemaId' // Thay đổi 'status' thành 'name' hoặc thông tin bạn muốn hiển thị
+          select: 'name' // Thay đổi 'status' thành 'name' hoặc thông tin bạn muốn hiển thị
         },
         {
           path: 'ShowScheduleId',
