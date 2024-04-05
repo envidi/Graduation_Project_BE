@@ -50,7 +50,7 @@ const seatChema = new mongoose.Schema(
     },
     ShowScheduleId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'ShowSchedule',
+      ref: 'Showtimes',
       required: true
     }
   },
