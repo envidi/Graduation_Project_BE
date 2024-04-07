@@ -14,6 +14,18 @@ export const getAll = async (req, res, next) => {
     next(error)
   }
 }
+export const getCountMovie = async (req, res, next) => {
+  try {
+    const data = await movieService.getCountMovie(req)
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 export const getAllMovieHasShow = async (req, res, next) => {
   try {
     const data = await movieService.getAllHasShow(req)

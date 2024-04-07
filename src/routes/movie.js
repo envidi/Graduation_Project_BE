@@ -12,7 +12,8 @@ import {
   getAllMovieHomePage,
   searchMovie,
   getMovieStatus,
-  getAllMovieHasShow
+  getAllMovieHasShow,
+  getCountMovie
 } from '../controllers/movie.js'
 
 import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js'
@@ -39,6 +40,7 @@ const routerProducts = express.Router()
 // })
 
 routerProducts.get('/', getAll)
+routerProducts.get('/count', getCountMovie)
 routerProducts.get('/showtime', getAllMovieHasShow)
 routerProducts.get('/sta', getMovieStatus)
 routerProducts.get('/home', getAllMovieHomePage)

@@ -161,6 +161,20 @@ export const getAllMovieHomePage = async (reqBody) => {
     throw error
   }
 }
+export const getCountMovie = async (reqBody) => {
+  try {
+    const data = await Movie.countDocuments({})
+
+    if (!data) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
+    }
+
+
+    return data
+  } catch (error) {
+    throw error
+  }
+}
 export const getMovieStatus = async (reqBody) => {
   try {
     const {
