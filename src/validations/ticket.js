@@ -21,6 +21,7 @@ const ticketValidateSchema = Joi.object({
     .required()
     .min(1),
   userId: Joi.string(),
+  totalFood : Joi.number(),
   movieId: Joi.string(),
   screenRoomId: Joi.string(),
   cinemaId: Joi.string(),

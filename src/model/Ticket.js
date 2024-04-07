@@ -78,12 +78,15 @@ const TicketSchema = new mongoose.Schema(
           type: String,
           required: true
         },
-        price : {
-          type : String,
+        price: {
+          type: String,
           required: true
         }
       }
     ],
+    totalFood: {
+      type: Number
+    },
     showtimeId: {
       type: mongoose.Types.ObjectId,
       ref: 'Showtimes',

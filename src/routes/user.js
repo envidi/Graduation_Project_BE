@@ -10,7 +10,8 @@ import {
   forgotPassword,
   resetPassword,
   updateClient,
-  registerGoogle
+  registerGoogle,
+  totalCountUser
 } from '../controllers/user.js'
 import { Router } from 'express'
 import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js'
@@ -32,6 +33,7 @@ const upload = multer({
 routerUser.post('/register', upload.single('avatar'), register)
 routerUser.post('/googleSign', registerGoogle)
 routerUser.post('/login', login)
+routerUser.get('/count', totalCountUser)
 routerUser.get('/', getAllUser)
 routerUser.get('/userDetail', verifyAccessToken, getDetailUser)
 routerUser.patch(

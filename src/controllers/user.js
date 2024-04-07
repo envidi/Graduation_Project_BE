@@ -75,7 +75,10 @@ export const registerGoogle = asyncHandler(async (req, res, next) => {
     if (user) {
       const isMatch = await bcrypt.compare(body.password, user.password)
       if (!isMatch) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'Mật khẩu không đúng hoặc bạn đã dùng email này để đăng kí !')
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          'Mật khẩu không đúng hoặc bạn đã dùng email này để đăng kí !'
+        )
       }
       const { roleIds, ...userData } = user.toObject()
       // AccessToken dùng để xác thực người dùng, phân quyền
@@ -114,6 +117,22 @@ export const registerGoogle = asyncHandler(async (req, res, next) => {
       message: newUser ? 'Đăng kí thành công' : 'Đăng kí thất bại',
       Accesstoken,
       newUser
+    })
+  } catch (error) {
+    next(error)
+  }
+})
+export const totalCountUser = asyncHandler(async (req, res, next) => {
+  try {
+
+    const countUser = await User.countDocuments({})
+    if (!countUser) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No user found')
+    }
+
+    return res.status(200).json({
+      message: countUser ? 'Lấy tổng số người dùng thành công' : 'Lấy tổng số người dùng thất bại',
+      countUser
     })
   } catch (error) {
     next(error)

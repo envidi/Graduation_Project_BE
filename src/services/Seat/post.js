@@ -11,7 +11,7 @@ export const insertSeatIntoScreen = async (rowCount, columnCount, data) => {
   for (let row = 1; row <= rowCount; row++) {
     for (let column = 1; column <= columnCount; column++) {
       let seatTypeToUse = VIP
-      let priceSeat = 120
+      let priceSeat = 70000
       // Check if the seat is in the middle (assuming rowCount and columnCount are odd)
       if (
         row === 1 ||
@@ -22,7 +22,7 @@ export const insertSeatIntoScreen = async (rowCount, columnCount, data) => {
         column === columnCount
       ) {
         seatTypeToUse = NORMAL
-        priceSeat = 100
+        priceSeat = 50000
       }
 
       // Add the new seat with seat type
