@@ -1,6 +1,4 @@
-// import Product from '../models/Product.js';
 import ApiError from '../utils/ApiError.js'
-// import { slugify } from '../utils/stringToSlug.js'
 import { StatusCodes } from 'http-status-codes'
 import CinemaValidate from '../validations/cinema.js'
 import Cinema from '../model/Cinema.js'
@@ -103,7 +101,7 @@ export const remove = async (req, res, next) => {
     const data = await Cinema.findByIdAndDelete(id)
     if (!data) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete Cinema failed!')
-    }             
+    }
     return res.status(StatusCodes.OK).json({
       message: 'Success!',
       data

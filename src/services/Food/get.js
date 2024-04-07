@@ -1,9 +1,9 @@
 /* eslint-disable no-useless-catch */
-
 import Food from '../../model/Food'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../utils/ApiError.js'
 import { v2 as cloudinary } from 'cloudinary';
+
 const checkImageExists = async (public_id) => {
   // console.log('public_id:', public_id);
   try {
@@ -14,30 +14,27 @@ const checkImageExists = async (public_id) => {
     return false;
   }
 };
+
 export const getAllService = async (reqBody) => {
   try {
-    const {
-      _page = 1,
-      _limit = 10,
-      _sort = 'createdAt',
-      _order = 'asc',
-      includeDeleted // Thêm tham số này để kiểm tra query parameter
-    } = reqBody.query; // Sử dụng req.query thay vì req.body để nhận tham số từ query string
+    // const {
+    //   _sort = 'createdAt',
+    //   _order = 'asc',
+    //   includeDeleted // Thêm tham số này để kiểm tra query parameter
+    // } = reqBody.query; // Sử dụng req.query thay vì req.body để nhận tham số từ query string
 
-    const queryCondition = includeDeleted === 'true' ? {} : { isDeleted: false }
+    // const queryCondition = includeDeleted === 'true' ? {} : { isDeleted: false }
 
-    const options = {
-      page: _page,
-      limit: _limit,
-      sort: {
-        [_sort]: _order === 'asc' ? 1 : -1
-      }
-    }
+    // const options = {
+    //   sort: {
+    //     [_sort]: _order === 'asc' ? 1 : -1
+    //   }
+    // }
     // const data = await Food.paginate({}, options)
     // const data = await Food.paginate({ isDeleted: false }, options); // Chỉ lấy các thực phẩm chưa bị xóa mềm
-    const data = await Food.paginate(queryCondition, options);
+    const data = await Food.find({ isDeleted: false });
 
-    if (!data || data.docs.length === 0) {
+    if (!data || data.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No food found!')
     }
     return data
@@ -54,14 +51,6 @@ export const getOneService = async (reqBody) => {
     const { includeDeleted } = reqBody.query // lấy tham số includeDeleted từ query string
     const queryCondition = includeDeleted === 'true' ? { _id: id } : { _id: id, isDeleted: false };
     const data = await Food.findOne(queryCondition)
-    // check ảnh trên Cloudinary
-    const imageExists = await checkImageExists(data.image)
-    // console.log('data.image:', data.image);
-    // console.log('imageExists:', imageExists);
-    if (!imageExists) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Image not found!')
-    }
-    ///////////////////////////////
     if (!data || data.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Not food found!')
     }

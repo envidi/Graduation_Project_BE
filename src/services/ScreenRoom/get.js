@@ -18,31 +18,31 @@ export const getAllService = async (reqBody) => {
       limit: _limit,
       sort: {
         [_sort]: _order === 'asc' ? 1 : -1
-      },
-      populate: {
-        path: 'TimeSlotId',
-        populate: {
-          path: 'SeatId',
-          select: 'status'
-        }
       }
+      // populate: {
+      //   path: 'TimeSlotId',
+      //   populate: {
+      //     path: 'SeatId',
+      //     select: 'status'
+      //   }
+      // }
     }
     const data = await ScreeningRoom.paginate({ destroy: false }, options)
 
-    const timeSlotNotDeletedSoft = data.docs.map((screen) => {
-      const arrayTimeSlotNotDeleted = screen.TimeSlotId.map((timeslot) => {
-        if (timeslot.destroy === false) {
-          return timeslot
-        }
-        return
-      })
-      screen.TimeSlotId = [...arrayTimeSlotNotDeleted]
-      return screen
-    })
+    // const timeSlotNotDeletedSoft = data.docs.map((screen) => {
+    //   const arrayTimeSlotNotDeleted = screen.TimeSlotId.map((timeslot) => {
+    //     if (timeslot.destroy === false) {
+    //       return timeslot
+    //     }
+    //     return
+    //   })
+    //   screen.TimeSlotId = [...arrayTimeSlotNotDeleted]
+    //   return screen
+    // })
     if (!data || data.docs.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No screening rooms found!')
     }
-    return timeSlotNotDeletedSoft
+    return data
   } catch (error) {
     throw error
   }
@@ -88,14 +88,48 @@ export const getOneService = async (reqBody) => {
   }
 }
 
-export const getAllIncludeDestroyService = async (reqBody) => {
+// export const getAllIncludeDestroyService = async (reqBody) => {
+//   try {
+//     const {
+//       _page = 1,
+//       _limit = 10,
+//       _sort = 'createdAt',
+//       _order = 'asc'
+//     } = reqBody.query
+//     const options = {
+//       page: _page,
+//       limit: _limit,
+//       sort: {
+//         [_sort]: _order === 'asc' ? 1 : -1
+//       },
+//       populate: {
+//         path: 'ShowtimesId'
+//       }
+//     }
+//     const data = await ScreeningRoom.paginate({}, options)
+//     if (!data || data.docs.length === 0) {
+//       throw new ApiError(StatusCodes.NOT_FOUND, 'No screening rooms found!')
+//     }
+//     return data
+//   } catch (error) {
+//     throw error
+//   }
+// }
+
+export const getAllIncludeDestroyService = async (req) => {
   try {
+    // Điều chỉnh để nhận các tham số trực tiếp từ `req.query`
     const {
       _page = 1,
       _limit = 10,
       _sort = 'createdAt',
-      _order = 'asc'
-    } = reqBody.query
+      _order = 'asc',
+      CinemaId // Thêm tham số này để lọc theo CinemaId
+    } = req.query;
+
+    // Tạo điều kiện truy vấn dựa trên CinemaId nếu nó được cung cấp
+    const queryCondition = CinemaId ? { CinemaId } : {};
+
     const options = {
       page: _page,
       limit: _limit,
@@ -103,16 +137,17 @@ export const getAllIncludeDestroyService = async (reqBody) => {
         [_sort]: _order === 'asc' ? 1 : -1
       },
       populate: {
-        path: 'TimeSlotId',
-        select: 'ScreeningRoomId SeatId status destroy'
+        path: 'ShowtimesId' // Duy trì việc populate nếu bạn muốn lấy thông tin chi tiết của Showtimes liên quan
       }
-    }
-    const data = await ScreeningRoom.paginate({}, options)
+    };
+
+    // Sử dụng điều kiện truy vấn khi gọi phương thức paginate
+    const data = await ScreeningRoom.paginate(queryCondition, options);
     if (!data || data.docs.length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'No screening rooms found!')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No screening rooms found!');
     }
-    return data
+    return data;
   } catch (error) {
-    throw error
+    throw error;
   }
-}
+};
