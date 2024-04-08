@@ -36,6 +36,18 @@ export const reply = async (req, res, next) => {
     next(error)
   }
 }
+export const likeComment = async (req, res, next) => {
+  try {
+    const data = await commentService.likeService(req)
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      datas: data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 export const deleteComment = async (req, res, next) => {
   try {
     const data = await commentService.removeService(req)

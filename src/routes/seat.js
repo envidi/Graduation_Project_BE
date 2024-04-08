@@ -4,6 +4,7 @@ import {
   getAll,
   getAllByShowTime,
   getDetail,
+  getSeatByShowTime,
   remove,
   update
 } from '../controllers/seat.js';
@@ -19,6 +20,7 @@ const routerSeat = express.Router();
 
 routerSeat.get('/all', getAll);
 routerSeat.get('/', getAllByShowTime);
+routerSeat.get('/show', getSeatByShowTime);
 routerSeat.get('/:id', getDetail);
 routerSeat.patch('/:id', update);
 routerSeat.post('/', create);

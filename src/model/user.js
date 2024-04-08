@@ -45,7 +45,14 @@ var userSchema = new mongoose.Schema(
       type: String,
       default: ''
     },
-    wishlist: [{ type: mongoose.Types.ObjectId, ref: 'Movie' }],
+    age: {
+      type: Number,
+      default: 0
+    },
+    sex: {
+      type: String,
+      enum: ['Nam', 'Nữ']
+    },
     isBlocked: {
       type: Boolean,
       default: false

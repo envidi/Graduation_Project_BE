@@ -14,6 +14,7 @@ import routerEmail from './email.js'
 import routerPay from './payment.js'
 import routerTicket from './ticket.js'
 import routerWatchList from './watchList.js'
+import routerStatistic from './statistic.js'
 const routerInit = Router()
 
 routerInit.use('/user', routerUser)
@@ -31,5 +32,6 @@ routerInit.use('/email', routerEmail)
 routerInit.use('/payment', routerPay)
 routerInit.use('/ticket', routerTicket)
 routerInit.use('/watchlist', routerWatchList)
+routerInit.use('/statistic', routerStatistic)
 
 export default routerInit

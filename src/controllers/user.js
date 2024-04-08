@@ -67,6 +67,77 @@ export const register = asyncHandler(async (req, res, next) => {
     next(error)
   }
 })
+export const registerGoogle = asyncHandler(async (req, res, next) => {
+  try {
+    const body = req.body
+
+    const user = await User.findOne({ email: body.email })
+    if (user) {
+      const isMatch = await bcrypt.compare(body.password, user.password)
+      if (!isMatch) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          'Mật khẩu không đúng hoặc bạn đã dùng email này để đăng kí !'
+        )
+      }
+      const { roleIds, ...userData } = user.toObject()
+      // AccessToken dùng để xác thực người dùng, phân quyền
+      const Accesstoken = AccessTokenUser(user._id, roleIds)
+      return res.status(200).json({
+        message: 'đăng nhập thành công',
+        Accesstoken,
+        userData
+      })
+    }
+    const hashPassword = await bcrypt.hash(body.password, 10)
+
+    const response = await User.create({
+      name: body.name,
+      email: body.email,
+      password: hashPassword,
+      confirmPassword: hashPassword,
+      avatar: body.avatar
+    })
+
+    const newUser = await response.populate('roleIds', 'roleName')
+
+    // thêm user vào bảng role user
+    const [, responseRegister] = await Promise.all([
+      RoleUser.findOneAndUpdate(
+        { roleName: 'user' },
+        { $push: { userIds: newUser._id } },
+        { new: true }
+      ),
+      User.findOne({ email: body.email })
+    ])
+
+    const Accesstoken = AccessTokenUser(response._id, responseRegister.roleIds)
+
+    return res.status(200).json({
+      message: newUser ? 'Đăng kí thành công' : 'Đăng kí thất bại',
+      Accesstoken,
+      newUser
+    })
+  } catch (error) {
+    next(error)
+  }
+})
+export const totalCountUser = asyncHandler(async (req, res, next) => {
+  try {
+
+    const countUser = await User.countDocuments({})
+    if (!countUser) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No user found')
+    }
+
+    return res.status(200).json({
+      message: countUser ? 'Lấy tổng số người dùng thành công' : 'Lấy tổng số người dùng thất bại',
+      countUser
+    })
+  } catch (error) {
+    next(error)
+  }
+})
 
 export const login = asyncHandler(async (req, res) => {
   const body = req.body
@@ -139,7 +210,6 @@ export const updateUser = asyncHandler(async (req, res) => {
   const { _id, password, oldPassword } = req.user
   if (!_id || Object.keys(req.body).length === 0)
     throw new ApiError(StatusCodes.NOT_FOUND, 'Missing inputs')
-
   const body = req.body
 
   const { error } = userValidate.validate(body, { abortEarly: true })

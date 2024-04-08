@@ -1,7 +1,7 @@
-import { WHITELIST_DOMAINS } from '~/utils/constants.js'
+import { WHITELIST_DOMAINS } from '../utils/constants.js'
 import { env } from './environment.js'
 import { StatusCodes } from 'http-status-codes'
-import ApiError from '~/utils/ApiError.js'
+import ApiError from '../utils/ApiError.js'
 
 // Cấu hình CORS Option trong dự án thực tế
 export const corsOptions = {
