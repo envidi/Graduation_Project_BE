@@ -117,7 +117,7 @@ export const getAllByUser = async (reqBody) => {
           foods: newFood,
           createdAt: convertTimeToCurrentZone(d._doc.createdAt),
           showtimeId: {
-            timeFrom: convertTimeToCurrentZone(d._doc.showtimeId.timeFrom)
+            timeFrom: convertTimeToCurrentZone(d._doc.showtimeId?.timeFrom)
           },
           movieId: {
             _id: d._doc.movieId._id,
