@@ -65,6 +65,9 @@ export const getTop5MovieRevenue = async (req, res, next) => {
           },
           priceFood: {
             $sum: '$totalFood'
+          },
+          count: {
+            $sum: '$quantity'
           }
         }
       },
@@ -93,6 +96,7 @@ export const getTop5MovieRevenue = async (req, res, next) => {
           totalSold: 1,
           priceMovie: 1,
           priceFood: 1,
+          count: 1,
           profit: {
             $add: [
               {
@@ -104,6 +108,63 @@ export const getTop5MovieRevenue = async (req, res, next) => {
               { $multiply: ['$priceFood', 0.85] }
             ]
           }
+        }
+      }
+    ])
+    if (!data || data.length == 0) {
+      return []
+    }
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+export const getTop5UserRevenue = async (req, res, next) => {
+  try {
+    const data = await Ticket.aggregate([
+      {
+        $match: {
+          status: PAID
+        }
+      },
+      {
+        $group: {
+          _id: '$userId',
+          totalSold: { $sum: '$totalPrice' },
+          count: {
+            $sum: '$quantity'
+          }
+        }
+      },
+      { $sort: { totalSold: -1 } },
+      { $limit: 5 },
+      {
+        $lookup: {
+          from: 'users', // collection chứa thông tin các bộ phim
+          localField: '_id', // trường trong collection 'sales'
+          pipeline: [
+            {
+              $project: {
+                name: 1,
+                _id: 1,
+                avatar: 1,
+                email : 1
+              }
+            }
+          ],
+          foreignField: '_id', // trường tương ứng trong collection 'movies'
+          as: 'userDetails' // tên mảng chứa kết quả sau khi kết nối
+        }
+      },
+      {
+        $project: {
+          userDetails: 1,
+          totalSold: 1,
+          count: 1
         }
       }
     ])
