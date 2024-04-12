@@ -12,7 +12,7 @@ const movieSchema = JoiExtended.object({
   actor: Joi.string().min(3).required(),
   language: Joi.string().min(3).required(),
   author: Joi.string().required().min(1).max(255).trim().strict(),
-  image: Joi.string().required().min(1).max(255).trim().strict(),
+  image: Joi.string(),
   duration: Joi.number().required().min(30).max(300),
   country: Joi.string().required().min(1).max(100).trim().strict(),
   trailer: Joi.string().required().min(1),

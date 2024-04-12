@@ -78,13 +78,13 @@ export const update = async (req, res, next) => {
     }
     /// check status movie
 
-    const checkstt = checkmovie[0]
-    if (checkstt.status == 'COMING_SOON') {
-      throw new ApiError(
-        StatusCodes.NOT_FOUND,
-        'Phim đang công chiếu không thể sửa giá !'
-      )
-    }
+    // const checkstt = checkmovie[0]
+    // if (checkstt.status == 'COMING_SOON') {
+    //   throw new ApiError(
+    //     StatusCodes.NOT_FOUND,
+    //     'Phim đang công chiếu không thể sửa giá !'
+    //   )
+    // }
     const { error } = updateMoviePriceSchema.validate(body, {
       abortEarly: true
     })

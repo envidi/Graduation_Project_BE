@@ -55,6 +55,8 @@ export const updateService = async (req) => {
     // const data = await Movie.findByIdAndUpdate(id, body, { new: true })
     const data = await Movie.findById(id, 'categoryId')
 
+    
+
     const updateData = await Movie.updateOne(
       { _id: id },
       {
