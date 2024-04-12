@@ -17,39 +17,25 @@ import {
 } from '../controllers/movie.js'
 
 import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js'
-import cloudinary, { upload } from '../middleware/multer.js'
-// import { CloudinaryStorage } from 'multer-storage-cloudinary'
+// import { upload } from '../middleware/multer.js'
+import { CloudinaryStorage } from 'multer-storage-cloudinary'
 // import cloudinary from '../middleware/multer.js'
-// import multer from 'multer'
+import multer from 'multer'
+import cloudinary from '../middleware/multer.js'
+// import cloudinary, { upload } from '../middleware/multer.js'
 
-// import { checkPermission } from "../middlewares/checkPermission";
 const routerProducts = express.Router()
 
-// const storage = new CloudinaryStorage({
-//   cloudinary: cloudinary,
-//   folder: 'AVATAR',
-//   allowedFormats: ['jpg', 'png', 'jpeg'],
-//   transformation: [{ with: 500, height: 500, crop: 'limit' }]
-// })
-// const upload = multer({
-//   storage: storage
-// })
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  folder: 'AVATAR',
+  allowedFormats: ['jpg', 'png', 'jpeg'],
+  transformation: [{ with: 500, height: 500, crop: 'limit' }]
+})
+const upload = multer({
+  storage: storage
+})
 
-// routerProducts.get('/', verifyAccessToken, getAll);
-// routerProducts.get('/:id', verifyAccessToken, getDetail);
-// routerProducts.put('/:id', verifyAccessToken, isAdmin, update);
-// routerProducts.post('/', verifyAccessToken, isAdmin, create);
-// routerProducts.delete('/:id', verifyAccessToken, isAdmin, remove);
-
-// const storage = new CloudinaryStorage({
-//   cloudinary: cloudinary,
-//   folder: 'AVATAR',
-//   allowedFormats: ['jpg', 'png', 'jpeg'],
-//   transformation: [{ with: 500, height: 500, crop: 'limit' }]
-// })
-// const upload = multer({
-//   storage: storage
-// })
 
 
 routerProducts.get('/', getAll)

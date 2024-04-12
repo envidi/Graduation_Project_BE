@@ -8,18 +8,25 @@ import Showtimes from '../../model/Showtimes.js'
 import Category from '../../model/Category.js'
 import { convertTimeToIsoString } from '../../utils/timeLib.js'
 import findDifferentElements from '../../utils/findDifferent.js'
+import { create, update } from '../../controllers/MoviePrice.js'
+import { moviePriceService } from '../moviePrice.js'
+import MoviePrice from '../../model/MoviePrice.js'
+
 
 export const updateService = async (req) => {
   try {
     const id = req.params.id
     const body = req.body
-    // const { error } = movieSchema.validate(body, { abortEarly: true })
-    // if (error) {
-    //   throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
-    // }
-    // check suat chieu nếu có thì k sửa dc
+    const { error } = movieSchema.validate(body, { abortEarly: true })
+    if (error) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
+    }
     const checkmovie = await Movie.findById(id)
+    if (!checkmovie || checkmovie.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found! (k cj)')
+    }
 
+    // check suat chieu nếu có thì k sửa dc
     const checkshowtimes = await Showtimes.find({ movieId: id })
     const showtime = await checkshowtimes[0]
     // if (showtime != undefined) {
@@ -54,17 +61,43 @@ export const updateService = async (req) => {
 
     // const data = await Movie.findByIdAndUpdate(id, body, { new: true })
     const data = await Movie.findById(id, 'categoryId')
+    // const dataprice1 = await MoviePrice.findById(checkmovie.prices[0])
+    // const dataprice2 = await MoviePrice.findById(checkmovie.prices[1])
+    // if (dataprice1) {
+    //   await update(checkmovie.prices[0], body.prices[0].price)
+    //   //  body.prices[0] = checkmovie.prices[0]
+    // } else {
+    //   await create({ movieId: id, price: body.prices[0].price, daytype: "weekday" })
+    // }
+    // if (dataprice2) {
+    //   // body.prices[1] = checkmovie.prices[1]
+    //   await update(checkmovie.prices[0], body.prices[1].price)
+    // } else {
+    //   await create({ movieId: id, price: body.prices[1].price, daytype: "weekend" })
+    // }
 
-    
+    // const { prices, ...reqbody } = body
+
 
     const updateData = await Movie.updateOne(
       { _id: id },
       {
         ...body,
+        // ...reqbody,
         fromDate: new Date(convertTimeToIsoString(body.fromDate)),
         toDate: new Date(convertTimeToIsoString(body.toDate))
       }
     )
+
+    // update giá
+    // if (prices && prices.length > 0) {
+    //   for (let i = 0; i < prices.length; i++) {
+    //     await moviePriceService.updateprice({
+    //       // movieId: data.id.toString(),
+    //       price : prices[i].price
+    //     })
+    //   }
+    // }
 
     if (!updateData) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Update movie failed!')
@@ -119,6 +152,6 @@ export const updateService = async (req) => {
 
     return updateData
   } catch (error) {
-    // throw error
+    throw error
   }
 }

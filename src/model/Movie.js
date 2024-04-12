@@ -1,3 +1,4 @@
+import { array } from 'joi'
 import mongoose from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
 export const COMING_SOON = 'COMING_SOON'
@@ -14,7 +15,9 @@ const productSchema = mongoose.Schema(
     },
     image: {
       type: String,
-      required: false
+      required: false,
+      // default: ''
+
     },
     duration: {
       type: Number,
@@ -76,6 +79,7 @@ const productSchema = mongoose.Schema(
     prices: [
       {
         type: mongoose.Schema.Types.ObjectId,
+        // type: mongoose.Schema.Types.Mixed,
         ref: 'MoviePrice',
         validate: [(val) => val <= 2, '{PATH} exceeds the limit of 2']
       }
