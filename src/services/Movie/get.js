@@ -45,7 +45,7 @@ export const getAllService = async (reqBody) => {
 
     // Add the 'price' field to each movie based on the current day type
     plainDocs.forEach((movie) => {
-      const priceObject = movie.prices.find((price) => {
+      const priceObject = movie.prices?.find((price) => {
         return currentDay >= 1 && currentDay <= 5
           ? price.dayType === 'weekday'
           : price.dayType === 'weekend'

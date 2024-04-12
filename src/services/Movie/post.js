@@ -12,10 +12,10 @@ import { moviePriceService } from '../moviePrice.js'
 export const createService = async (req) => {
   try {
     const body = req.body
-    // thêm đường dẫn ảnh vào body
+    //thêm đường dẫn ảnh vòa body
     // if (req.file) {
-    //   body.image = req.file.path
-    // }
+    //   body.image = reqBody.file.path;
+    // } 
         // thêm ảnh 
     // let imageUrl
     // let cloudGetUrl
@@ -28,10 +28,7 @@ export const createService = async (req) => {
     //   imageUrl = cloudGetUrl.secure_url
     // }
     // body.image = imageUrl
-    // const newProfile = {
-    //   ...body,
-    //   ...(cloudGetUrl && { image: imageUrl })
-    // }
+
 
     const { error } = movieSchema.validate(body, { abortEarly: true })
     if (error) {
@@ -78,3 +75,4 @@ export const createService = async (req) => {
     throw error
   }
 }
+ 

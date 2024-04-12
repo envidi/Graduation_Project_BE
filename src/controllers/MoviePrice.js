@@ -38,7 +38,8 @@ export const getAll = async (req, res, next) => {
       data: data.docs
     })
   } catch (error) {
-    next(error)
+    throw error
+    // next(error)
   }
 }
 
@@ -53,7 +54,8 @@ export const getDetail = async (req, res, next) => {
       datas: data
     })
   } catch (error) {
-    next(error)
+    // next(error)
+    throw error
   }
 }
 
@@ -68,14 +70,14 @@ export const update = async (req, res, next) => {
     const checkprice = await MoviePrice.findById(id)
     const checkmovie = await Movie.find({ _id: checkprice.movieId })
     // check xuat chieu
-    const checkshowtimes = await Showtimes.find({ movieId: checkprice.movieId })
-    const showtime = await checkshowtimes[0]
-    if (showtime != undefined) {
-      throw new ApiError(
-        StatusCodes.NOT_FOUND,
-        'Movies that are currently playing cannot be Update! (phim đang có xuất chiếu không thể sửa được )'
-      )
-    }
+    // const checkshowtimes = await Showtimes.find({ movieId: checkprice.movieId })
+    // const showtime = await checkshowtimes[0]
+    // if (showtime != undefined) {
+    //   throw new ApiError(
+    //     StatusCodes.NOT_FOUND,
+    //     'Movies that are currently playing cannot be Update! (phim đang có xuất chiếu không thể sửa được )'
+    //   )
+    // }
     /// check status movie
 
     // const checkstt = checkmovie[0]
@@ -102,7 +104,8 @@ export const update = async (req, res, next) => {
       datas: updateData
     })
   } catch (error) {
-    next(error)
+    // next(error)
+    throw error
   }
 }
 
@@ -115,7 +118,8 @@ export const create = async (req, res, next) => {
       data: data
     })
   } catch (error) {
-    next(error)
+    // next(error)
+    throw error
   }
 }
 
@@ -162,6 +166,7 @@ export const remove = async (req, res, next) => {
       movie: updatedMovie
     })
   } catch (error) {
-    next(error)
+    // next(error)
+    throw error
   }
 }
