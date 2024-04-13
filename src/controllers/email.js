@@ -56,6 +56,7 @@ export const sendMailController = asyncHandler(async (req, res) => {
   
 
   `
+  
   const data = {
     email:email,
     html

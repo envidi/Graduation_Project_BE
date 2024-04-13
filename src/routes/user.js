@@ -9,7 +9,8 @@ import {
     updateUserById,
     forgotPassword,
     resetPassword,
-    updateClient
+    updateClient,
+    getDetailUserById
   } from '../controllers/user.js'
   import { Router } from 'express'
   import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js'
@@ -41,6 +42,7 @@ routerUser.post('/register',upload.single('avatar'), register)
 routerUser.post('/login', login)
 routerUser.get('/', getAllUser)
 routerUser.get('/userDetail',verifyAccessToken,  getDetailUser)
+routerUser.get('/:id',  getDetailUserById)
 routerUser.patch(
     '/updateUser',
     upload.single('avatar'),
@@ -58,6 +60,6 @@ routerUser.post('/forgotPassword', forgotPassword)
 routerUser.put('/resetPassword', resetPassword)
 
 routerUser.put('/:id', verifyAccessToken, isAdmin, updateUserById)
-routerUser.delete('/:id', verifyAccessToken, isAdmin, deleteUser)
+routerUser.delete('/:id', verifyAccessToken, deleteUser)
 
 export default routerUser

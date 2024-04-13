@@ -45,8 +45,8 @@ export const verifyAccessPaymentToken = asyncHandler(async (req, res, next) => {
 })
 // đặt isAdmin sau hàm verify thì sẽ dùng đươc req.user của hàm trên
 export const isAdmin = asyncHandler(async (req, res, next) => {
-  const { role } = req.user
-  if (role !== 'admin')
+  const { roleName } = req.user
+  if (roleName !== 'admin')
     return res.status(401).json({
       success: false,
       message: 'Required admin role'

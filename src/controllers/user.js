@@ -92,13 +92,25 @@ export const login = asyncHandler(async (req, res) => {
 })
 
 export const getAllUser = asyncHandler(async (req, res) => {
-  const response = await User.find({})
+  const response = await User.find({}).populate("roleIds","roleName")
   if (!response || response.length === 0) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'No users found!')
   }
 
   return res.status(StatusCodes.OK).json({
     message: 'Gọi danh sách users thành công',
+    response
+  })
+})
+export const getDetailUserById = asyncHandler(async (req, res) => {
+  const {id} = req.params
+  const response = await User.findById(id).populate("roleIds","roleName")
+  if (!response || response.length === 0) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'No users found!')
+  }
+
+  return res.status(StatusCodes.OK).json({
+    message: 'Gọi  users thành công',
     response
   })
 })

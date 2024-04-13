@@ -65,36 +65,37 @@ export const getAllServiceByMovie = async (req) => {
   }
 }
 
-export const getOneService = async (req) => {
-  try {
-    const { id } = req.params
-    const response = await Showtimes.paginate(
-      { _id: id },
-      {
-        populate: {
-          path: 'screenRoomId',
-          select: 'name status'
+  export const getOneService = async (req) => {
+    try {
+      const { id } = req.params
+      const populateOptions = [
+        { path: 'screenRoomId', select: 'name status' },
+        { path: 'movieId', select: 'name' }
+      ];
+      const response = await Showtimes.paginate(
+        { _id: id },
+        {
+          populate: populateOptions
         }
-      }
-    )
-    const plainDocs = response.docs.map((doc) => doc.toObject())
+      )
+      const plainDocs = response.docs.map((doc) => doc.toObject())
 
-    // Add the 'price' field to each movie based on the current day type
-    plainDocs.forEach((showtime) => {
-      showtime.timeFrom = convertTimeToCurrentZone(showtime.timeFrom)
-      showtime.timeTo = convertTimeToCurrentZone(showtime.timeTo)
-    })
-    if (!response) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'No list Show found!')
+      // Add the 'price' field to each movie based on the current day type
+      plainDocs.forEach((showtime) => {
+        showtime.timeFrom = convertTimeToCurrentZone(showtime.timeFrom)
+        showtime.timeTo = convertTimeToCurrentZone(showtime.timeTo)
+      })
+      if (!response) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'No list Show found!')
+      }
+      return {
+        ...response,
+        docs: plainDocs
+      }
+    } catch (error) {
+      throw error
     }
-    return {
-      ...response,
-      docs: plainDocs
-    }
-  } catch (error) {
-    throw error
   }
-}
 
 export const getAllIncludeDestroyService = async (reqBody) => {
   try {
