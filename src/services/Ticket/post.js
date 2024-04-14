@@ -66,8 +66,8 @@ export const createService = async (reqBody) => {
     const totalFoodPrice =
       foods && foods.length > 0
         ? foods.reduce((accu, food) => {
-            return (accu += food.price)
-          }, 0)
+          return (accu += food.price)
+        }, 0)
         : 0
     // const totalFoodPrice = 0
     const totalPriceMovie = priceMovie.price

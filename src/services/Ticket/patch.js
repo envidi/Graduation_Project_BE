@@ -27,6 +27,7 @@ export const updateService = async (reqBody) => {
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, error.message) // Nếu lỗi, trả về lỗi BAD_REQUEST
     }
+
     // Kiểm tra xem Ghế có đang trống hay không
 
     const [ticket, seat] = await Promise.all([
@@ -56,19 +57,25 @@ export const updateService = async (reqBody) => {
       { $set: updateData }, // Cập nhật dữ liệu
       { new: true } // Trả về vé sau khi đã cập nhật
     )
+
     if (!data) {
       throw new ApiError(
         StatusCodes.NOT_FOUND,
         'Ticket not found or has been deleted!'
       )
     }
-    const differentElement = findDifferentElements(ticket.seatId, newIds)
+
+    const differentElement = findDifferentElements(
+      ticket.seatId.map((seat) => seat._id),
+      newIds
+    )
     const newTicketSeat = differentElement.filter((pro) => {
       if (updateData.seatId.includes(pro)) {
         return pro
       }
     })
     const oldSeatStatus = findDifferentElements(newTicketSeat, differentElement)
+
     const promises = []
     if (newTicketSeat || newTicketSeat.length > 0) {
       newTicketSeat.forEach((element) => {
@@ -96,9 +103,11 @@ export const updateService = async (reqBody) => {
         promises.push(seatService.updateStatusService(reqBody))
       })
     }
+
     await Promise.all(promises).catch((err) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, err.message)
     })
+    console.log(updateData)
     return data
   } catch (error) {
     throw error

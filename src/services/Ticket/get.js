@@ -48,9 +48,8 @@ export const getAllByUser = async (reqBody) => {
       _userId = '1',
       _start = new Date('2024-03-01'),
       _end = new Date('2024-09-26'),
-      _q = ''
+      _q = null
     } = reqBody.query // Sử dụng req.query thay vì req.body để nhận tham số từ query string
-
     const options = {
       page: _page,
       limit: _limit,
@@ -58,19 +57,15 @@ export const getAllByUser = async (reqBody) => {
         [_sort]: _order === 'asc' ? 1 : -1
       },
       populate: {
-        path: 'priceId seatId  showtimeId paymentId screenRoomId movieId cinemaId',
-        select:
-          'CinemaName CinemaAdress price row column typeSeat name email timeFrom screenRoomId movieId typeBank typePayment name image categoryId'
+        path: 'priceId paymentId',
+        select: 'price name email timeFrom typeBank typePayment'
       },
       select: {
         isDeleted: 0,
         updatedAt: 0
       }
     }
-    let query = [{}]
-    if (mongoose.Types.ObjectId.isValid(_q)) {
-      query = [{ _id: _q }]
-    }
+
     const data = await Ticket.paginate(
       {
         isDeleted: false,
@@ -78,62 +73,23 @@ export const getAllByUser = async (reqBody) => {
         createdAt: {
           $gte: _start, // Lớn hơn hoặc bằng ngày bắt đầu
           $lte: _end // Nhỏ hơn hoặc bằng ngày kết thúc
-        },
-        $or: query
+        }
+        // $or: query
       },
       options
     )
     const newData = await Promise.all(
       data.docs.map(async (d) => {
-        const dataFoodIds = d.foods.map((food) => food.foodId)
-        const categoryObject = await Category.find(
-          {
-            _id: {
-              $in: d.movieId.categoryId
-            }
-          },
-          'name'
-        )
-        const foods = await Food.find(
-          {
-            _id: {
-              $in: dataFoodIds
-            }
-          },
-          'name price'
-        )
-
-        const newFood = d.foods.map((food, index) => {
-          return {
-            _id: food._id,
-            quantityFood: food.quantityFood,
-            name: foods[index].name,
-            price: foods[index].price
-          }
-        })
-
         return {
           ...d._doc,
-          foods: newFood,
           createdAt: convertTimeToCurrentZone(d._doc.createdAt),
-          showtimeId: {
-            timeFrom: convertTimeToCurrentZone(d._doc.showtimeId?.timeFrom)
-          },
-          movieId: {
-            _id: d._doc.movieId._id,
-            name: d._doc.movieId.name,
-            image: d._doc.movieId.image,
-            categoryId: [...categoryObject]
-          },
           movieName: d._doc.movieId.name,
           screenName: d._doc.screenRoomId.name,
           cinemaName: d._doc.cinemaId.CinemaName
         }
       })
     )
-    let searchData = mongoose.Types.ObjectId.isValid(_q)
-      ? newData
-      : searchByFields(newData, _q)
+    let searchData = _q == null ? newData : searchByFields(newData, _q)
     if (!newData || newData.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No Ticket found!')
     }

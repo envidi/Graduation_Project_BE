@@ -17,8 +17,12 @@ export function searchByFields(objects, query) {
     for (const key of Object.keys(obj)) {
       // Nếu trường là name, author hoặc actor và giá trị của trường chứa query
       if (
-        (key === 'movieName' || key === 'screenName' || key === 'cinemaName'|| key === 'status' ) &&
-        obj[key].toLowerCase().includes(query.toLowerCase())
+        (key === 'movieName' ||
+          key === 'screenName' ||
+          key === 'cinemaName' ||
+          key === 'orderNumber' ||
+          key === 'status') &&
+        obj[key].toString().toLowerCase().includes(query.toLowerCase())
       ) {
         result.push(obj)
         break // Thoát khỏi vòng lặp nếu đã tìm thấy kết quả
@@ -64,4 +68,17 @@ export function convertNumberToAlphabet(num) {
   } else {
     return num.toString() // Trả về số nếu không nằm trong khoảng từ 1 đến 26
   }
+}
+export function generateTimeBasedOrderNumber() {
+  // Lấy thời gian hiện tại tính bằng millisecond
+  const now = new Date().getTime()
+
+  // Chuyển đổi thời gian hiện tại thành chuỗi và lấy 4 ký tự cuối cùng
+  const lastFourDigits = now.toString().slice(-2)
+
+  // Tạo một số ngẫu nhiên từ 1000 đến 9999
+  const randomFourDigits = Math.floor(100 + Math.random() * 900)
+
+  // Kết hợp hai số này để tạo ra một số order
+  return parseInt(lastFourDigits + randomFourDigits)
 }

@@ -1,13 +1,9 @@
 /* eslint-disable no-useless-catch */
 import { StatusCodes } from 'http-status-codes'
-import { v2 as cloudinary } from 'cloudinary'
 
 import Movie, { IS_SHOWING } from '../../model/Movie.js'
 import ShowTime, { AVAILABLE_SCHEDULE } from '../../model/Showtimes.js'
-import {
-  convertTimeToCurrentZone,
-  convertTimeToIsoString
-} from '../../utils/timeLib.js'
+import { convertTimeToCurrentZone } from '../../utils/timeLib.js'
 import ApiError from '../../utils/ApiError.js'
 import mongoose from 'mongoose'
 // import {
@@ -161,14 +157,13 @@ export const getAllMovieHomePage = async (reqBody) => {
     throw error
   }
 }
-export const getCountMovie = async (reqBody) => {
+export const getCountMovie = async () => {
   try {
     const data = await Movie.countDocuments({})
 
     if (!data) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
     }
-
 
     return data
   } catch (error) {
