@@ -34,18 +34,23 @@ const movieSchema = JoiExtended.object({
   rate: Joi.number().required().min(1).max(5),
   // Trong array của show_schedule thêm một object có trường id và name
   prices: Joi.alternatives().try(
-    Joi.array()
-    .items(
+    Joi.array().items(
       Joi.object({
         price: Joi.number().required().min(0),
         dayType: Joi.string().required().valid('weekday', 'weekend')
       })
-      )
-    , Joi.string().min(1).required()
     ),
+    Joi.string().min(1).required()
+  ),
 
-    showTimes: Joi.alternatives().try(Joi.array().items(Joi.string()), Joi.string().required()),
-    categoryId: Joi.alternatives().try(Joi.array().items(Joi.string()), Joi.string().required()),
+  showTimes: Joi.alternatives().try(
+    Joi.array().items(Joi.string()),
+    Joi.string().required()
+  ),
+  categoryId: Joi.alternatives().try(
+    Joi.array().items(Joi.string()),
+    Joi.string().required()
+  )
 
   // showTimes: Joi.array().items(Joi.string()).min(0),
   // // Movie Price

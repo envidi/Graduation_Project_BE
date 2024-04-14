@@ -10,7 +10,7 @@ export const updateService = async (reqBody) => {
 
     // Thêm đường dẫn ảnh vào body
     if (reqBody.file) {
-      body.image = reqBody.file.path;
+      body.image = reqBody.file.path
     }
 
     if (!id) {
@@ -23,13 +23,16 @@ export const updateService = async (reqBody) => {
     }
 
     // Kiểm tra xem thực phẩm có bị xóa mềm không trước khi cập nhật
-    const existingFood = await Food.findOne({ _id: id, isDeleted: false });
+    const existingFood = await Food.findOne({ _id: id, isDeleted: false })
     if (!existingFood) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Food not found or has been deleted!')
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        'Food not found or has been deleted!'
+      )
     }
 
     // Thực hiện cập nhật
-    const data = await Food.findByIdAndUpdate(id, body, { new: true });
+    const data = await Food.findByIdAndUpdate(id, body, { new: true })
     if (!data) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Update Food failed!')
     }
@@ -47,7 +50,7 @@ export const updateDeletedService = async (reqBody) => {
 
     // Thêm đường dẫn ảnh vào body nếu có file ảnh được upload
     if (reqBody.file) {
-      body.image = reqBody.file.path;
+      body.image = reqBody.file.path
     }
 
     // Kiểm tra ID có được cung cấp hay không
@@ -62,13 +65,35 @@ export const updateDeletedService = async (reqBody) => {
     }
 
     // Tìm kiếm thực phẩm đã bị xóa mềm để cập nhật
-    const existingFood = await Food.findOne({ _id: id, isDeleted: true });
+    const existingFood = await Food.findOne({ _id: id, isDeleted: true })
     if (!existingFood) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Deleted Food not found!')
     }
 
     // Cập nhật chỉ những thực phẩm đã bị xóa mềm
-    const data = await Food.findByIdAndUpdate(id, body, { new: true });
+    const data = await Food.findByIdAndUpdate(id, body, { new: true })
+    if (!data) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Update deleted Food failed!')
+    }
+
+    return data
+  } catch (error) {
+    throw error
+  }
+}
+
+export const restoreService = async (reqBody) => {
+  try {
+    const id = reqBody.params.id
+
+    // Cập nhật chỉ những thực phẩm đã bị xóa mềm
+    const data = await Food.findByIdAndUpdate(
+      id,
+      {
+        isDeleted: false
+      },
+      { new: true }
+    )
     if (!data) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Update deleted Food failed!')
     }
