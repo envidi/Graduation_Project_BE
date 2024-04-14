@@ -1,7 +1,7 @@
 import express from 'express'
 
 import { verifyAccessPaymentToken } from '../middleware/verifyToken'
-import { getAgeUser, getProfit, getRevenueAfterWeek, getSexUser, getTop5MovieRevenue, getTop5UserRevenue } from '../controllers/statistic'
+import { getAgeUser, getProfit, getRevenueAfterWeek, getSexUser, getTop3Food, getTop5MovieRevenue, getTop5UserRevenue } from '../controllers/statistic'
 const routerStatistic = express.Router()
 
 // routerProducts.get('/', verifyAccessToken, getAll);
@@ -13,6 +13,7 @@ const routerStatistic = express.Router()
 routerStatistic.get('/profit', getProfit)
 routerStatistic.get('/topmovie', getTop5MovieRevenue)
 routerStatistic.get('/topuser', getTop5UserRevenue)
+routerStatistic.get('/topfood', getTop3Food)
 routerStatistic.get('/sex', getSexUser)
 routerStatistic.get('/age', getAgeUser)
 routerStatistic.get('/revenueWeek', getRevenueAfterWeek)

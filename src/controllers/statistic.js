@@ -1,4 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
+import Food from '../model/Food'
 import Ticket, { PAID } from '../model/Ticket'
 import user from '../model/user'
 const PERCENT_PROFIT_FOOD = 85 / 100
@@ -60,9 +61,6 @@ export const getTop5MovieRevenue = async (req, res, next) => {
         $group: {
           _id: '$movieId',
           totalSold: { $sum: '$totalPrice' },
-          priceMovie: {
-            $sum: '$priceId.price'
-          },
           priceFood: {
             $sum: '$totalFood'
           },
@@ -94,20 +92,10 @@ export const getTop5MovieRevenue = async (req, res, next) => {
         $project: {
           movieDetails: 1,
           totalSold: 1,
-          priceMovie: 1,
+
           priceFood: 1,
           count: 1,
-          profit: {
-            $add: [
-              {
-                $subtract: [
-                  { $subtract: ['$totalSold', '$priceMovie'] }, // Trừ 'totalSold' - 'priceMovie'
-                  '$priceFood' // Sau đó, trừ kết quả từ bước trước đi 'priceFood'
-                ]
-              },
-              { $multiply: ['$priceFood', 0.85] }
-            ]
-          }
+          priceMovie: { $subtract: ['$totalSold', '$priceFood'] }
         }
       }
     ])
@@ -152,7 +140,7 @@ export const getTop5UserRevenue = async (req, res, next) => {
                 name: 1,
                 _id: 1,
                 avatar: 1,
-                email : 1
+                email: 1
               }
             }
           ],
@@ -175,6 +163,39 @@ export const getTop5UserRevenue = async (req, res, next) => {
     return res.status(StatusCodes.OK).json({
       message: 'Success',
       data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+export const getTop3Food = async (req, res, next) => {
+  try {
+    const foods = await Food.find({}).populate('ticketId', 'foods')
+    const convertFoods = foods.map((food) => food.toObject())
+    const newFoods = convertFoods.map((food) => {
+      const ticket = food.ticketId
+        .map((ticket) => {
+          const foodTickets = ticket.foods.find(
+            (foodTicket) => foodTicket.foodId == food._id
+          )
+          return {
+            ...ticket,
+            foods: foodTickets.price
+          }
+        })
+        .reduce((acc, foodPriceTicket) => {
+          return acc + parseInt(foodPriceTicket.foods)
+        }, 0)
+
+      return {
+        ...food,
+        ticketId: ticket
+      }
+    }).sort((a, b) => b.ticketId - a.ticketId)
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      foods : newFoods
     })
   } catch (error) {
     next(error)

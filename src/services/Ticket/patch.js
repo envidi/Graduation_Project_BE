@@ -15,7 +15,8 @@ import { IS_SHOWING } from '../../model/Movie.js'
 import { scheduleService } from '../ShowTime/index.js'
 import { paymentService } from '../Payment/index.js'
 import { accessResultToken } from '../../middleware/jwt.js'
-import { sendMailController, sendMailTicket } from '../../controllers/email.js'
+import { sendMailTicket } from '../../controllers/email.js'
+import Food from '../../model/Food.js'
 
 export const updateService = async (reqBody) => {
   try {
@@ -75,8 +76,8 @@ export const updateService = async (reqBody) => {
       }
     })
     const oldSeatStatus = findDifferentElements(newTicketSeat, differentElement)
-
     const promises = []
+
     if (newTicketSeat || newTicketSeat.length > 0) {
       newTicketSeat.forEach((element) => {
         const reqBody = {
@@ -107,7 +108,7 @@ export const updateService = async (reqBody) => {
     await Promise.all(promises).catch((err) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, err.message)
     })
-    console.log(updateData)
+
     return data
   } catch (error) {
     throw error
@@ -187,6 +188,23 @@ export const updatePaymentTicketService = async (reqBody) => {
     }
 
     const promises = []
+    const foodIds = updateData.foods.map((food) => food.foodId)
+    if (foodIds || foodIds.length > 0) {
+      promises.push(
+        Food.updateMany(
+          {
+            _id: {
+              $in: foodIds
+            }
+          },
+          {
+            $addToSet: {
+              ticketId: id
+            }
+          }
+        )
+      )
+    }
 
     updateData.seatId.forEach((element) => {
       promises.push(
