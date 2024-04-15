@@ -37,41 +37,41 @@ export const getAllService = async (req) => {
       _limit = 10,
       _sort = 'createdAt',
       _order = 'asc',
-      screenRoomId
-    } = req.query
+      screenRoomId,
+    } = req.query;
 
     const options = {
       page: _page,
       limit: _limit,
       sort: {
-        [_sort]: _order === 'asc' ? 1 : -1
-      }
-    }
+        [_sort]: _order === 'asc' ? 1 : -1,
+      },
+    };
 
     // Gộp các điều kiện truy vấn lại với nhau
     const queryCondition = {
       ...(screenRoomId && { screenRoomId }),
-      destroy: false // Đảm bảo tất cả các kết quả trả về đều không bị "destroy"
-    }
+      destroy: false, // Đảm bảo tất cả các kết quả trả về đều không bị "destroy"
+    };
 
-    const data = await Showtimes.paginate(queryCondition, options)
+    const data = await Showtimes.paginate(queryCondition, options);
     if (!data || data.docs.length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'No list show found!')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No list show found!');
     }
     const populateOptions = [
       { path: 'screenRoomId', select: 'name' },
       { path: 'movieId', select: 'name' }
-    ]
+    ];
 
     // Populate screenRoomId and movieId for each document
     for (const doc of data.docs) {
-      await doc.populate(populateOptions)
+      await doc.populate(populateOptions);
     }
-    return data
+    return data;
   } catch (error) {
-    throw error
+    throw error;
   }
-}
+};
 
 export const getAllServiceByMovie = async (req) => {
   try {
@@ -107,22 +107,14 @@ export const getOneService = async (req) => {
     const populateOptions = [
       { path: 'screenRoomId', select: 'name status' },
       { path: 'movieId', select: 'name' }
-    ]
+    ];
     const response = await Showtimes.paginate(
       { _id: id },
       {
         populate: populateOptions
       }
     )
-    // const response = await Showtimes.paginate(
-    //   { _id: id },
-    //   {
-    //     populate: {
-    //       path: 'screenRoomId',
-    //       select: 'name status'
-    //     }
-    //   }
-    // )
+   
     const plainDocs = response.docs.map((doc) => doc.toObject())
 
     // Add the 'price' field to each movie based on the current day type
@@ -160,6 +152,15 @@ export const getAllIncludeDestroyService = async (reqBody) => {
     const data = await Showtimes.paginate({ destroy: true }, options)
     if (!data || data.docs.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No screening rooms found!')
+    }
+    const populateOptions = [
+      { path: 'screenRoomId', select: 'name' },
+      { path: 'movieId', select: 'name' }
+    ];
+
+    // Populate screenRoomId and movieId for each document
+    for (const doc of data.docs) {
+      await doc.populate(populateOptions);
     }
     return data
   } catch (error) {
