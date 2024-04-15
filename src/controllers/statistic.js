@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
 import Food from '../model/Food'
+import Category from '../model/Category'
 import Ticket, { PAID } from '../model/Ticket'
 import user from '../model/user'
 const PERCENT_PROFIT_FOOD = 85 / 100
@@ -168,34 +169,56 @@ export const getTop5UserRevenue = async (req, res, next) => {
     next(error)
   }
 }
-export const getTop3Food = async (req, res, next) => {
+export const getTop4Food = async (req, res, next) => {
   try {
-    const foods = await Food.find({}).populate('ticketId', 'foods')
+    const foods = await Food.find({})
+      .populate('ticketId', 'foods')
+      .limit(4)
+      .select('name image ticketId price')
     const convertFoods = foods.map((food) => food.toObject())
-    const newFoods = convertFoods.map((food) => {
-      const ticket = food.ticketId
-        .map((ticket) => {
+    const newFoods = convertFoods
+      .map((food) => {
+        const ticket = food.ticketId.map((ticket) => {
           const foodTickets = ticket.foods.find(
             (foodTicket) => foodTicket.foodId == food._id
           )
           return {
             ...ticket,
-            foods: foodTickets.price
+            foods: foodTickets.price,
+            count: foodTickets.quantityFood
           }
         })
-        .reduce((acc, foodPriceTicket) => {
-          return acc + parseInt(foodPriceTicket.foods)
+
+        const priceTicket = ticket.reduce((acc, foodPriceTicket) => {
+          return acc + parseInt(foodPriceTicket.foods) * foodPriceTicket.count
+        }, 0)
+        const countFood = ticket.reduce((acc, foodPriceTicket) => {
+          return acc + parseInt(foodPriceTicket.count)
         }, 0)
 
-      return {
-        ...food,
-        ticketId: ticket
-      }
-    }).sort((a, b) => b.ticketId - a.ticketId)
+        return {
+          ...food,
+          ticketId: priceTicket,
+          count: countFood
+        }
+      })
+      .sort((a, b) => b.ticketId - a.ticketId)
 
     return res.status(StatusCodes.OK).json({
       message: 'Success',
-      foods : newFoods
+      data: newFoods
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+export const getCountCategories = async (req, res, next) => {
+  try {
+    const countCate = await Category.countDocuments({})
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      data: countCate
     })
   } catch (error) {
     next(error)
@@ -301,7 +324,7 @@ export const getRevenueAfterWeek = async (req, res, next) => {
       }
     ])
     const revenue = data.map((ticket) => ticket.dailyRevenue)
-    const profit = data.map((ticket) => ticket.profit)
+    // const profit = data.map((ticket) => ticket.profit)
     const date = data.map((ticket) => {
       const day = ticket._id.day < 10 ? '0' + ticket._id.day : ticket._id.day
       const month =
@@ -315,10 +338,63 @@ export const getRevenueAfterWeek = async (req, res, next) => {
         {
           name: 'Doanh thu',
           data: revenue
-        },
+        }
+        // {
+        //   name: 'Lợi nhuận',
+        //   data: profit
+        // }
+      ],
+      date
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+export const getCountTicketAfterWeek = async (req, res, next) => {
+  try {
+    const data = await Ticket.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $lt: new Date()
+          }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' },
+            day: { $dayOfMonth: '$createdAt' }
+          },
+          countTicket: { $sum: '$quantity' }
+        }
+      },
+      {
+        $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 }
+      },
+      {
+        $project: {
+          _id: 1,
+          countTicket: 1
+        }
+      }
+    ])
+    const date = data.map((ticket) => {
+      const day = ticket._id.day < 10 ? '0' + ticket._id.day : ticket._id.day
+      const month =
+        ticket._id.month < 10 ? '0' + ticket._id.month : ticket._id.month
+      return `${day}.${month}.${ticket._id.year}`
+    })
+    const count = data.map((ticket) => {
+      return ticket.countTicket
+    })
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      series: [
         {
-          name: 'Lợi nhuận',
-          data: profit
+          name: 'Vé bán được',
+          data: count
         }
       ],
       date
