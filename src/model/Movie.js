@@ -76,14 +76,18 @@ const productSchema = mongoose.Schema(
       enum: [1, 2, 3, 4, 5],
       required: true
     },
-    prices: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        // type: mongoose.Schema.Types.Mixed,
-        ref: 'MoviePrice',
-        validate: [(val) => val <= 2, '{PATH} exceeds the limit of 2']
-      }
-    ],
+    price: {
+      type: Number,
+      required: true
+    },
+    // prices: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     // type: mongoose.Schema.Types.Mixed,
+    //     ref: 'MoviePrice',
+    //     validate: [(val) => val <= 2, '{PATH} exceeds the limit of 2']
+    //   }
+    // ],
     slug: {
       type: String
     },

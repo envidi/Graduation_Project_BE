@@ -34,24 +34,24 @@ export const getAllService = async (reqBody) => {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
     }
     // Convert Mongoose documents to plain JavaScript objects
-    const plainDocs = data.docs.map((doc) => doc.toObject())
+    // const plainDocs = data.docs.map((doc) => doc.toObject())
 
-    const currentDate = new Date()
-    const currentDay = currentDate.getDay() // Sunday is 0, Monday is 1, ..., Saturday is 6
+    // const currentDate = new Date()
+    // const currentDay = currentDate.getDay() // Sunday is 0, Monday is 1, ..., Saturday is 6
 
     // Add the 'price' field to each movie based on the current day type
-    plainDocs.forEach((movie) => {
-      const priceObject = movie.prices?.find((price) => {
-        return currentDay >= 1 && currentDay <= 5
-          ? price.dayType === 'weekday'
-          : price.dayType === 'weekend'
-      })
+    // plainDocs.forEach((movie) => {
+    //   const priceObject = movie.prices?.find((price) => {
+    //     return currentDay >= 1 && currentDay <= 5
+    //       ? price.dayType === 'weekday'
+    //       : price.dayType === 'weekend'
+    //   })
 
-      movie.price = priceObject ? priceObject.price : null
-    })
+    //   movie.price = priceObject ? priceObject.price : null
+    // })
     return {
       ...data,
-      docs: plainDocs
+      // docs: plainDocs
     }
   } catch (error) {
     throw error
