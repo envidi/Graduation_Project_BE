@@ -30,14 +30,14 @@ export const updateService = async (req) => {
     ])
 
     if (!show || Object.keys(show).length === 0) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Showtime id not found')
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Không tìm thấy lịch chiếu')
     }
     // Không thể chuyển lịch chiếu sang rạp khác
 
     if (show.screenRoomId.CinemaId.toString() != currentCinema.toString()) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Cannot change showtime into another cinema'
+        'Không thể thay đổi lịch chiếu vào 1 rạp khác'
       )
     }
     // const timeSlot = await timeSlotService.getTimeSlotIdWithScreenRoomId({
@@ -66,19 +66,19 @@ export const updateService = async (req) => {
     }
 
     if (body.movieId !== show.movieId.toString()) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Cannot change the movie id')
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Không thể thay đổi phim')
     }
     if (body.status === FULL_SCHEDULE) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Cannot change status schedule into full'
+        'Không thể thay đổi lịch trạng thái thành đầy đủ'
       )
     }
     // Nếu như lịch chiếu đã bị xóa mềm thì không thể sửa
     if (show.destroy) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'This timeslot is deleted soft'
+        'Lịch chiếu đã bị xóa mềm'
       )
     }
 
@@ -91,17 +91,17 @@ export const updateService = async (req) => {
     if (!resultMovieAndScreenRoom[0] || !resultMovieAndScreenRoom[1]) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'movieId hoặc screenRoomId không hợp lệ'
+        'MovieId hoặc ScreenRoomId không hợp lệ'
       )
     }
     if (validateDurationMovie(body, resultMovieAndScreenRoom[0])) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Timeframe is not equal to duration of movie'
+        'Khung thời gian không bằng thời lượng phim'
       )
     }
     if (await validateTime(body, show._id)) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'This time has been set')
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Khoảng thời gian này đã tồn tại')
     }
     let promises = [
       Showtimes.updateOne(
@@ -128,7 +128,7 @@ export const updateService = async (req) => {
       ) {
         throw new ApiError(
           StatusCodes.BAD_REQUEST,
-          'Update showtime status to cancelled failed'
+          'Cập nhật trạng thái lịch chiếu thành đã hủy không thành công'
         )
       }
     }
@@ -193,7 +193,7 @@ export const updateService = async (req) => {
       if (!screenRoomNew || Object.keys(screenRoomNew).length === 0) {
         throw new ApiError(
           StatusCodes.NOT_FOUND,
-          'This new screen room is not exist in database'
+          'Phòng chiếu mới này không tồn tại trong cơ sở dữ liệu'
         )
       }
     }
@@ -206,7 +206,7 @@ export const updateService = async (req) => {
     if (!result || result.length === 0) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Update timeslot or showtime failed'
+        'Cập nhật khung thời gian hoặc lịch chiếu không thành công'
       )
     }
 
