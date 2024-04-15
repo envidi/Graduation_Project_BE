@@ -35,7 +35,8 @@ export const createService = async (req) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
 
-    const { prices, ...restBody } = body
+    // const { prices, ...restBody } = body
+    const { ...restBody } = body
 
     const data = await Movie.create({
       ...restBody,
@@ -61,14 +62,14 @@ export const createService = async (req) => {
     }
 
     // Tạo giá
-    if (prices && prices.length > 0) {
-      for (let i = 0; i < prices.length; i++) {
-        await moviePriceService.create({
-          movieId: data._id.toString(),
-          ...prices[i]
-        })
-      }
-    }
+    // if (prices && prices.length > 0) {
+    //   for (let i = 0; i < prices.length; i++) {
+    //     await moviePriceService.create({
+    //       movieId: data._id.toString(),
+    //       ...prices[i]
+    //     })
+    //   }
+    // }
 
     return data
   } catch (error) {
