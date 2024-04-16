@@ -99,3 +99,15 @@ export const remove = async (req, res, next) => {
     next(error)
   }
 }
+
+export const removeHard = async (req, res, next) => {
+  try {
+    const data = await foodService.removeAdminHardService(req)
+    return res.status(StatusCodes.OK).json({
+      message: 'Success!',
+      data
+    })
+  } catch (error) {
+    next(error)
+  }
+}

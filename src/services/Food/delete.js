@@ -64,3 +64,31 @@ export const removeHardService = async (reqBody) => {
     throw error
   }
 }
+
+export const removeAdminHardService = async (reqBody) => {
+  try {
+    const id = reqBody.params.id;
+    const food = await Food.findById(id);
+
+    if (!food) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Food not found!');
+    }
+
+    if (food.ticketId.length > 0) {
+      throw new ApiError(
+        StatusCodes.CONFLICT,
+        'This food has already sold. Cannot delete it'
+      );
+    }
+
+    // Xóa cứng đối tượng Food
+    const data = await Food.findByIdAndDelete(id);
+    if (!data) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Delete food failed');
+    }
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
