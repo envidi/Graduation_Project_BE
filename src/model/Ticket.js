@@ -133,6 +133,9 @@ const TicketSchema = new mongoose.Schema(
       },
       timeFrom: {
         type: String
+      },
+      timeTo: {
+        type: String
       }
     },
     quantity: {

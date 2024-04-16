@@ -57,7 +57,8 @@ const ticketValidateSchema = Joi.object({
   ),
   showtimeId: Joi.object({
     _id: Joi.string().required(),
-    timeFrom: Joi.string().required()
+    timeFrom: Joi.string().required(),
+    timeTo: Joi.string().required()
   }),
   quantity: Joi.number().min(1).max(2),
   totalPrice: Joi.number().min(1)

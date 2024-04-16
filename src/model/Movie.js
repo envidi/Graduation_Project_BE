@@ -15,9 +15,8 @@ const productSchema = mongoose.Schema(
     },
     image: {
       type: String,
-      required: false,
+      required: false
       // default: ''
-
     },
     duration: {
       type: Number,
@@ -44,12 +43,12 @@ const productSchema = mongoose.Schema(
       required: true
     },
     language: {
-      type:String,
-      required:true
+      type: String,
+      required: true
     },
-    actor : {
-      type:String,
-      required:true
+    actor: {
+      type: String,
+      required: true
     },
     trailer: {
       type: String,
@@ -80,14 +79,7 @@ const productSchema = mongoose.Schema(
       type: Number,
       required: true
     },
-    // prices: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     // type: mongoose.Schema.Types.Mixed,
-    //     ref: 'MoviePrice',
-    //     validate: [(val) => val <= 2, '{PATH} exceeds the limit of 2']
-    //   }
-    // ],
+
     slug: {
       type: String
     },

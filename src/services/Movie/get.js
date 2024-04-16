@@ -26,7 +26,7 @@ export const getAllService = async (reqBody) => {
       sort: {
         [_sort]: _order === 'asc' ? 1 : -1
       },
-      populate: ['prices', 'showTimes']
+      populate: ['showTimes']
     }
     const data = await Movie.paginate({ destroy: false }, options)
 
@@ -50,7 +50,7 @@ export const getAllService = async (reqBody) => {
     //   movie.price = priceObject ? priceObject.price : null
     // })
     return {
-      ...data,
+      ...data
       // docs: plainDocs
     }
   } catch (error) {
@@ -484,6 +484,7 @@ export const getDetailService = async (reqBody) => {
               return {
                 ...showTimeDemension,
                 timeFrom: convertTimeToCurrentZone(showTimeDemension.timeFrom),
+                timeTo: convertTimeToCurrentZone(showTimeDemension.timeTo),
                 date: showTimeDemension.date
               }
             }
