@@ -167,10 +167,12 @@ export const login = asyncHandler(async (req, res) => {
 })
 
 export const getAllUser = asyncHandler(async (req, res) => {
-  const response = await User.find({})
+  const response = await User.find({}).populate("roleIds", "roleName")
   if (!response || response.length === 0) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'No users found!')
   }
+
+  
 
   return res.status(StatusCodes.OK).json({
     message: 'Gọi danh sách users thành công',
@@ -415,3 +417,23 @@ export const resetPassword = asyncHandler(async (req, res) => {
     message: user ? 'Update password success' : ' Something wrongs'
   })
 })
+
+
+export const blocked = async(req, res, next) => {
+  try {
+    const { id } = req.params;
+    const body = req.body
+    const user = await User.findByIdAndUpdate(id,body, {new:true} );
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({ message: "User blocked successfully", user });
+
+  } catch (error) {
+    next(error)
+
+  }
+}
+
