@@ -86,7 +86,7 @@ const productSchema = mongoose.Schema(
     destroy: {
       type: Boolean,
       default: false
-    }, 
+    },
     showTimes: [
       {
         type: mongoose.Types.ObjectId,
@@ -94,10 +94,7 @@ const productSchema = mongoose.Schema(
       }
     ]
   },
-  { versionKey: false, timestamps: true ,
-    strictPopulate: false
-  }
-
+  { versionKey: false, timestamps: true, strictPopulate: false }
 )
 
 productSchema.pre('findOneAndDelete', async function (next) {

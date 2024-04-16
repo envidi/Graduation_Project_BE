@@ -45,16 +45,15 @@ const movieSchema = JoiExtended.object({
   //   Joi.string().min(1).required()
   // ),
 
-  showTimes: Joi.alternatives().try(
-    Joi.array().items(Joi.string()),
-    Joi.string().required()
-  ),
+  // showTimes: Joi.alternatives().try(
+  //   Joi.array().items(Joi.string()),
+  //   Joi.string().required()
+  // ),
   categoryId: Joi.alternatives().try(
     Joi.array().items(Joi.string()),
     Joi.string().required()
-  )
-
-  // showTimes: Joi.array().items(Joi.string()).min(0),
+  ),
+  showTimes: Joi.array().items(Joi.string().allow('')).empty(Joi.array().length(0))
   // // Movie Price
   // prices: Joi.array()
   //   .items(
