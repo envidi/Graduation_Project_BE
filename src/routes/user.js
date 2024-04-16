@@ -11,7 +11,8 @@ import {
   resetPassword,
   updateClient,
   registerGoogle,
-  totalCountUser
+  totalCountUser,
+  blocked
 } from '../controllers/user.js'
 import { Router } from 'express'
 import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js'
@@ -51,7 +52,9 @@ routerUser.patch(
 routerUser.post('/forgotPassword', forgotPassword)
 routerUser.put('/resetPassword', resetPassword)
 
-routerUser.put('/:id', verifyAccessToken, isAdmin, updateUserById)
-routerUser.delete('/:id', verifyAccessToken, isAdmin, deleteUser)
+routerUser.patch('/block/:id', blocked)
+
+routerUser.put('/:id', updateUserById)
+routerUser.delete('/:id', deleteUser)
 
 export default routerUser
