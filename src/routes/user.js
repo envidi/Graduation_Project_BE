@@ -13,7 +13,8 @@ import {
   registerGoogle,
   totalCountUser,
   blocked,
-  unBlock
+  unBlock,
+  getDetailUserById
 } from '../controllers/user.js'
 import { Router } from 'express'
 import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js'
@@ -38,6 +39,7 @@ routerUser.post('/login', login)
 routerUser.get('/count', totalCountUser)
 routerUser.get('/', getAllUser)
 routerUser.get('/userDetail', verifyAccessToken, getDetailUser)
+routerUser.get('/:id', getDetailUserById)
 routerUser.patch(
   '/updateUser',
   upload.single('avatar'),
@@ -53,10 +55,10 @@ routerUser.patch(
 routerUser.post('/forgotPassword', forgotPassword)
 routerUser.put('/resetPassword', resetPassword)
 
-routerUser.patch('/block/:id', blocked)
+routerUser.patch('/block/:id',verifyAccessToken, isAdmin,  blocked)
 routerUser.patch('/unBlock/:id', unBlock)
 
-routerUser.put('/:id', updateUserById)
+routerUser.put('/:id', verifyAccessToken, isAdmin, updateUserById)
 routerUser.delete('/:id', deleteUser)
 
 export default routerUser
