@@ -422,14 +422,34 @@ export const resetPassword = asyncHandler(async (req, res) => {
 export const blocked = async(req, res, next) => {
   try {
     const { id } = req.params;
-    const body = req.body
-    const user = await User.findByIdAndUpdate(id,body, {new:true} );
+    const update = { isBlocked: true, status: "Blocked" }
+
+    const user = await User.findByIdAndUpdate(id,update, {new:true} );
     
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     return res.status(200).json({ message: "User blocked successfully", user });
+
+  } catch (error) {
+    next(error)
+
+  }
+}
+
+export const unBlock = async(req, res, next) => {
+  try {
+    const { id } = req.params;
+    const update = { isBlocked: false, status: "Active" }
+
+    const user = await User.findByIdAndUpdate(id,update, {new:true} );
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({ message: "Unblock user successfully", user });
 
   } catch (error) {
     next(error)

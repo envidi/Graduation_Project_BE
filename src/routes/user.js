@@ -12,7 +12,8 @@ import {
   updateClient,
   registerGoogle,
   totalCountUser,
-  blocked
+  blocked,
+  unBlock
 } from '../controllers/user.js'
 import { Router } from 'express'
 import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js'
@@ -53,6 +54,7 @@ routerUser.post('/forgotPassword', forgotPassword)
 routerUser.put('/resetPassword', resetPassword)
 
 routerUser.patch('/block/:id', blocked)
+routerUser.patch('/unBlock/:id', unBlock)
 
 routerUser.put('/:id', updateUserById)
 routerUser.delete('/:id', deleteUser)
