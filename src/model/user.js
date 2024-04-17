@@ -72,6 +72,11 @@ var userSchema = new mongoose.Schema(
     roleIds: {
       type: mongoose.Schema.Types.ObjectId, // Chỉ định kiểu dữ liệu là mảng ObjectId
       ref: 'RoleUser'
+    },
+    status: {
+      type : String,
+      default : "Active"
+
     }
   },
   {
