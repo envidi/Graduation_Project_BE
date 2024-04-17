@@ -192,6 +192,19 @@ export const getDetailUser = asyncHandler(async (req, res) => {
   })
 })
 
+export const getDetailUserById = asyncHandler(async (req, res) => {
+  const { id } = req.params
+  const detailProduct = await User.findById(id)
+  if (!detailProduct) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'No user found!')
+  }
+  return res.status(StatusCodes.OK).json({
+    success: detailProduct ? 'Gọi user thành công' : false,
+    message: detailProduct ? detailProduct : 'Gọi user thất bại'
+  })
+})
+
+
 export const deleteUser = async (req, res, next) => {
   try {
     const response = await User.findByIdAndDelete(req.params.id)
@@ -419,24 +432,31 @@ export const resetPassword = asyncHandler(async (req, res) => {
 })
 
 
-export const blocked = async(req, res, next) => {
+const mongoose = require('mongoose');
+
+export const blocked = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const update = { isBlocked: true, status: "Blocked" }
-
-    const user = await User.findByIdAndUpdate(id,update, {new:true} );
-    
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Không có user ID" });
     }
 
+    const update = { isBlocked: true, status: "Blocked" }
+    const user = await User.findByIdAndUpdate(id, update, { new: true });
+    console.log("check user", user);
+    if (!user || user?.roleIds.equals("659b79c6757ca91b82e2b9d0")) {
+      return res.status(400).json({ message: "Không thể block admin" });
+    }
+    
+
+    
     return res.status(200).json({ message: "User blocked successfully", user });
 
   } catch (error) {
-    next(error)
-
+    next(error);
   }
 }
+
 
 export const unBlock = async(req, res, next) => {
   try {
