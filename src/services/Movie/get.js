@@ -413,7 +413,6 @@ export const getDetailService = async (reqBody) => {
         }
       }
     ])
-    // console.log(data[0].showTimeCol)
 
     const arrayShowTimeId = data[0].showTimeCol.map((showtime) => showtime._id)
     const populateCinema = await ShowTime.paginate(
@@ -447,7 +446,7 @@ export const getDetailService = async (reqBody) => {
         : price.dayType === 'weekend'
     })
 
-    let convertShowTime = data[0].showTimeCol
+    let convertShowTime = [...data[0].showTimeCol]
     convertShowTime = convertShowTime
       .map((showTime, index) => {
         if (showTime.destroy) return
@@ -461,15 +460,19 @@ export const getDetailService = async (reqBody) => {
         }
       })
       .filter((showtime) => showtime != null)
+    const showtimeNotDeleted = [...data[0].showTimeCol].filter((showtime) => {
+      return !showtime.destroy
+    })
 
     let condition = false
     const arrayDemension = []
-    const showTimeDimension = data[0].showTimeCol
+    const showTimeDimension = showtimeNotDeleted
       .map((showTime) => {
         if (condition) return
         const currentShowtime = showTime.timeFrom
-        const currentArray = data[0].showTimeCol
+        const currentArray = showtimeNotDeleted
           .map((showTimeDemension) => {
+            // console.log(showTimeDemension)
             if (
               showTimeDemension.timeFrom.getDate() ===
                 currentShowtime.getDate() &&
@@ -494,7 +497,6 @@ export const getDetailService = async (reqBody) => {
         return [...currentArray]
       })
       .filter((showTime) => showTime != null)
-
     const newData = {
       ...data[0],
       moviePriceCol: getPriceByDay,
