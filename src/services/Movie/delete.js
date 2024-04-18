@@ -74,12 +74,12 @@ export const removeService = async (req) => {
     const data = await Movie.findOneAndDelete({ _id: id })
 
     // get all price of movie
-    // const prices = data.prices
+    const prices = data.prices
     //loop and delete all price of movie
 
-    // for (let i = 0; i < prices.length; i++) {
-    //   await moviePriceService.remove(prices[i])
-    // }
+    for (let i = 0; i < prices.length; i++) {
+      await moviePriceService.remove(prices[i])
+    }
 
     if (!data) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete movie failed!')

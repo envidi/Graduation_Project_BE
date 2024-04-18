@@ -74,9 +74,8 @@ var userSchema = new mongoose.Schema(
       ref: 'RoleUser'
     },
     status: {
-      type : String,
-      default : "Active"
-
+      type: String,
+      default: 'Active'
     }
   },
   {

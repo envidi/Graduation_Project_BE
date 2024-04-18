@@ -44,7 +44,7 @@ export const moviePriceService = {
     if (existingMoviePrice) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'A MoviePrice with the same movieId and dayType already exists'
+        'Đã có giá phim được khởi tạo'
       )
     }
 

@@ -8,11 +8,14 @@ import Category from '../../model/Category.js'
 import { convertTimeToIsoString } from '../../utils/timeLib.js'
 import { slugify } from '../../utils/stringToSlug.js'
 import cloudinary from '../../middleware/multer.js'
+import { moviePriceService } from '../moviePrice.js'
 
 export const createService = async (req) => {
   try {
     const body = req.body
     //thêm đường dẫn ảnh vòa body
+    body.prices = JSON.parse(body.prices)
+
     let imageUrl
     let cloudGetUrl
     const { error } = movieSchema.validate(body, { abortEarly: true })
@@ -32,7 +35,7 @@ export const createService = async (req) => {
     }
 
     // const { prices, ...restBody } = body
-    const { ...restBody } = body
+    const { prices, ...restBody } = body
 
     const data = await Movie.create({
       ...restBody,
@@ -55,6 +58,15 @@ export const createService = async (req) => {
           products: data._id
         }
       })
+    }
+    // Tạo giá
+    if (prices && prices.length > 0) {
+      for (let i = 0; i < prices.length; i++) {
+        await moviePriceService.create({
+          movieId: data._id.toString(),
+          ...prices[i]
+        })
+      }
     }
 
     return data
