@@ -101,17 +101,14 @@ export const getAllHasShow = async (reqBody) => {
     // Convert Mongoose documents to plain JavaScript objects
     const plainDocs = data.docs.map((doc) => doc.toObject())
 
-    // const currentDate = new Date()
-    // const currentDay = currentDate.getDay() // Sunday is 0, Monday is 1, ..., Saturday is 6
-
-    // Add the 'price' field to each movie based on the current day type
-    plainDocs.forEach((movie) => {
+    const filterMovieDay = plainDocs.filter((movie) => {
       movie.showTimes = movie.showTimes.filter(
         (show) => show.timeFrom > new Date()
       )
+      return movie.showTimes.length > 0 && movie
     })
     return {
-      docs: plainDocs
+      docs: filterMovieDay
     }
   } catch (error) {
     throw error
@@ -454,8 +451,6 @@ export const getDetailService = async (reqBody) => {
     convertShowTime = convertShowTime
       .map((showTime, index) => {
         if (showTime.destroy) return
-        // showTime.timeFrom = convertTimeToCurrentZone(showTime.timeFrom)
-        // showTime.timeTo = convertTimeToCurrentZone(showTime.timeTo)
         return {
           date: showTime.date,
           timeFrom: convertTimeToCurrentZone(showTime.timeFrom),
@@ -492,7 +487,7 @@ export const getDetailService = async (reqBody) => {
           .filter((showTime) => showTime != null)
         arrayDemension.push([...currentArray])
         const currentLength = arrayDemension.flatMap((element) => element)
-        if (currentLength.length === data[0].showTimeCol.length) {
+        if (currentLength.length === convertShowTime.length) {
           condition = true
         }
 

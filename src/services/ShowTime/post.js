@@ -84,7 +84,6 @@ export const createService = async (req) => {
   // "timeTo": "13-01-2024 16:38"
   try {
     const body = req.body
-
     const { error } = showtimesValidate.validate(body, { abortEarly: true })
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
