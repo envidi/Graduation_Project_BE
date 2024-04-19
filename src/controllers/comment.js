@@ -12,6 +12,17 @@ export const getAll = async (req, res, next) => {
     next(error)
   }
 }
+export const getCommentByMovie = async (req, res, next) => {
+  try {
+    const data = await commentService.getByMovieService(req)
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      datas: data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 export const create = async (req, res, next) => {
   try {
     const data = await commentService.createService(req)
@@ -52,6 +63,17 @@ export const deleteComment = async (req, res, next) => {
   try {
     const data = await commentService.removeService(req)
 
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      datas: data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+export const deleteCommentAndSubComment = async (req, res, next) => {
+  try {
+    const data = await commentService.removeSubService(req)
     return res.status(StatusCodes.OK).json({
       message: 'Success',
       datas: data
