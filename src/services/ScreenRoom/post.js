@@ -93,6 +93,11 @@ export const createForPostManService = async (reqBody) => {
       _id: {
         $in: body.SeatId
       }
+      ,
+        populate: {
+          path: 'CinemaId ShowtimesId',
+          select: 'CinemaName CinemaAdress timeFrom timeTo' // Specify the fields you want to select
+        }
     })
     const hasScreenRoom = isExistSeat.filter((seat) => {
       return seat.ScreeningRoomId == undefined
