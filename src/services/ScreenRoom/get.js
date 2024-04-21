@@ -19,6 +19,11 @@ export const getAllService = async (reqBody) => {
       sort: {
         [_sort]: _order === 'asc' ? 1 : -1
       }
+      ,
+        populate: {
+          path: 'CinemaId ShowtimesId',
+          select: 'CinemaName CinemaAdress timeFrom timeTo' // Specify the fields you want to select
+        }
       // populate: {
       //   path: 'TimeSlotId',
       //   populate: {
@@ -47,7 +52,38 @@ export const getAllService = async (reqBody) => {
     throw error
   }
 }
+export const getAllDestroyService = async (req) => {
+  try {
+    const {
+      _page = 1,
+      _limit = 10,
+      _sort = 'createdAt',
+      _order = 'asc'
+    } = req.query;
 
+    const options = {
+      page: _page,
+      limit: _limit,
+      sort: {
+        [_sort]: _order === 'asc' ? 1 : -1
+      },
+      populate: {
+        path: 'CinemaId ShowtimesId',
+        select: 'CinemaName CinemaAdress timeFrom timeTo' // Specify the fields you want to select
+      }
+    };
+
+    const data = await ScreeningRoom.paginate({ destroy: true }, options);
+
+    if (!data || data.docs.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No soft-deleted screening rooms found!');
+    }
+    return data;
+  } catch (error) {
+    // console.log(error);
+    throw error;
+  }
+};
 export const getOneService = async (reqBody) => {
   try {
     const id = reqBody.params.id
@@ -66,7 +102,7 @@ export const getOneService = async (reqBody) => {
           foreignField: '_id',
           as: 'SeatColumn'
         }
-      },
+      },  
       {
         $project: {
           name: 1,

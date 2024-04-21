@@ -8,7 +8,8 @@ import {
   update,
   deleteSoft,
   getAllInCludeDestroy,
-  restore
+  restore,
+  getAllDestroy
 } from '../controllers/screenRoom.js';
 import { isAdmin, verifyAccessToken } from '../middleware/verifyToken.js';
 // import { checkPermission } from "../middlewares/checkPermission";
@@ -21,6 +22,7 @@ const routerScreenRoom = express.Router();
 // routerProducts.delete('/:id', verifyAccessToken, isAdmin, remove);
 
 routerScreenRoom.get('/', getAll);
+routerScreenRoom.get('/destroy', getAllDestroy);
 routerScreenRoom.get('/all', getAllInCludeDestroy);
 routerScreenRoom.get('/:id', getDetail);
 routerScreenRoom.patch('/:id', update);

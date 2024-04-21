@@ -7,7 +7,8 @@ import {
   update,
   removeHard,
   checkoutPaymentSeat,
-  getAllTicketByUser
+  getAllTicketByUser,
+  getAllFontend
 } from '../controllers/ticket'
 import { verifyAccessPaymentToken } from '../middleware/verifyToken'
 const routerTicket = express.Router()
@@ -19,6 +20,7 @@ const routerTicket = express.Router()
 // routerProducts.delete('/:id', verifyAccessToken, isAdmin, remove);
 
 routerTicket.get('/', getAll)
+routerTicket.get('/all', getAllFontend)
 routerTicket.get('/user', getAllTicketByUser)
 routerTicket.get('/:id', getDetail)
 routerTicket.patch('/:id', update)
