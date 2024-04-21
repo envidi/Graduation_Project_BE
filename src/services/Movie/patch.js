@@ -36,10 +36,23 @@ export const updateService = async (req) => {
     } else {
       imageUrl = body.image
     }
+    // let imageUrl
+    // let cloudGetUrl
+    // if (req.file) {
+    //   cloudGetUrl = await cloudinary.uploader.upload(req.file.path, {
+    //     folder: 'AVATAR',
+    //     allowed_formats: ['jpg', 'png', 'jpeg'],
+    //     transformation: [{ width: 500, height: 500, crop: 'limit' }]
+    //   })
+    //   imageUrl = cloudGetUrl.secure_url
+    // } else {
+    //   imageUrl = checkmovie.image
+    // }
 
     // check suat chieu nếu có thì k sửa dc
     const checkshowtimes = await Showtimes.find({ movieId: id })
     const showtime = await checkshowtimes[0]
+    
     // if (showtime != undefined) {
     //   // if (checkmovie.duration != req.body.duration) {
     //   //   throw new ApiError(StatusCodes.NOT_FOUND, 'Phim đang xuất chiếu không thể sửa duration !')
