@@ -56,6 +56,7 @@ export const createService = async (reqBody) => {
     }
     const data = await ScreeningRoom.create({
       ...body,
+      CinemaId : '65d30a80a047aeebd3c78c72',
       slug: slugify(body.name)
     })
 
@@ -67,7 +68,7 @@ export const createService = async (reqBody) => {
     }
     const updateCinema = await Cinema.findByIdAndUpdate(
       {
-        _id: body.CinemaId
+        _id: '65d30a80a047aeebd3c78c72'
       },
       {
         $addToSet: {
