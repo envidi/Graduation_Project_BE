@@ -8,24 +8,45 @@ import Showtimes from '../../model/Showtimes.js'
 import Category from '../../model/Category.js'
 import { convertTimeToIsoString } from '../../utils/timeLib.js'
 import findDifferentElements from '../../utils/findDifferent.js'
-import { create, update } from '../../controllers/MoviePrice.js'
 import { moviePriceService } from '../moviePrice.js'
-import MoviePrice from '../../model/MoviePrice.js'
 import cloudinary from '../../middleware/multer.js'
-
 
 export const updateService = async (req) => {
   try {
     const id = req.params.id
     const body = req.body
-    delete body.avatar
+    body.prices = JSON.parse(body.prices)
+    let imageUrl
+    let cloudGetUrl
     const { error } = movieSchema.validate(body, { abortEarly: true })
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
     const checkmovie = await Movie.findById(id)
     if (!checkmovie || checkmovie.length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found! (k cj)')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Phim không tồn tại')
+    }
+    if (req.file) {
+      cloudGetUrl = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'AVATAR',
+        allowed_formats: ['jpg', 'png', 'jpeg'],
+        transformation: [{ width: 500, height: 500, crop: 'limit' }]
+      })
+      imageUrl = cloudGetUrl.secure_url
+    } else {
+      imageUrl = body.image
+    }
+    let imageUrl
+    let cloudGetUrl
+    if (req.file) {
+      cloudGetUrl = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'AVATAR',
+        allowed_formats: ['jpg', 'png', 'jpeg'],
+        transformation: [{ width: 500, height: 500, crop: 'limit' }]
+      })
+      imageUrl = cloudGetUrl.secure_url
+    } else {
+      imageUrl = checkmovie.image
     }
     let imageUrl
     let cloudGetUrl
@@ -67,37 +88,37 @@ export const updateService = async (req) => {
     // }
 
     // check destroy nếu đang xóa mềm thì không thể sửa được bất cứ trường nào
-    // if (checkmovie.destroy == true) {
-    //   throw new ApiError(
-    //     StatusCodes.NOT_FOUND,
-    //     'The movie is in the deletion list and cannot be edited !'
-    //   )
-    // }
+    if (checkmovie.destroy) {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        'Bộ phim này đã bị xóa mềm không thể sửa!'
+      )
+    }
 
     // const data = await Movie.findByIdAndUpdate(id, body, { new: true })
-    const data = await Movie.findById(id, 'categoryId')
+    const data = await Movie.findById(id, 'categoryId prices')
+
+    const { prices, ...reqbody } = body
+
     const updateData = await Movie.updateOne(
       { _id: id },
       {
-        ...body,
-      // ...(cloudGetUrl && { image: imageUrl }),
-      image: imageUrl,
-
-        // ...reqbody,
+        ...reqbody,
+        ...(cloudGetUrl && { image: imageUrl }),
         fromDate: new Date(convertTimeToIsoString(body.fromDate)),
         toDate: new Date(convertTimeToIsoString(body.toDate))
       }
     )
 
     // update giá
-    // if (prices && prices.length > 0) {
-    //   for (let i = 0; i < prices.length; i++) {
-    //     await moviePriceService.updateprice({
-    //       // movieId: data.id.toString(),
-    //       price : prices[i].price
-    //     })
-    //   }
-    // }
+    if (prices && prices.length > 0) {
+      for (let i = 0; i < data.prices.length; i++) {
+        await moviePriceService.updatePrice({
+          _id: data.prices[i]._id,
+          price: prices[i].price
+        })
+      }
+    }
 
     if (!updateData) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Update movie failed!')
