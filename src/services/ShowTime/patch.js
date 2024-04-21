@@ -24,36 +24,13 @@ export const updateService = async (req) => {
     const { id } = req.params
     const body = req.body
 
-    const [show, { CinemaId: currentCinema }] = await Promise.all([
-      Showtimes.findById(id).populate('screenRoomId'),
-      ScreenRoom.findById(body.screenRoomId)
+    const [show] = await Promise.all([
+      Showtimes.findById(id).populate('screenRoomId')
     ])
 
     if (!show || Object.keys(show).length === 0) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Không tìm thấy lịch chiếu')
     }
-    // Không thể chuyển lịch chiếu sang rạp khác
-
-    if (show.screenRoomId.CinemaId.toString() != currentCinema.toString()) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'Không thể thay đổi lịch chiếu vào 1 rạp khác'
-      )
-    }
-    // const timeSlot = await timeSlotService.getTimeSlotIdWithScreenRoomId({
-    //   showTimeId: show._id,
-    //   screenRoomId: show.screenRoomId
-    // })
-
-    // const reqBody = {
-    //   body: {
-    //     ScreenRoomId: body.screenRoomId.toString(),
-    //     Show_scheduleId: show._id.toString()
-    //   },
-    //   params: {
-    //     id: timeSlot._id.toString()
-    //   }
-    // }
 
     if (!show || Object.keys(show).length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Lịch chiếu không tồn tại')
@@ -71,15 +48,12 @@ export const updateService = async (req) => {
     if (body.status === FULL_SCHEDULE) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Không thể thay đổi lịch trạng thái thành đầy đủ'
+        'Không thể thay đổi lịch trạng thái thành full'
       )
     }
     // Nếu như lịch chiếu đã bị xóa mềm thì không thể sửa
     if (show.destroy) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'Lịch chiếu đã bị xóa mềm'
-      )
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Lịch chiếu đã bị xóa mềm')
     }
 
     // // Kiểm tra tồn tại của movieId và screenRoomId
@@ -101,7 +75,10 @@ export const updateService = async (req) => {
       )
     }
     if (await validateTime(body, show._id)) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Khoảng thời gian này đã tồn tại')
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Khoảng thời gian này đã tồn tại'
+      )
     }
     let promises = [
       Showtimes.updateOne(
@@ -215,6 +192,7 @@ export const updateService = async (req) => {
     throw error
   }
 }
+
 
 export const updateStatusFull = async (id, body) => {
   try {
