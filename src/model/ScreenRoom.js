@@ -8,6 +8,7 @@ export const PROJECTOR_1 = 'Projector_1'
 export const PROJECTOR_2 = 'Projector_2'
 export const PROJECTOR_3 = 'Projector_3'
 export const projectors = [PROJECTOR_1, PROJECTOR_2, PROJECTOR_3]
+
 const ScreenRoomSchema = mongoose.Schema(
   {
     name: {
