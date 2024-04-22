@@ -56,6 +56,7 @@ export const createService = async (reqBody) => {
     }
     const data = await ScreeningRoom.create({
       ...body,
+      CinemaId : '65d30a80a047aeebd3c78c72',
       slug: slugify(body.name)
     })
 
@@ -67,7 +68,7 @@ export const createService = async (reqBody) => {
     }
     const updateCinema = await Cinema.findByIdAndUpdate(
       {
-        _id: body.CinemaId
+        _id: '65d30a80a047aeebd3c78c72'
       },
       {
         $addToSet: {
@@ -93,6 +94,11 @@ export const createForPostManService = async (reqBody) => {
       _id: {
         $in: body.SeatId
       }
+      ,
+        populate: {
+          path: 'CinemaId ShowtimesId',
+          select: 'CinemaName CinemaAdress timeFrom timeTo' // Specify the fields you want to select
+        }
     })
     const hasScreenRoom = isExistSeat.filter((seat) => {
       return seat.ScreeningRoomId == undefined

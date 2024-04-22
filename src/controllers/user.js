@@ -441,21 +441,32 @@ export const blocked = async (req, res, next) => {
       return res.status(400).json({ message: "Không có user ID" });
     }
 
-    const update = { isBlocked: true, status: "Blocked" }
-    const user = await User.findByIdAndUpdate(id, update, { new: true });
-    console.log("check user", user);
-    if (!user || user?.roleIds.equals("659b79c6757ca91b82e2b9d0")) {
-      return res.status(400).json({ message: "Không thể block admin" });
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "Người dùng không tồn tại" });
     }
-    
 
-    
-    return res.status(200).json({ message: "User blocked successfully", user });
+    // Kiểm tra xem người dùng có phải là admin không
+    if (user.roleIds && user.roleIds.toString() === "659b79c6757ca91b82e2b9d0") {
+      return res.status(400).json({ message: "Không thể block admin" });
+    }else{
+  // Nếu không phải là admin, cập nhật trạng thái và lưu lại người dùng
+  const update = { isBlocked: true, status: "Blocked" }
+
+  const newUser =  await User.findByIdAndUpdate(id, update, { new: true });
+  // console.log("check block user",user);
+  
+
+  return res.status(200).json({ message: "User blocked successfully", newUser });
+    }
+
+  
 
   } catch (error) {
     next(error);
   }
 }
+
 
 
 export const unBlock = async(req, res, next) => {

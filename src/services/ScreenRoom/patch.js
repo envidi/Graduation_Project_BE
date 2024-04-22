@@ -38,6 +38,11 @@ export const updateService = async (reqBody) => {
             select: 'status'
           }
         }
+        ,
+        populate: {
+          path: 'CinemaId ShowtimesId',
+          select: 'CinemaName CinemaAdress timeFrom timeTo' // Specify the fields you want to select
+        }
       }
     )
     // Không thể chuyển phòng sang rạp chiếu khác
