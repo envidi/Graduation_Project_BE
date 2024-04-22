@@ -142,8 +142,8 @@ export const getOneService = async (reqBody) => {
         date: convertTimeToCurrentZone(showtime.date),
         timeFrom: convertTimeToCurrentZone(showtime.timeFrom),
         timeTo: convertTimeToCurrentZone(showtime.timeTo),
-        SeatId : {
-          seatSold : seatSold.length,
+        SeatId: {
+          seatSold: seatSold.length,
           seatNotSold: seatNotSold.length,
           seatVip,
           seatNormal
@@ -251,9 +251,37 @@ export const getAllIncludeDestroyService = async (req) => {
     // Sử dụng điều kiện truy vấn khi gọi phương thức paginate
     const data = await ScreeningRoom.paginate(queryCondition, options)
     if (!data || data.docs.length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'No screening rooms found!')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No screening rooms found!');
     }
-    return data
+    return data;
+  } catch (error) {
+    throw error
+  }
+}
+
+
+export const getDetailRoomByShowTime = async (reqBody) => {
+  try {
+    const {
+      _showId = ''
+    } = reqBody.query
+
+    const query = {}
+    if (_showId) query.ShowtimesId = _showId;
+
+    const options = {
+      populate: {
+        path: 'ShowtimesId',
+        select: 'timeFrom timeTo movieId' // Thêm populate cho lịch chiếu để lấy thông tin lịch chiếu
+      }
+    }
+
+    //lấy ra dữ liệu phòng theo lịch chiếu
+    const data = await ScreeningRoom.paginate(query, options)
+    if (!data || data.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Không có dữ liệu phòng cho lịch chiếu này!');
+    }
+    return data;
   } catch (error) {
     throw error
   }
