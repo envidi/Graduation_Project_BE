@@ -2,7 +2,7 @@
 import { StatusCodes } from 'http-status-codes'
 
 import Movie, { IS_SHOWING } from '../../model/Movie.js'
-import ShowTime, { AVAILABLE_SCHEDULE } from '../../model/Showtimes.js'
+import ShowTime, { AVAILABLE_SCHEDULE, CANCELLED_SCHEDULE } from '../../model/Showtimes.js'
 import { convertTimeToCurrentZone } from '../../utils/timeLib.js'
 import ApiError from '../../utils/ApiError.js'
 import mongoose from 'mongoose'
@@ -461,7 +461,7 @@ export const getDetailService = async (reqBody) => {
       })
       .filter((showtime) => showtime != null)
     const showtimeNotDeleted = [...data[0].showTimeCol].filter((showtime) => {
-      return !showtime.destroy
+      return !showtime.destroy && showtime.status != CANCELLED_SCHEDULE
     })
 
     let condition = false
@@ -502,6 +502,7 @@ export const getDetailService = async (reqBody) => {
       moviePriceCol: getPriceByDay,
       showTimeCol: convertShowTime,
       showTimeDimension,
+      prices: data[0].moviePriceCol,
       fromDate: convertTimeToCurrentZone(data[0].fromDate),
       toDate: convertTimeToCurrentZone(data[0].toDate)
     }

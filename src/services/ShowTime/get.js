@@ -34,7 +34,7 @@ export const getAllService = async (req) => {
   try {
     const {
       _page = 1,
-      _limit = 10,
+      _limit = 20,
       _sort = 'createdAt',
       _order = 'asc',
       screenRoomId,
@@ -77,7 +77,7 @@ export const getAllServiceByMovie = async (req) => {
   try {
     const {
       _page = 1,
-      _limit = 10,
+      _limit = 20,
       _sort = 'createdAt',
       _order = 'asc'
     } = req.query
@@ -106,7 +106,7 @@ export const getOneService = async (req) => {
     const { id } = req.params
     const populateOptions = [
       { path: 'screenRoomId', select: 'name status' },
-      { path: 'movieId', select: 'name' }
+      { path: 'movieId', select: 'name duration ' }
     ];
     const response = await Showtimes.paginate(
       { _id: id },

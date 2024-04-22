@@ -13,6 +13,18 @@ export const getAll = async (req, res, next) => {
     next(error)
   }
 }
+export const getAllDestroy = async (req, res, next) => {
+  try {
+    req.body.destroy = true
+    const data = await screenRoomService.getAllDestroyService(req)
+  return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      datas: data
+    });
+  } catch (error) {
+    next(error);
+  }
+}
 export const getAllInCludeDestroy = async (req, res, next) => {
   try {
     const data = await screenRoomService.getAllIncludeDestroyService(req)
