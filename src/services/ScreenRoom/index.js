@@ -3,7 +3,7 @@ import ScreeningRoom from '../../model/ScreenRoom.js'
 import { createService, createForPostManService } from './post.js'
 import { deleteSoftService, removeService, restoreService } from './delete.js'
 import { updateService, updateStatusScreen } from './patch.js'
-import { getAllService, getOneService, getAllIncludeDestroyService } from './get.js'
+import { getAllService, getOneService, getAllIncludeDestroyService, getAllDestroyService } from './get.js'
 
 
 export const findSingleDocument = async (id) => {
@@ -27,6 +27,7 @@ export const screenRoomService = {
   updateService,
   getOneService,
   getAllService,
-  updateStatusScreen
+  updateStatusScreen,
+  getAllDestroyService
 
 }

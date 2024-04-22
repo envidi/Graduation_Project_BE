@@ -12,6 +12,17 @@ export const getAll = async (req, res, next) => {
     next(error)
   }
 }
+export const getAllFontend = async (req, res, next) => {
+  try {
+    const data = await ticketService.getAllServiceFontend(req)
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      data: data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const getDetail = async (req, res, next) => {
   try {
