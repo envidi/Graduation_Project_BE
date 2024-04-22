@@ -38,6 +38,7 @@ export const getAllService = async (reqBody) => {
     throw error
   }
 }
+
 export const getAllServiceFontend = async (reqBody) => {
   try {
     const {
@@ -59,7 +60,7 @@ export const getAllServiceFontend = async (reqBody) => {
       populate: {
         path: 'priceId paymentId userId',
         select: 'price name email timeFrom typeBank typePayment'
-      },
+      }
     }
     // const data = await Ticket.paginate({}, options)
     // const data = await Ticket.paginate({ isDeleted: false }, options); // Chỉ lấy các thực phẩm chưa bị xóa mềm
@@ -143,6 +144,34 @@ export const getOneService = async (reqBody) => {
     const queryCondition =
       includeDeleted === 'true' ? { _id: id } : { _id: id, isDeleted: false }
     const data = await Ticket.findOne(queryCondition)
+    if (!data || data.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Not Ticket found!')
+    }
+    return data
+  } catch (error) {
+    throw error
+  }
+}
+export const getDetailService = async (reqBody) => {
+  try {
+    const id = reqBody.params.id
+    // const data = await Ticket.findById(id)
+    // const data = await Ticket.findOne({ _id: id, isDeleted: false }); // Kiểm tra thêm điều kiện không bị xóa mềm
+    const data = await Ticket.paginate(
+      { _id: id },
+      {
+        populate: {
+          path: 'userId paymentId',
+          select : {
+            name : 1,
+            typeBank : 1,
+            typePayment : 1,
+            createdAt : 1,
+            email : 1
+          }
+        }
+      }
+    )
     if (!data || data.length === 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Not Ticket found!')
     }
