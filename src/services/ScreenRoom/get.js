@@ -151,3 +151,31 @@ export const getAllIncludeDestroyService = async (req) => {
     throw error;
   }
 };
+
+
+export const getDetailRoomByShowTime = async (reqBody) => {
+  try {
+    const {
+      _showId = ''
+    } = reqBody.query
+
+    const query = {}
+    if (_showId) query.ShowtimesId = _showId;
+
+    const options = {
+      populate: {
+        path: 'ShowtimesId',
+        select: 'timeFrom timeTo movieId' // Thêm populate cho lịch chiếu để lấy thông tin lịch chiếu
+      }
+    }
+
+    //lấy ra dữ liệu phòng theo lịch chiếu
+    const data = await ScreeningRoom.paginate(query, options)
+    if (!data || data.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Không có dữ liệu phòng cho lịch chiếu này!');
+    }
+    return data;
+  } catch (error) {
+    throw error
+  }
+}
