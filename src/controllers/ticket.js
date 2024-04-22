@@ -35,6 +35,17 @@ export const getDetail = async (req, res, next) => {
     next(error)
   }
 }
+export const getDetailTicket = async (req, res, next) => {
+  try {
+    const data = await ticketService.getDetailService(req)
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      data: data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 export const create = async (req, res, next) => {
   try {
     const data = await ticketService.createService(req)
