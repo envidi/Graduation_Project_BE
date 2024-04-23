@@ -14,6 +14,7 @@ import {
 } from '../../utils/timeLib.js'
 import { insertSeatIntoScreen } from '../Seat/post.js'
 import ScreenRoom from '../../model/ScreenRoom.js'
+import { getRowAndCol } from '../../utils/getRowAndCol.js'
 
 export const validateDurationMovie = (body, movie) => {
   const currentTimeFrom = new Date(convertTimeToIsoString(body.timeFrom))
@@ -120,7 +121,7 @@ export const createService = async (req) => {
     if (!data || Object.keys(data).length == 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Create showtime failed')
     }
-
+    const { row, column } =getRowAndCol(resultMovieAndScreenRoom[1].NumberSeat) 
     const promises = [
       ScreenRoom.updateOne(
         { _id: body.screenRoomId },
@@ -130,7 +131,7 @@ export const createService = async (req) => {
           }
         }
       ),
-      insertSeatIntoScreen(8, 8, data),
+      insertSeatIntoScreen(row, column, data),
       Movie.findByIdAndUpdate(body.movieId, {
         $push: { showTimes: data._id }
       })
