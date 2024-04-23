@@ -9,6 +9,7 @@ import {
   getAllShow,
   getDetailShow,
   restoreShow,
+  updateMovieShowTime,
   updateShowTime
 } from '../controllers/showtimes.js'
 const ShowtimesRouter = express.Router()
@@ -19,6 +20,7 @@ ShowtimesRouter.get('/all', getAllIncludeDestroy)
 ShowtimesRouter.get('/:id', getDetailShow)
 ShowtimesRouter.delete('/:id', deleteShow)
 ShowtimesRouter.patch('/:id', updateShowTime)
+ShowtimesRouter.patch('/exchange/:id', updateMovieShowTime)
 ShowtimesRouter.patch('/:id/soft', deleteSoftShow)
 ShowtimesRouter.patch('/:id/restore', restoreShow)
 
