@@ -46,12 +46,12 @@ export const updateService = async (reqBody) => {
       }
     )
     // Không thể chuyển phòng sang rạp chiếu khác
-    if (body.CinemaId.toString() !== allTimeSlots.docs[0].CinemaId.toString()) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'Cannot change the cinema'
-      )
-    }
+    // if (body.CinemaId.toString() !== allTimeSlots.docs[0].CinemaId.toString()) {
+    //   throw new ApiError(
+    //     StatusCodes.BAD_REQUEST,
+    //     'Cannot change the cinema'
+    //   )
+    // }
     // Nếu như screen đã bị xóa mềm
     // thì không thể chỉnh sửa
     if (allTimeSlots.docs[0].destroy) {
@@ -61,17 +61,17 @@ export const updateService = async (reqBody) => {
       )
     }
     // Kiểm tra xem tất cả ghế trong mỗi khung giờ đã được đặt chưa
-    allTimeSlots.docs[0].TimeSlotId.forEach((timeslot) => {
-      const checkSeat = timeslot.SeatId.some(
-        (seat) => seat.status === SOLD || seat.status === UNAVAILABLE
-      )
-      if (checkSeat) {
-        throw new ApiError(
-          StatusCodes.BAD_REQUEST,
-          'Some seat in this room is sold or unavailable'
-        )
-      }
-    })
+    // allTimeSlots.docs[0].TimeSlotId.forEach((timeslot) => {
+    //   const checkSeat = timeslot.SeatId.some(
+    //     (seat) => seat.status === SOLD || seat.status === UNAVAILABLE
+    //   )
+    //   if (checkSeat) {
+    //     throw new ApiError(
+    //       StatusCodes.BAD_REQUEST,
+    //       'Some seat in this room is sold or unavailable'
+    //     )
+    //   }
+    // })
     const arrayShowtime = allTimeSlots.docs[0].TimeSlotId.map(
       (timeslot) => timeslot.Show_scheduleId
     )
