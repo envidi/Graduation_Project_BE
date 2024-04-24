@@ -11,7 +11,7 @@ export const getAllService = async (reqBody) => {
   try {
     const {
       _page = 1,
-      _limit = 10,
+      _limit = 1000,
       _sort = 'createdAt',
       _order = 'asc'
     } = reqBody.query
@@ -57,7 +57,7 @@ export const getAllDestroyService = async (req) => {
   try {
     const {
       _page = 1,
-      _limit = 10,
+      _limit = 1000,
       _sort = 'createdAt',
       _order = 'asc'
     } = req.query
