@@ -108,6 +108,18 @@ export const updateShowTime = async (req, res, next) => {
     next(error)
   }
 }
+export const updateMovieShowTime = async (req, res, next) => {
+  try {
+    const updatedShow = await scheduleService.updateMovieShowService(req)
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Cập nhật lịch chiếu thành công',
+      data: updatedShow
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 export const getAllIncludeDestroy = async (req, res, next) => {
   try {
     const updatedShow = await scheduleService.getAllIncludeDestroyService(req)

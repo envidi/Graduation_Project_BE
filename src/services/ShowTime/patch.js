@@ -5,19 +5,21 @@ import ScreeningRoom from '../../model/ScreenRoom.js'
 import ApiError from '../../utils/ApiError.js'
 import showtimesValidate from '../../validations/showtimes.js'
 import Showtimes, {
-  AVAILABLE_SCHEDULE,
+  // AVAILABLE_SCHEDULE,
   CANCELLED_SCHEDULE,
   FULL_SCHEDULE
 } from '../../model/Showtimes.js'
 import Movie from '../../model/Movie.js'
-import { timeSlotService } from '../TimeSlot/index.js'
+// import { timeSlotService } from '../TimeSlot/index.js'
 import { convertTimeToIsoString } from '../../utils/timeLib.js'
 
 import { validateDurationMovie, validateTime } from './post.js'
 import { checkSomeSeatSold } from '../TimeSlot/patch.js'
-import { CANCELLED_TIMESLOT } from '../../model/TimeSlot.js'
+// import { CANCELLED_TIMESLOT } from '../../model/TimeSlot.js'
 import ScreenRoom from '../../model/ScreenRoom.js'
 import Seat from '../../model/Seat.js'
+import { insertSeatIntoScreen } from '../Seat/post.js'
+import { getRowAndCol } from '../../utils/getRowAndCol.js'
 
 export const updateService = async (req) => {
   try {
@@ -30,10 +32,6 @@ export const updateService = async (req) => {
 
     if (!show || Object.keys(show).length === 0) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Không tìm thấy lịch chiếu')
-    }
-
-    if (!show || Object.keys(show).length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Lịch chiếu không tồn tại')
     }
 
     // // Kiểm tra validate của dữ liệu đầu vào
@@ -122,15 +120,21 @@ export const updateService = async (req) => {
       )
     }
     //  Thay đổi lịch chiếu sang phòng khác
-    if (body.screenRoomId !== show.screenRoomId) {
+    if (body.screenRoomId.toString() !== show.screenRoomId._id.toString()) {
       // Lấy ra screen cũ
-      const screenRoomOld = await ScreenRoom.findById(show.screenRoomId)
+      const screenRoomOld = await ScreenRoom.findById(show.screenRoomId._id)
       // Lấy ra screen mới
       const screenRoomNew = await ScreenRoom.findById(body.screenRoomId)
 
       // Cập nhật screen mới , thêm timeslot hiện tại vào screen mới
       // Cập nhật screen cũ , xóa timeslot hiện tại khỏi screen cũ
       // Đặt lại screen id trong tất cả ghế của timeslot hiện tại
+      if (!screenRoomNew || Object.keys(screenRoomNew).length === 0) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          'Phòng chiếu mới này không tồn tại trong cơ sở dữ liệu'
+        )
+      }
       promises.push(
         ScreenRoom.updateOne(
           { _id: screenRoomNew._id },
@@ -151,6 +155,54 @@ export const updateService = async (req) => {
           }
         )
       )
+      if (
+        show.screenRoomId.NumberSeat !== resultMovieAndScreenRoom[1].NumberSeat
+      ) {
+        const data = {
+          _id: id,
+          screenRoomId: body.screenRoomId
+        }
+        const { row, column } = getRowAndCol(screenRoomNew.NumberSeat)
+        // insertSeatIntoScreen(row, column, data)
+        // const deleteOldSeat = await Showtimes.deleteMany({
+        //   _id: {
+        //     $in: show.SeatId
+        //   }
+        // })
+        await Promise.all([
+          insertSeatIntoScreen(row, column, data),
+          Seat.deleteMany({
+            _id: {
+              $in: show.SeatId
+            }
+          }),
+          Showtimes.updateOne(
+            {
+              _id: id
+            },
+            {
+              $pull: {
+                SeatId: {
+                  $in: show.SeatId
+                }
+              }
+            }
+          )
+        ])
+        const result = await Promise.all(promises).catch((error) => {
+          throw new ApiError(StatusCodes.CONFLICT, new Error(error.message))
+        })
+        // Update lịch chiếu phim
+
+        if (!result || result.length === 0) {
+          throw new ApiError(
+            StatusCodes.BAD_REQUEST,
+            'Cập nhật khung thời gian hoặc lịch chiếu không thành công'
+          )
+        }
+        return
+      }
+
       promises.push(
         Seat.updateMany(
           {
@@ -167,18 +219,11 @@ export const updateService = async (req) => {
       )
 
       // // Nếu như screen id mới không tồn tại trong database thì không cho phép sửa
-      if (!screenRoomNew || Object.keys(screenRoomNew).length === 0) {
-        throw new ApiError(
-          StatusCodes.NOT_FOUND,
-          'Phòng chiếu mới này không tồn tại trong cơ sở dữ liệu'
-        )
-      }
     }
-
-    // Update lịch chiếu phim
     const result = await Promise.all(promises).catch((error) => {
       throw new ApiError(StatusCodes.CONFLICT, new Error(error.message))
     })
+    // Update lịch chiếu phim
 
     if (!result || result.length === 0) {
       throw new ApiError(
@@ -192,7 +237,151 @@ export const updateService = async (req) => {
     throw error
   }
 }
+export const updateMovieShowService = async (req) => {
+  try {
+    const { id } = req.params
+    const body = req.body
+    const currentShow = await Showtimes.findById(id).populate('screenRoomId')
+    const swapShow = await Showtimes.findById(body._id).populate('screenRoomId')
+    if (!currentShow || !swapShow) {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        'Không tìm thấy lịch chiếu hợp lệ'
+      )
+    }
+    await Promise.all([
+      Showtimes.updateOne(
+        {
+          _id: id
+        },
+        {
+          $set: {
+            movieId: body.movieId
+          }
+        }
+      ),
+      Showtimes.updateOne(
+        {
+          _id: body._id
+        },
+        {
+          $set: {
+            movieId: currentShow.movieId
+          }
+        }
+      )
+    ])
 
+    // const currentPullMovie = await Movie.updateOne(
+    //   {
+    //     _id: currentShow.movieId
+    //   },
+    //   {
+    //     $pull: {
+    //       showTimes: id
+    //     }
+    //   }
+    // )
+    // const currentAddMovie = await Movie.updateOne(
+    //   {
+    //     _id: currentShow.movieId
+    //   },
+    //   {
+    //     $addToSet: {
+    //       showTimes: body._id
+    //     }
+    //   }
+    // )
+    // const swapPullMovie = await Movie.updateOne(
+    //   {
+    //     _id: currentShow.movieId
+    //   },
+    //   {
+    //     $pull: {
+    //       showTimes: body._id
+    //     }
+    //   }
+    // )
+    // const swapAddMovie = await Movie.updateOne(
+    //   {
+    //     _id: currentShow.movieId
+    //   },
+    //   {
+    //     $addToSet: {
+    //       showTimes: id
+    //     }
+    //   }
+    // )
+
+    // if (
+    //   currentShow.screenRoomId.NumberSeat !== swapShow.screenRoomId.NumberSeat
+    //   // currentShow.screenRoomId._id !== swapShow.screenRoomId._id
+    // ) {
+    //   const dataCurrent = {
+    //     _id: id,
+    //     screenRoomId: body.screenRoomId
+    //   }
+    //   const dataSwap = {
+    //     _id: body._id,
+    //     screenRoomId: currentShow.screenRoomId._id
+    //   }
+    //   const { row: rowCurrent, column: columnCurrent } = getRowAndCol(
+    //     currentShow.screenRoomId.NumberSeat
+    //   )
+    //   const { row: rowSwap, column: columnSwap } = getRowAndCol(
+    //     swapShow.screenRoomId.NumberSeat
+    //   )
+    //   // insertSeatIntoScreen(row, column, data)
+    //   // const deleteOldSeat = await Showtimes.deleteMany({
+    //   //   _id: {
+    //   //     $in: show.SeatId
+    //   //   }
+    //   // })
+    //   await Promise.all([
+    //     insertSeatIntoScreen(rowCurrent, columnCurrent, dataCurrent),
+    //     insertSeatIntoScreen(rowSwap, columnSwap, dataSwap),
+    //     Seat.deleteMany({
+    //       _id: {
+    //         $in: currentShow.SeatId
+    //       }
+    //     }),
+    //     Seat.deleteMany({
+    //       _id: {
+    //         $in: swapShow.SeatId
+    //       }
+    //     }),
+    //     Showtimes.updateOne(
+    //       {
+    //         _id: id
+    //       },
+    //       {
+    //         $pull: {
+    //           SeatId: {
+    //             $in: currentShow.SeatId
+    //           }
+    //         }
+    //       }
+    //     ),
+    //     Showtimes.updateOne(
+    //       {
+    //         _id: body._id
+    //       },
+    //       {
+    //         $pull: {
+    //           SeatId: {
+    //             $in: swapShow.SeatId
+    //           }
+    //         }
+    //       }
+    //     )
+    //   ])
+    // }
+
+    return body
+  } catch (error) {
+    throw error
+  }
+}
 
 export const updateStatusFull = async (id, body) => {
   try {
