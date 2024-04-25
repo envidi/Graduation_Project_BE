@@ -18,7 +18,7 @@ const ScreenRoomSchema = mongoose.Schema(
     NumberSeat: {
       type: Number,
       default: 20,
-      enum: [49, 64, 72],
+      enum: [56, 64, 72],
       required: true
     },
     projector: {
