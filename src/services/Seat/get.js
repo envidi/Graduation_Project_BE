@@ -286,7 +286,7 @@ export const getSeatByShowTime = async (reqBody) => {
   try {
     const {
       _page = 1,
-      _limit = 50,
+      _limit = 100,
       _sort = 'createdAt',
       _order = 'asc',
       _hallId = '',

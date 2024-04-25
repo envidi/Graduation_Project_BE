@@ -6,7 +6,7 @@ const screenSchema = Joi.object({
   name: Joi.string().required().min(6).max(255).label('Name').messages({
     'string.empty': `{{ #label }} is 'required'`
   }),
-  NumberSeat: Joi.number().valid(...[49, 64, 72]),
+  NumberSeat: Joi.number().valid(...[56, 64, 72]),
   projector: Joi.string()
     .valid(...projectors)
     .required(),

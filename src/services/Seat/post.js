@@ -8,7 +8,6 @@ import { seatService } from './index.js'
 import Showtimes from '../../model/Showtimes.js'
 
 export const insertSeatIntoScreen = async (rowCount, columnCount, data) => {
-  let promises = []
   for (let row = 1; row <= rowCount; row++) {
     for (let column = 1; column <= columnCount; column++) {
       let seatTypeToUse = VIP
@@ -37,17 +36,19 @@ export const insertSeatIntoScreen = async (rowCount, columnCount, data) => {
           price: priceSeat
         }
       }
-      const promise = seatService.createService(req).then((dataSeat) => {
-        return Showtimes.findByIdAndUpdate(
-          data._id,
-          { $addToSet: { SeatId: dataSeat._id } },
-          { new: true }
-        )
-      })
-      promises.push(promise)
+
+      const dataSeat = await seatService.createService(req)
+
+      await Showtimes.findByIdAndUpdate(
+        data._id,
+        {
+          $addToSet: { SeatId: dataSeat._id }
+        },
+        { new: true }
+      )
     }
   }
-  await Promise.all(promises)
+  // await Promise.all(promises)
 }
 
 export const createService = async (reqBody) => {

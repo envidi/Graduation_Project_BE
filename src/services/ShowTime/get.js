@@ -57,7 +57,7 @@ export const getAllService = async (req) => {
 
     const data = await Showtimes.paginate(queryCondition, options)
     if (!data || data.docs.length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'No list show found!')
+      return []
     }
     const populateOptions = [
       { path: 'screenRoomId', select: 'name' },
