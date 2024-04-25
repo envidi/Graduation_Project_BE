@@ -121,7 +121,7 @@ export const createService = async (req) => {
     if (!data || Object.keys(data).length == 0) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Create showtime failed')
     }
-    const { row, column } =getRowAndCol(resultMovieAndScreenRoom[1].NumberSeat) 
+    const { row, column } = getRowAndCol(resultMovieAndScreenRoom[1].NumberSeat)
     const promises = [
       ScreenRoom.updateOne(
         { _id: body.screenRoomId },

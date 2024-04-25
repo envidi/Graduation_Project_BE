@@ -2,7 +2,10 @@
 import { StatusCodes } from 'http-status-codes'
 
 import Movie, { IS_SHOWING } from '../../model/Movie.js'
-import ShowTime, { AVAILABLE_SCHEDULE, CANCELLED_SCHEDULE } from '../../model/Showtimes.js'
+import ShowTime, {
+  AVAILABLE_SCHEDULE,
+  CANCELLED_SCHEDULE
+} from '../../model/Showtimes.js'
 import { convertTimeToCurrentZone } from '../../utils/timeLib.js'
 import ApiError from '../../utils/ApiError.js'
 import mongoose from 'mongoose'
@@ -466,19 +469,34 @@ export const getDetailService = async (reqBody) => {
 
     let condition = false
     const arrayDemension = []
+
     const showTimeDimension = showtimeNotDeleted
       .map((showTime) => {
         if (condition) return
         const currentShowtime = showTime.timeFrom
+
+        const dimensionIds =
+          arrayDemension.length > 0
+            ? Array.from(
+                new Set(
+                  arrayDemension
+                    .flatMap((element) => element)
+                    .map((di) => di._id)
+                )
+              )
+            : []
         const currentArray = showtimeNotDeleted
           .map((showTimeDemension) => {
-            // console.log(showTimeDemension)
             if (
+              !dimensionIds.includes(showTime._id) &&
               showTimeDemension.timeFrom.getDate() ===
                 currentShowtime.getDate() &&
               showTimeDemension.status == AVAILABLE_SCHEDULE &&
               !showTimeDemension.destroy
             ) {
+              // console.log('howTimeDemension.timeFrom',showTimeDemension.timeFrom)
+              // console.log('currentShowtime.getDate()',currentShowtime)
+
               return {
                 ...showTimeDemension,
                 timeFrom: convertTimeToCurrentZone(showTimeDemension.timeFrom),
@@ -488,8 +506,10 @@ export const getDetailService = async (reqBody) => {
             }
           })
           .filter((showTime) => showTime != null)
+        if (currentArray.length == 0) return
         arrayDemension.push([...currentArray])
         const currentLength = arrayDemension.flatMap((element) => element)
+
         if (currentLength.length === convertShowTime.length) {
           condition = true
         }
