@@ -14,7 +14,7 @@ export const insertSeatIntoScreen = async (rowCount, columnCount, data) => {
   for (let row = 1; row <= rowCount; row++) {
     for (let column = 1; column <= columnCount; column++) {
       let seatTypeToUse = VIP
-      let priceSeat = 120
+      let priceSeat = 70000
       // Check if the seat is in the middle (assuming rowCount and columnCount are odd)
       if (
         row === 1 ||
@@ -23,7 +23,7 @@ export const insertSeatIntoScreen = async (rowCount, columnCount, data) => {
         column === columnCount
       ) {
         seatTypeToUse = NORMAL
-        priceSeat = 100
+        priceSeat = 50000
       }
 
       // Add the new seat with seat type
@@ -56,7 +56,7 @@ export const createService = async (reqBody) => {
     }
     const data = await ScreeningRoom.create({
       ...body,
-      CinemaId : '65d30a80a047aeebd3c78c72',
+      CinemaId: '65d30a80a047aeebd3c78c72',
       slug: slugify(body.name)
     })
 
@@ -93,12 +93,11 @@ export const createForPostManService = async (reqBody) => {
     const isExistSeat = await Seat.find({
       _id: {
         $in: body.SeatId
+      },
+      populate: {
+        path: 'CinemaId ShowtimesId',
+        select: 'CinemaName CinemaAdress timeFrom timeTo' // Specify the fields you want to select
       }
-      ,
-        populate: {
-          path: 'CinemaId ShowtimesId',
-          select: 'CinemaName CinemaAdress timeFrom timeTo' // Specify the fields you want to select
-        }
     })
     const hasScreenRoom = isExistSeat.filter((seat) => {
       return seat.ScreeningRoomId == undefined

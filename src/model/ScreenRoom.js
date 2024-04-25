@@ -18,6 +18,7 @@ const ScreenRoomSchema = mongoose.Schema(
     NumberSeat: {
       type: Number,
       default: 20,
+      enum: [56, 64, 72],
       required: true
     },
     projector: {
@@ -30,10 +31,12 @@ const ScreenRoomSchema = mongoose.Schema(
       ref: 'Cinema',
       required: true
     },
-    ShowtimesId: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Showtimes'
-    }],
+    ShowtimesId: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Showtimes'
+      }
+    ],
     status: {
       type: String,
       enum: statusScreen,

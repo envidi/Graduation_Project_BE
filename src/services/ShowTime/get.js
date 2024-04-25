@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import Showtimes from '../../model/Showtimes.js'
 import ApiError from '../../utils/ApiError.js'
 import { convertTimeToCurrentZone } from '../../utils/timeLib.js'
+import { RESERVED, SOLD } from '../../model/Seat.js'
 
 // export const getAllService = async (req) => {
 //   try {
@@ -37,41 +38,53 @@ export const getAllService = async (req) => {
       _limit = 20,
       _sort = 'createdAt',
       _order = 'asc',
-      screenRoomId,
-    } = req.query;
+      screenRoomId
+    } = req.query
 
     const options = {
       page: _page,
       limit: _limit,
       sort: {
-        [_sort]: _order === 'asc' ? 1 : -1,
-      },
-    };
+        [_sort]: _order === 'asc' ? 1 : -1
+      }
+    }
 
     // Gộp các điều kiện truy vấn lại với nhau
     const queryCondition = {
       ...(screenRoomId && { screenRoomId }),
-      destroy: false, // Đảm bảo tất cả các kết quả trả về đều không bị "destroy"
-    };
+      destroy: false // Đảm bảo tất cả các kết quả trả về đều không bị "destroy"
+    }
 
-    const data = await Showtimes.paginate(queryCondition, options);
+    const data = await Showtimes.paginate(queryCondition, options)
     if (!data || data.docs.length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'No list show found!');
+      return []
     }
     const populateOptions = [
       { path: 'screenRoomId', select: 'name' },
-      { path: 'movieId', select: 'name' }
-    ];
+      { path: 'movieId', select: 'name' },
+      { path: 'SeatId', select: 'status' }
+    ]
+    // const seatSold =
 
     // Populate screenRoomId and movieId for each document
     for (const doc of data.docs) {
-      await doc.populate(populateOptions);
+      await doc.populate(populateOptions)
     }
-    return data;
+    const newData = data.docs.map((show) => {
+      const seatSold = show.SeatId.filter((seat) => seat.status === SOLD)
+      const seatReserved = show.SeatId.filter(
+        (seat) => seat.status === RESERVED
+      )
+      return {
+        ...show._doc,
+        seatSold: seatSold.length + seatReserved.length
+      }
+    })
+    return newData
   } catch (error) {
-    throw error;
+    throw error
   }
-};
+}
 
 export const getAllServiceByMovie = async (req) => {
   try {
@@ -107,14 +120,14 @@ export const getOneService = async (req) => {
     const populateOptions = [
       { path: 'screenRoomId', select: 'name status' },
       { path: 'movieId', select: 'name duration ' }
-    ];
+    ]
     const response = await Showtimes.paginate(
       { _id: id },
       {
         populate: populateOptions
       }
     )
-   
+
     const plainDocs = response.docs.map((doc) => doc.toObject())
 
     // Add the 'price' field to each movie based on the current day type
@@ -156,11 +169,11 @@ export const getAllIncludeDestroyService = async (reqBody) => {
     const populateOptions = [
       { path: 'screenRoomId', select: 'name' },
       { path: 'movieId', select: 'name' }
-    ];
+    ]
 
     // Populate screenRoomId and movieId for each document
     for (const doc of data.docs) {
-      await doc.populate(populateOptions);
+      await doc.populate(populateOptions)
     }
     return data
   } catch (error) {
