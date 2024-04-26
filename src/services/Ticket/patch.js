@@ -149,11 +149,11 @@ export const updatePaymentTicketService = async (reqBody) => {
         $in: updateData.seatId
       }
     })
-    seat.forEach((s) => {
-      if (!s || ![AVAILABLE, RESERVED].includes(s.status)) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, 'Ghế không khả dụng.')
-      }
-    })
+    // seat.forEach((s) => {
+    //   if (!s || ![AVAILABLE, RESERVED].includes(s.status)) {
+    //     throw new ApiError(StatusCodes.BAD_REQUEST, 'Ghế không khả dụng.')
+    //   }
+    // })
 
     // Kiểm tra xem Lịch chiếu có sẵn hay không
     const showtime = await Showtimes.findById(updateData.showtimeId)
