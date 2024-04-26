@@ -5,6 +5,7 @@ import ScreeningRoom from '../../model/ScreenRoom.js'
 import ApiError from '../../utils/ApiError.js'
 import showtimesValidate from '../../validations/showtimes.js'
 import Showtimes, {
+  AVAILABLE_SCHEDULE,
   // AVAILABLE_SCHEDULE,
   CANCELLED_SCHEDULE,
   FULL_SCHEDULE
@@ -272,111 +273,6 @@ export const updateMovieShowService = async (req) => {
       )
     ])
 
-    // const currentPullMovie = await Movie.updateOne(
-    //   {
-    //     _id: currentShow.movieId
-    //   },
-    //   {
-    //     $pull: {
-    //       showTimes: id
-    //     }
-    //   }
-    // )
-    // const currentAddMovie = await Movie.updateOne(
-    //   {
-    //     _id: currentShow.movieId
-    //   },
-    //   {
-    //     $addToSet: {
-    //       showTimes: body._id
-    //     }
-    //   }
-    // )
-    // const swapPullMovie = await Movie.updateOne(
-    //   {
-    //     _id: currentShow.movieId
-    //   },
-    //   {
-    //     $pull: {
-    //       showTimes: body._id
-    //     }
-    //   }
-    // )
-    // const swapAddMovie = await Movie.updateOne(
-    //   {
-    //     _id: currentShow.movieId
-    //   },
-    //   {
-    //     $addToSet: {
-    //       showTimes: id
-    //     }
-    //   }
-    // )
-
-    // if (
-    //   currentShow.screenRoomId.NumberSeat !== swapShow.screenRoomId.NumberSeat
-    //   // currentShow.screenRoomId._id !== swapShow.screenRoomId._id
-    // ) {
-    //   const dataCurrent = {
-    //     _id: id,
-    //     screenRoomId: body.screenRoomId
-    //   }
-    //   const dataSwap = {
-    //     _id: body._id,
-    //     screenRoomId: currentShow.screenRoomId._id
-    //   }
-    //   const { row: rowCurrent, column: columnCurrent } = getRowAndCol(
-    //     currentShow.screenRoomId.NumberSeat
-    //   )
-    //   const { row: rowSwap, column: columnSwap } = getRowAndCol(
-    //     swapShow.screenRoomId.NumberSeat
-    //   )
-    //   // insertSeatIntoScreen(row, column, data)
-    //   // const deleteOldSeat = await Showtimes.deleteMany({
-    //   //   _id: {
-    //   //     $in: show.SeatId
-    //   //   }
-    //   // })
-    //   await Promise.all([
-    //     insertSeatIntoScreen(rowCurrent, columnCurrent, dataCurrent),
-    //     insertSeatIntoScreen(rowSwap, columnSwap, dataSwap),
-    //     Seat.deleteMany({
-    //       _id: {
-    //         $in: currentShow.SeatId
-    //       }
-    //     }),
-    //     Seat.deleteMany({
-    //       _id: {
-    //         $in: swapShow.SeatId
-    //       }
-    //     }),
-    //     Showtimes.updateOne(
-    //       {
-    //         _id: id
-    //       },
-    //       {
-    //         $pull: {
-    //           SeatId: {
-    //             $in: currentShow.SeatId
-    //           }
-    //         }
-    //       }
-    //     ),
-    //     Showtimes.updateOne(
-    //       {
-    //         _id: body._id
-    //       },
-    //       {
-    //         $pull: {
-    //           SeatId: {
-    //             $in: swapShow.SeatId
-    //           }
-    //         }
-    //       }
-    //     )
-    //   ])
-    // }
-
     return body
   } catch (error) {
     throw error
@@ -393,3 +289,18 @@ export const updateStatusFull = async (id, body) => {
     throw error
   }
 }
+export const updateApproval = async (id) => {
+  try {
+    const updateShowTime = await Showtimes.updateOne({ _id: id }, {
+      $set : {
+        status : AVAILABLE_SCHEDULE
+      }
+    }, {
+      new: true
+    })
+    return updateShowTime
+  } catch (error) {
+    throw error
+  }
+}
+

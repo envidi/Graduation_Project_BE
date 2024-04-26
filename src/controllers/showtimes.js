@@ -32,6 +32,19 @@ export const getAllShow = async (req, res, next) => {
     next(error)
   }
 }
+export const getAllApprovalShow = async (req, res, next) => {
+  try {
+
+    const response = await scheduleService.getAllApprovalService(req)
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Gọi danh sách lịch chiếu thành công',
+      response
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 export const getAllShowByMovie = async (req, res, next) => {
   try {
 
@@ -111,6 +124,19 @@ export const updateShowTime = async (req, res, next) => {
 export const updateMovieShowTime = async (req, res, next) => {
   try {
     const updatedShow = await scheduleService.updateMovieShowService(req)
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Cập nhật lịch chiếu thành công',
+      data: updatedShow
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+export const updateApprovalShowTime = async (req, res, next) => {
+  try {
+    const id = req.params.id
+    const updatedShow = await scheduleService.updateApproval(id)
 
     return res.status(StatusCodes.OK).json({
       message: 'Cập nhật lịch chiếu thành công',
