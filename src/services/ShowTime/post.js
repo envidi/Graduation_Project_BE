@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 
 import ScreeningRoom from '../../model/ScreenRoom.js'
 import ApiError from '../../utils/ApiError.js'
-import Showtimes from '../../model/Showtimes.js'
+import Showtimes, { APPROVAL_SCHEDULE } from '../../model/Showtimes.js'
 import showtimesValidate from '../../validations/showtimes.js'
 import Movie, { COMING_SOON, IS_SHOWING } from '../../model/Movie.js'
 import { timeSlotService } from '../TimeSlot/index.js'
@@ -114,6 +114,7 @@ export const createService = async (req) => {
     // Tạo lịch chiếu phim
     const data = await Showtimes.create({
       ...body,
+      status : APPROVAL_SCHEDULE,
       date: new Date(convertTimeToIsoString(body.date)),
       timeFrom: new Date(convertTimeToIsoString(body.timeFrom)),
       timeTo: new Date(convertTimeToIsoString(body.timeTo))

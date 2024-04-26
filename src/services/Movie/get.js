@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 
 import Movie, { IS_SHOWING } from '../../model/Movie.js'
 import ShowTime, {
+  APPROVAL_SCHEDULE,
   AVAILABLE_SCHEDULE,
   CANCELLED_SCHEDULE
 } from '../../model/Showtimes.js'
@@ -452,7 +453,11 @@ export const getDetailService = async (reqBody) => {
     let convertShowTime = [...data[0].showTimeCol]
     convertShowTime = convertShowTime
       .map((showTime, index) => {
-        if (showTime.destroy) return
+        if (
+          showTime.destroy &&
+          [CANCELLED_SCHEDULE, APPROVAL_SCHEDULE].includes(showTime.status)
+        )
+          return
         return {
           date: showTime.date,
           timeFrom: convertTimeToCurrentZone(showTime.timeFrom),
@@ -464,7 +469,10 @@ export const getDetailService = async (reqBody) => {
       })
       .filter((showtime) => showtime != null)
     const showtimeNotDeleted = [...data[0].showTimeCol].filter((showtime) => {
-      return !showtime.destroy && showtime.status != CANCELLED_SCHEDULE
+      return (
+        !showtime.destroy &&
+        ![CANCELLED_SCHEDULE, APPROVAL_SCHEDULE].includes(showtime.status)
+      )
     })
 
     let condition = false
@@ -494,9 +502,6 @@ export const getDetailService = async (reqBody) => {
               showTimeDemension.status == AVAILABLE_SCHEDULE &&
               !showTimeDemension.destroy
             ) {
-              // console.log('howTimeDemension.timeFrom',showTimeDemension.timeFrom)
-              // console.log('currentShowtime.getDate()',currentShowtime)
-
               return {
                 ...showTimeDemension,
                 timeFrom: convertTimeToCurrentZone(showTimeDemension.timeFrom),
