@@ -133,14 +133,14 @@ export const updatePaymentTicketService = async (reqBody) => {
     if (dataShowTime.movieId.status !== IS_SHOWING) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'The movie is not released. Cannot order the seat'
+        'Bộ phim chưa công chiếu. Không thể đặt ghế'
       )
     }
     const now = dayjs()
     if (now > dataShowTime.timeFrom) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'The seat reservation time has expired'
+        'Thời gian đặt ghế đã quá hạn'
       )
     }
     // Kiểm tra xem Ghế có đang trống hay không
@@ -149,11 +149,12 @@ export const updatePaymentTicketService = async (reqBody) => {
         $in: updateData.seatId
       }
     })
-    // seat.forEach((s) => {
-    //   if (!s || ![AVAILABLE, RESERVED].includes(s.status)) {
-    //     throw new ApiError(StatusCodes.BAD_REQUEST, 'Ghế không khả dụng.')
-    //   }
-    // })
+    seat.forEach((s) => {
+      if (!s || ![AVAILABLE, RESERVED].includes(s.status)) {
+        console.log(s)
+        throw new ApiError(StatusCodes.BAD_REQUEST, 'Ghế không khả dụng.')
+      }
+    })
 
     // Kiểm tra xem Lịch chiếu có sẵn hay không
     const showtime = await Showtimes.findById(updateData.showtimeId)
