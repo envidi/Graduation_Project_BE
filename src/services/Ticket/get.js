@@ -80,7 +80,7 @@ export const getAllByUser = async (reqBody) => {
       _page = 1,
       _limit = 10,
       _sort = 'createdAt',
-      _order = 'asc',
+      _order = 'desc',
       _userId = '1',
       _start = new Date('2024-03-01'),
       _end = new Date('2024-09-26'),
