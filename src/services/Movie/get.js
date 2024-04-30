@@ -322,11 +322,14 @@ export const getAllSoftDeleteService = async (reqBody) => {
     const data = await Movie.paginate({ destroy: true }, options)
 
     if (!data || data.docs.length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
+      // throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
+      return data
+      
+        // docs: plainDocs
+
     }
     // Convert Mongoose documents to plain JavaScript objects
     const plainDocs = data.docs.map((doc) => doc.toObject())
-
     const currentDate = new Date()
     const currentDay = currentDate.getDay() // Sunday is 0, Monday is 1, ..., Saturday is 6
 
