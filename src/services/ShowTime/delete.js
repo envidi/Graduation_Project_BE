@@ -5,7 +5,7 @@ import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../utils/ApiError.js'
 // import { SOLD, UNAVAILABLE, AVAILABLE } from '../../model/Seat.js'
 // import TimeSlot from '../../model/TimeSlot.js'
-import Showtimes from '../../model/Showtimes.js'
+import Showtimes, { AVAILABLE_SCHEDULE, CANCELLED_SCHEDULE } from '../../model/Showtimes.js'
 import { timeSlotService } from '../TimeSlot/index.js'
 import Movie, { COMING_SOON } from '../../model/Movie.js'
 import ScreenRoom from '../../model/ScreenRoom.js'
@@ -93,7 +93,7 @@ export const deleteSoftService = async (req) => {
     // const body = reqBody.body
     const updateShowTime = await Showtimes.findByIdAndUpdate(
       id,
-      { destroy: true },
+      { destroy: true, status: CANCELLED_SCHEDULE },
       { new: true }
     )
     if (!updateShowTime || Object.keys(updateShowTime).length === 0) {
@@ -114,7 +114,7 @@ export const restoreService = async (req) => {
     // const body = reqBody.body
     const updateShowTime = await Showtimes.findByIdAndUpdate(
       id,
-      { destroy: false },
+      { destroy: false, status : AVAILABLE_SCHEDULE },
       { new: true }
     )
     if (!updateShowTime || Object.keys(updateShowTime).length === 0) {

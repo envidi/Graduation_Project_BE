@@ -2,7 +2,7 @@
 import { StatusCodes } from 'http-status-codes'
 import Showtimes from '../../model/Showtimes.js'
 import ApiError from '../../utils/ApiError.js'
-import Movie from '../../model/Movie.js'
+import Movie, { CANCELLED, COMING_SOON } from '../../model/Movie.js'
 import { moviePriceService } from '../moviePrice.js'
 
 export const softDeleteService = async (req) => {
@@ -17,15 +17,16 @@ export const softDeleteService = async (req) => {
         'Movies that have already been released cannot be deleted !'
       )
     }
-    const data = await Movie.updateOne({ _id: id }, { destroy: true })
+    const data = await Movie.updateOne(
+      { _id: id },
+      { destroy: true, status: CANCELLED }
+    )
     if (!data) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Soft delete movie failed!')
     }
     return data
-
   } catch (error) {
     throw error
-
   }
 }
 export const restoreService = async (req) => {
@@ -37,13 +38,12 @@ export const restoreService = async (req) => {
     if (showtime != undefined) {
       throw new ApiError(StatusCodes.NOT_FOUND, '')
     }
-    const data = await Movie.updateOne({ _id: id }, { destroy: false })
+    const data = await Movie.updateOne({ _id: id }, { destroy: false, status: COMING_SOON })
     if (!data) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Movie restore failed !')
     }
     return data
   } catch (error) {
-
     throw error
   }
 }
@@ -60,11 +60,9 @@ export const removeService = async (req) => {
       )
     }
 
-
     // check status
     const checkmovie = await Movie.findById(id)
     if (checkmovie.status == 'IS_SHOWING') {
-
       throw new ApiError(
         StatusCodes.NOT_FOUND,
         'Movies that are currently showing cannot be deleted !'
@@ -85,7 +83,6 @@ export const removeService = async (req) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete movie failed!')
     }
     return data
-
   } catch (error) {
     throw error
   }

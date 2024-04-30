@@ -323,7 +323,7 @@ export const getAllSoftDeleteService = async (reqBody) => {
     const data = await Movie.paginate({ destroy: true }, options)
 
     if (!data || data.docs.length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
+      return { docs: [] }
     }
     // Convert Mongoose documents to plain JavaScript objects
     const plainDocs = data.docs.map((doc) => doc.toObject())
