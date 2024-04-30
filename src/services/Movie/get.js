@@ -211,6 +211,7 @@ export const getMovieStatus = async (reqBody) => {
       destroy: false,
       status: status
     }
+
     if (_country !== '0') {
       query = {
         ...query,
