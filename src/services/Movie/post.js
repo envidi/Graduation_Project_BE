@@ -39,8 +39,8 @@ export const createService = async (req) => {
 
     const data = await Movie.create({
       ...restBody,
-      fromDate: new Date(convertTimeToIsoString(body.fromDate)),
-      toDate: new Date(convertTimeToIsoString(body.toDate)),
+      // fromDate: new Date(convertTimeToIsoString(body.fromDate)),
+      // toDate: new Date(convertTimeToIsoString(body.toDate)),
       ...(cloudGetUrl && { image: imageUrl }),
       // image: imageUrl,
       slug: slugify(body.name)

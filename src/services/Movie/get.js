@@ -327,7 +327,6 @@ export const getAllSoftDeleteService = async (reqBody) => {
     }
     // Convert Mongoose documents to plain JavaScript objects
     const plainDocs = data.docs.map((doc) => doc.toObject())
-
     const currentDate = new Date()
     const currentDay = currentDate.getDay() // Sunday is 0, Monday is 1, ..., Saturday is 6
 

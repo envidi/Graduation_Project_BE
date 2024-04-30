@@ -30,14 +30,14 @@ const productSchema = mongoose.Schema(
       type: Number,
       required: true
     },
-    fromDate: {
-      type: Date,
-      required: true
-    },
-    toDate: {
-      type: Date,
-      required: true
-    },
+    // fromDate: {
+    //   type: Date,
+    //   required: true
+    // },
+    // toDate: {
+    //   type: Date,
+    //   required: true
+    // },
     author: {
       type: String,
       required: true
