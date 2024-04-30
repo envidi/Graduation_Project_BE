@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-catch */
 import { StatusCodes } from 'http-status-codes'
 import Seat from '../../model/Seat.js'
-import ScreeningRoom from '../../model/ScreenRoom.js'
+import ScreeningRoom, { AVAILABLE_SCREEN, CANCELLED_SCREEN } from '../../model/ScreenRoom.js'
 import ApiError from '../../utils/ApiError.js'
 import { SOLD, UNAVAILABLE, AVAILABLE } from '../../model/Seat.js'
 import TimeSlot from '../../model/TimeSlot.js'
@@ -109,7 +109,8 @@ export const deleteSoftService = async (reqBody) => {
     const data = await ScreeningRoom.findByIdAndUpdate(
       { _id: id },
       {
-        destroy: true
+        destroy: true,
+        status : CANCELLED_SCREEN
       },
       {
         new: true
@@ -172,7 +173,8 @@ export const restoreService = async (reqBody) => {
     const data = await ScreeningRoom.findByIdAndUpdate(
       { _id: id },
       {
-        destroy: false
+        destroy: false,
+        status : AVAILABLE_SCREEN
       },
       {
         new: true

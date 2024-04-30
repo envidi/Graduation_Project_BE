@@ -211,6 +211,7 @@ export const getMovieStatus = async (reqBody) => {
       destroy: false,
       status: status
     }
+
     if (_country !== '0') {
       query = {
         ...query,
@@ -322,11 +323,7 @@ export const getAllSoftDeleteService = async (reqBody) => {
     const data = await Movie.paginate({ destroy: true }, options)
 
     if (!data || data.docs.length === 0) {
-      // throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
-      return data
-      
-        // docs: plainDocs
-
+      return { docs: [] }
     }
     // Convert Mongoose documents to plain JavaScript objects
     const plainDocs = data.docs.map((doc) => doc.toObject())

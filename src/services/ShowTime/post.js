@@ -139,15 +139,15 @@ export const createService = async (req) => {
     ]
     // Nếu như khi thêm lịch chiếu một bộ phim thì bộ
     // phim sẽ chuyển sang trạng thái công chiếu
-    if (resultMovieAndScreenRoom[0].status === COMING_SOON) {
-      promises.push(
-        Movie.findByIdAndUpdate(body.movieId, {
-          $set: {
-            status: IS_SHOWING
-          }
-        })
-      )
-    }
+    // if (resultMovieAndScreenRoom[0].status === COMING_SOON) {
+    //   promises.push(
+    //     Movie.findByIdAndUpdate(body.movieId, {
+    //       $set: {
+    //         status: COMING_SOON
+    //       }
+    //     })
+    //   )
+    // }
     await Promise.all(promises).catch((error) => {
       throw new ApiError(StatusCodes.CONFLICT, new Error(error.message))
     })
