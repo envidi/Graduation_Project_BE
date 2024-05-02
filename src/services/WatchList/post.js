@@ -6,7 +6,8 @@ export const createService = async (req) => {
   try {
     const body = req.body
     const existWatchList = await WatchList.findOne({
-      movieId: req.body.movieId
+      movieId: req.body.movieId,
+      userId: req.body.userId
     })
     if (existWatchList && Object.keys(existWatchList).length > 0) {
       throw new ApiError(StatusCodes.CONFLICT, 'Watch list is exist!')
