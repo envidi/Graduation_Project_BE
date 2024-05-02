@@ -124,14 +124,15 @@ export const registerGoogle = asyncHandler(async (req, res, next) => {
 })
 export const totalCountUser = asyncHandler(async (req, res, next) => {
   try {
-
     const countUser = await User.countDocuments({})
     if (!countUser) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No user found')
     }
 
     return res.status(200).json({
-      message: countUser ? 'Lấy tổng số người dùng thành công' : 'Lấy tổng số người dùng thất bại',
+      message: countUser
+        ? 'Lấy tổng số người dùng thành công'
+        : 'Lấy tổng số người dùng thất bại',
       countUser
     })
   } catch (error) {
@@ -167,12 +168,10 @@ export const login = asyncHandler(async (req, res) => {
 })
 
 export const getAllUser = asyncHandler(async (req, res) => {
-  const response = await User.find({}).populate("roleIds", "roleName")
+  const response = await User.find({}).populate('roleIds', 'roleName')
   if (!response || response.length === 0) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'No users found!')
   }
-
-  
 
   return res.status(StatusCodes.OK).json({
     message: 'Gọi danh sách users thành công',
@@ -203,7 +202,6 @@ export const getDetailUserById = asyncHandler(async (req, res) => {
     message: detailProduct ? detailProduct : 'Gọi user thất bại'
   })
 })
-
 
 export const deleteUser = async (req, res, next) => {
   try {
@@ -328,7 +326,12 @@ export const updateUserById = asyncHandler(async (req, res) => {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Missing inputs')
 
   const infoUser = await User.findById(id)
-
+  if (
+    infoUser.roleIds &&
+    infoUser.roleIds.toString() === '659b79c6757ca91b82e2b9d0'
+  ) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'Không thể cập nhật admin')
+  }
   if (!infoUser) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'No user found!')
   }
@@ -431,60 +434,58 @@ export const resetPassword = asyncHandler(async (req, res) => {
   })
 })
 
-
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 export const blocked = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: "Không có user ID" });
+      return res.status(400).json({ message: 'Không có user ID' })
     }
 
-    const user = await User.findById(id);
+    const user = await User.findById(id)
     if (!user) {
-      return res.status(404).json({ message: "Người dùng không tồn tại" });
+      return res.status(404).json({ message: 'Người dùng không tồn tại' })
     }
+    // if(user._id === user._id){
+    //   throw new ApiError(StatusCodes.BAD_REQUEST, 'Bạn không thể block chính mình')
+    // }
 
     // Kiểm tra xem người dùng có phải là admin không
-    if (user.roleIds && user.roleIds.toString() === "659b79c6757ca91b82e2b9d0") {
-      return res.status(400).json({ message: "Không thể block admin" });
-    }else{
-  // Nếu không phải là admin, cập nhật trạng thái và lưu lại người dùng
-  const update = { isBlocked: true, status: "Blocked" }
+    if (
+      user.roleIds &&
+      user.roleIds.toString() === '659b79c6757ca91b82e2b9d0'
+    ) {
+      return res.status(400).json({ message: 'Không thể block admin' })
+    } else {
+      // Nếu không phải là admin, cập nhật trạng thái và lưu lại người dùng
+      const update = { isBlocked: true, status: 'Blocked' }
 
-  const newUser =  await User.findByIdAndUpdate(id, update, { new: true });
-  // console.log("check block user",user);
-  
+      const newUser = await User.findByIdAndUpdate(id, update, { new: true })
+      // console.log("check block user",user);
 
-  return res.status(200).json({ message: "User blocked successfully", newUser });
+      return res
+        .status(200)
+        .json({ message: 'User blocked successfully', newUser })
     }
-
-  
-
-  } catch (error) {
-    next(error);
-  }
-}
-
-
-
-export const unBlock = async(req, res, next) => {
-  try {
-    const { id } = req.params;
-    const update = { isBlocked: false, status: "Active" }
-
-    const user = await User.findByIdAndUpdate(id,update, {new:true} );
-    
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    return res.status(200).json({ message: "Unblock user successfully", user });
-
   } catch (error) {
     next(error)
-
   }
 }
 
+export const unBlock = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const update = { isBlocked: false, status: 'Active' }
+
+    const user = await User.findByIdAndUpdate(id, update, { new: true })
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    return res.status(200).json({ message: 'Unblock user successfully', user })
+  } catch (error) {
+    next(error)
+  }
+}

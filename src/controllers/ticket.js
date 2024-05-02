@@ -57,7 +57,28 @@ export const create = async (req, res, next) => {
     next(error)
   }
 }
-
+export const getAllServiceDataTable = async (req, res, next) => {
+  try {
+    const data = await ticketService.getAllServiceDataTable(req)
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      data: data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+export const getAllReservedTicket = async (req, res, next) => {
+  try {
+    const data = await ticketService.getAllReserved(req)
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      data: data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 export const getAllTicketByUser = async (req, res, next) => {
   try {
     const data = await ticketService.getAllByUser(req)

@@ -15,7 +15,6 @@ export const createService = async (req) => {
     const body = req.body
     //thêm đường dẫn ảnh vòa body
     body.prices = JSON.parse(body.prices)
-
     let imageUrl
     let cloudGetUrl
     const { error } = movieSchema.validate(body, { abortEarly: true })

@@ -10,7 +10,7 @@ import Showtimes, {
   CANCELLED_SCHEDULE,
   FULL_SCHEDULE
 } from '../../model/Showtimes.js'
-import Movie from '../../model/Movie.js'
+import Movie, { COMING_SOON, IS_SHOWING } from '../../model/Movie.js'
 // import { timeSlotService } from '../TimeSlot/index.js'
 import { convertTimeToIsoString } from '../../utils/timeLib.js'
 
@@ -270,6 +270,46 @@ export const updateMovieShowService = async (req) => {
             movieId: currentShow.movieId
           }
         }
+      ),
+      Movie.updateOne(
+        {
+          _id: currentShow.movieId
+        },
+        {
+          $pull: {
+            showTimes: id
+          }
+        }
+      ),
+      Movie.updateOne(
+        {
+          _id: currentShow.movieId
+        },
+        {
+          $addToSet: {
+            showTimes: body._id
+          }
+        }
+      ),
+      Movie.updateOne(
+        {
+          _id: swapShow.movieId
+        },
+        {
+          $pull: {
+            showTimes: body._id
+          }
+        }
+      ),
+      Movie.updateOne(
+        {
+          _id: swapShow.movieId
+        },
+        {
+          $addToSet: {
+            showTimes: id
+          }
+        }
       )
     ])
 
@@ -291,16 +331,32 @@ export const updateStatusFull = async (id, body) => {
 }
 export const updateApproval = async (id) => {
   try {
-    const updateShowTime = await Showtimes.updateOne({ _id: id }, {
-      $set : {
-        status : AVAILABLE_SCHEDULE
+    const updateShowTime = await Showtimes.updateOne(
+      { _id: id },
+      {
+        $set: {
+          status: AVAILABLE_SCHEDULE
+        }
+      },
+      {
+        new: true
       }
-    }, {
-      new: true
-    })
+    )
+    if (!updateShowTime || Object.keys(updateShowTime).length == 0) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Cập nhật thất bại')
+    }
+    const currentShow = await Showtimes.findById(id)
+    await Movie.findByIdAndUpdate(
+      currentShow.movieId,
+      {
+        $set: {
+          status: IS_SHOWING
+        }
+      },
+      { new: true }
+    )
     return updateShowTime
   } catch (error) {
     throw error
   }
 }
-

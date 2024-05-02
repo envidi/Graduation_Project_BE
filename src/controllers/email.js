@@ -76,7 +76,7 @@ export const sendMailController = asyncHandler(async (req, res) => {
 })
 export const sendMailTicket = asyncHandler(async (req) => {
   const {
-    _id,
+    orderNumber,
     email,
     seatId,
     movieName,
@@ -123,7 +123,7 @@ export const sendMailTicket = asyncHandler(async (req) => {
       <tr>
         <td style= " text-align:center; padding: 20px; border-top: 1px solid #eee;">
           <h2 style="color: #333; margin-bottom: 15px;">Thông tin vé</h2>
-          <p style="margin: 0; font-size: 16px;">ID vé: ${_id}</p>
+          <p style="margin: 0; font-size: 16px;">ID vé: ${orderNumber}</p>
           <p style="margin: 0; font-size: 16px;">Số lượng vé: ${quantityTicket}</p>
           <p style="margin: 0; font-size: 16px;">Tên phim: ${movieName}</p>
           <p style="margin: 0; font-size: 16px;">Phòng chiếu: ${screenName}</p>
