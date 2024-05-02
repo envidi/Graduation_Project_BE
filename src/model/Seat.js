@@ -19,6 +19,17 @@ export const statusSeat = [AVAILABLE, SOLD, RESERVED, UNAVAILABLE]
 export const NORMAL = 'normal'
 export const VIP = 'VIP'
 
+<<<<<<< HEAD
+const seatChema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  typeSeat: {
+    type: String,
+    enum: [NORMAL, VIP],
+    required: true
+=======
 const seatChema = new mongoose.Schema(
   {
     typeSeat: {
@@ -53,6 +64,7 @@ const seatChema = new mongoose.Schema(
       ref: 'Showtimes',
       required: true
     }
+>>>>>>> 57763df6c7ae1c5811723b00434ebd68eced301d
   },
   {
     timestamps: true,
