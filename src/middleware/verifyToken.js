@@ -41,8 +41,8 @@ export const verifyAccessPaymentToken = asyncHandler(async (req, res, next) => {
 })
 // đặt isAdmin sau hàm verify thì sẽ dùng đươc req.user của hàm trên
 export const isAdmin = asyncHandler(async (req, res, next) => {
-  const { roleIds } = req.user
-  if (roleIds !== '659b79c6757ca91b82e2b9d0')
+  const { role, roleIds } = req.user
+  if ((role, roleIds !== '659b79c6757ca91b82e2b9d0'))
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Bạn không phải Admin')
   next()
 })

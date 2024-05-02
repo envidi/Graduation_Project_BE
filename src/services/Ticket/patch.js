@@ -151,7 +151,6 @@ export const updatePaymentTicketService = async (reqBody) => {
     })
     seat.forEach((s) => {
       if (!s || ![AVAILABLE, RESERVED].includes(s.status)) {
-        console.log(s)
         throw new ApiError(StatusCodes.BAD_REQUEST, 'Ghế không khả dụng.')
       }
     })
@@ -278,7 +277,7 @@ export const updatePaymentTicketService = async (reqBody) => {
     } = dataReturn.docs[0]
     const req = {
       body: {
-        _id: data._id,
+        orderNumber: data.orderNumber,
         email: userId.email,
         seatId,
         date: data.createdAt,
