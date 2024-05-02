@@ -15,7 +15,6 @@ export const createService = async (req) => {
     const body = req.body
     //thêm đường dẫn ảnh vòa body
     body.prices = JSON.parse(body.prices)
-
     let imageUrl
     let cloudGetUrl
     const { error } = movieSchema.validate(body, { abortEarly: true })
@@ -39,8 +38,8 @@ export const createService = async (req) => {
 
     const data = await Movie.create({
       ...restBody,
-      // fromDate: new Date(convertTimeToIsoString(body.fromDate)),
-      // toDate: new Date(convertTimeToIsoString(body.toDate)),
+      fromDate: new Date(convertTimeToIsoString(body.fromDate)),
+      toDate: new Date(convertTimeToIsoString(body.toDate)),
       ...(cloudGetUrl && { image: imageUrl }),
       // image: imageUrl,
       slug: slugify(body.name)

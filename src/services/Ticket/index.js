@@ -1,4 +1,4 @@
-import { getAllService, getOneService, getAllByUser, getAllServiceFontend, getDetailService } from './get';
+import { getAllService, getOneService, getAllByUser, getAllServiceFontend, getDetailService, getAllServiceDataTable } from './get';
 import { createService } from './post';
 import { updateService, updatePaymentTicketService } from './patch';
 import { removeService, removeHardService } from './delete'
@@ -13,5 +13,6 @@ export const ticketService = {
   updatePaymentTicketService,
   getAllByUser,
   getAllServiceFontend,
-  getDetailService
+  getDetailService,
+  getAllServiceDataTable
 }

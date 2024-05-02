@@ -270,6 +270,46 @@ export const updateMovieShowService = async (req) => {
             movieId: currentShow.movieId
           }
         }
+      ),
+      Movie.updateOne(
+        {
+          _id: currentShow.movieId
+        },
+        {
+          $pull: {
+            showTimes: id
+          }
+        }
+      ),
+      Movie.updateOne(
+        {
+          _id: currentShow.movieId
+        },
+        {
+          $addToSet: {
+            showTimes: body._id
+          }
+        }
+      ),
+      Movie.updateOne(
+        {
+          _id: swapShow.movieId
+        },
+        {
+          $pull: {
+            showTimes: body._id
+          }
+        }
+      ),
+      Movie.updateOne(
+        {
+          _id: swapShow.movieId
+        },
+        {
+          $addToSet: {
+            showTimes: id
+          }
+        }
       )
     ])
 
