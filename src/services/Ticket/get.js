@@ -2,16 +2,13 @@
 import Ticket, { RESERVED } from '../../model/Ticket'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../utils/ApiError'
-import Food from '../../model/Food'
-import Category from '../../model/Category'
 import { convertTimeToCurrentZone } from '../../utils/timeLib'
-import mongoose from 'mongoose'
 import { searchByFields } from '../../utils/ToStringArray'
 export const getAllService = async (reqBody) => {
   try {
     const {
       _page = 1,
-      _limit = 10,
+      _limit = 50,
       _sort = 'createdAt',
       _order = 'asc',
       includeDeleted // Thêm tham số này để kiểm tra query parameter
@@ -43,7 +40,7 @@ export const getAllServiceFontend = async (reqBody) => {
   try {
     const {
       _page = 1,
-      _limit = 10,
+      _limit = 50,
       _sort = 'createdAt',
       _order = 'asc',
       includeDeleted // Thêm tham số này để kiểm tra query parameter

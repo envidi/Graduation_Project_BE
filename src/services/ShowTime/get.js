@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-catch */
 import { StatusCodes } from 'http-status-codes'
-import Showtimes, { APPROVAL_SCHEDULE, AVAILABLE_SCHEDULE } from '../../model/Showtimes.js'
+import Showtimes, { APPROVAL_SCHEDULE } from '../../model/Showtimes.js'
 import ApiError from '../../utils/ApiError.js'
 import { convertTimeToCurrentZone } from '../../utils/timeLib.js'
 import { RESERVED, SOLD } from '../../model/Seat.js'
@@ -35,7 +35,7 @@ export const getAllService = async (req) => {
   try {
     const {
       _page = 1,
-      _limit = 20,
+      _limit = 50,
       _sort = 'createdAt',
       _order = 'asc',
       screenRoomId

@@ -303,6 +303,7 @@ export const getRevenueAfterWeek = async (req, res, next) => {
       {
         $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 }
       },
+      { $limit: 7 },
       {
         $project: {
           _id: 1,
@@ -373,6 +374,7 @@ export const getCountTicketAfterWeek = async (req, res, next) => {
       {
         $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 }
       },
+      { $limit: 7 },
       {
         $project: {
           _id: 1,

@@ -5,9 +5,12 @@ import { StatusCodes } from 'http-status-codes'
 import ApiError from '../../utils/ApiError.js'
 // import { SOLD, UNAVAILABLE, AVAILABLE } from '../../model/Seat.js'
 // import TimeSlot from '../../model/TimeSlot.js'
-import Showtimes, { AVAILABLE_SCHEDULE, CANCELLED_SCHEDULE } from '../../model/Showtimes.js'
+import Showtimes, {
+  AVAILABLE_SCHEDULE,
+  CANCELLED_SCHEDULE
+} from '../../model/Showtimes.js'
 import { timeSlotService } from '../TimeSlot/index.js'
-import Movie, { COMING_SOON } from '../../model/Movie.js'
+import Movie, { COMING_SOON, IS_SHOWING } from '../../model/Movie.js'
 import ScreenRoom from '../../model/ScreenRoom.js'
 import Seat from '../../model/Seat.js'
 
@@ -99,6 +102,16 @@ export const deleteSoftService = async (req) => {
     if (!updateShowTime || Object.keys(updateShowTime).length === 0) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete soft showtime failed')
     }
+    const updateMovie = await Movie.findByIdAndUpdate(
+      updateShowTime.movieId,
+      {
+        status: COMING_SOON
+      },
+      { new: true }
+    )
+    if (!updateMovie || Object.keys(updateMovie).length === 0) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete soft showtime failed')
+    }
 
     return updateShowTime
   } catch (error) {
@@ -114,10 +127,20 @@ export const restoreService = async (req) => {
     // const body = reqBody.body
     const updateShowTime = await Showtimes.findByIdAndUpdate(
       id,
-      { destroy: false, status : AVAILABLE_SCHEDULE },
+      { destroy: false, status: AVAILABLE_SCHEDULE },
       { new: true }
     )
     if (!updateShowTime || Object.keys(updateShowTime).length === 0) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete soft showtime failed')
+    }
+    const updateMovie = await Movie.findByIdAndUpdate(
+      updateShowTime.movieId,
+      {
+        status: IS_SHOWING
+      },
+      { new: true }
+    )
+    if (!updateMovie || Object.keys(updateMovie).length === 0) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Delete soft showtime failed')
     }
 
