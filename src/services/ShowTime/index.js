@@ -1,8 +1,8 @@
 /* eslint-disable no-useless-catch */
 import { createService } from './post.js'
 import { deleteSoftService, removeService, restoreService, deleteShowTime } from './delete.js'
-import { updateService, updateStatusFull } from './patch.js'
-import { getAllService, getOneService, getAllIncludeDestroyService,getAllServiceByMovie } from './get.js'
+import { updateApproval, updateMovieShowService, updateService, updateStatusFull } from './patch.js'
+import { getAllService, getOneService, getAllIncludeDestroyService, getAllServiceByMovie, getAllApprovalService } from './get.js'
 
 
 export const scheduleService = {
@@ -16,5 +16,8 @@ export const scheduleService = {
   getAllService,
   updateStatusFull,
   deleteShowTime,
-  getAllServiceByMovie
+  getAllServiceByMovie,
+  updateMovieShowService,
+  updateApproval,
+  getAllApprovalService
 }

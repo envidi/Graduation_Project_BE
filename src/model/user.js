@@ -16,7 +16,7 @@ var userSchema = new mongoose.Schema(
     },
     mobile: {
       type: Number,
-      unique: true
+      unique: true,
     },
     password: {
       type: String,
@@ -43,7 +43,7 @@ var userSchema = new mongoose.Schema(
     ],
     address: {
       type: String,
-      default: ''
+      default: 'Chưa cập nhật'
     },
     age: {
       type: Number,
@@ -72,6 +72,10 @@ var userSchema = new mongoose.Schema(
     roleIds: {
       type: mongoose.Schema.Types.ObjectId, // Chỉ định kiểu dữ liệu là mảng ObjectId
       ref: 'RoleUser'
+    },
+    status: {
+      type: String,
+      default: 'Active'
     }
   },
   {

@@ -1,3 +1,4 @@
+import { array } from 'joi'
 import mongoose from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
 export const COMING_SOON = 'COMING_SOON'
@@ -10,11 +11,13 @@ const productSchema = mongoose.Schema(
   {
     name: {
       type: String,
+      unique: true,
       required: true
     },
     image: {
       type: String,
-      required: true
+      required: false
+      // default: ''
     },
     duration: {
       type: Number,
@@ -41,12 +44,12 @@ const productSchema = mongoose.Schema(
       required: true
     },
     language: {
-      type:String,
-      required:true
+      type: String,
+      required: true
     },
-    actor : {
-      type:String,
-      required:true
+    actor: {
+      type: String,
+      required: true
     },
     trailer: {
       type: String,
@@ -94,7 +97,7 @@ const productSchema = mongoose.Schema(
       }
     ]
   },
-  { versionKey: false, timestamps: true }
+  { versionKey: false, timestamps: true, strictPopulate: false }
 )
 
 productSchema.pre('findOneAndDelete', async function (next) {
@@ -124,6 +127,21 @@ productSchema.pre('findOneAndDelete', async function (next) {
     next(error)
   }
 })
+productSchema.pre('save', async function (next) {
+  try {
+    const Movie = mongoose.model('Movie')
+    // Kiểm tra xem có phim nào khác có cùng tên không
+    const existingMovie = await Movie.findOne({ name: this.name })
+    if (existingMovie) {
+      const error = new Error('Tên phim đã tồn tại')
+      return next(error)
+    }
+    next()
+  } catch (error) {
+    next(error)
+  }
+})
 productSchema.plugin(mongoosePaginate)
+productSchema.index({ name: 1 }, { unique: true })
 
 export default mongoose.model('Movie', productSchema)

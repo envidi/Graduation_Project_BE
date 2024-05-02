@@ -1,13 +1,13 @@
 /* eslint-disable no-useless-catch */
 import { StatusCodes } from 'http-status-codes'
-import { v2 as cloudinary } from 'cloudinary'
 
 import Movie, { IS_SHOWING } from '../../model/Movie.js'
-import ShowTime, { AVAILABLE_SCHEDULE } from '../../model/Showtimes.js'
-import {
-  convertTimeToCurrentZone,
-  convertTimeToIsoString
-} from '../../utils/timeLib.js'
+import ShowTime, {
+  APPROVAL_SCHEDULE,
+  AVAILABLE_SCHEDULE,
+  CANCELLED_SCHEDULE
+} from '../../model/Showtimes.js'
+import { convertTimeToCurrentZone } from '../../utils/timeLib.js'
 import ApiError from '../../utils/ApiError.js'
 import mongoose from 'mongoose'
 // import {
@@ -30,7 +30,7 @@ export const getAllService = async (reqBody) => {
       sort: {
         [_sort]: _order === 'asc' ? 1 : -1
       },
-      populate: ['prices', 'showTimes']
+      populate: ['showTimes']
     }
     const data = await Movie.paginate({ destroy: false }, options)
 
@@ -38,24 +38,24 @@ export const getAllService = async (reqBody) => {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
     }
     // Convert Mongoose documents to plain JavaScript objects
-    const plainDocs = data.docs.map((doc) => doc.toObject())
+    // const plainDocs = data.docs.map((doc) => doc.toObject())
 
-    const currentDate = new Date()
-    const currentDay = currentDate.getDay() // Sunday is 0, Monday is 1, ..., Saturday is 6
+    // const currentDate = new Date()
+    // const currentDay = currentDate.getDay() // Sunday is 0, Monday is 1, ..., Saturday is 6
 
     // Add the 'price' field to each movie based on the current day type
-    plainDocs.forEach((movie) => {
-      const priceObject = movie.prices.find((price) => {
-        return currentDay >= 1 && currentDay <= 5
-          ? price.dayType === 'weekday'
-          : price.dayType === 'weekend'
-      })
+    // plainDocs.forEach((movie) => {
+    //   const priceObject = movie.prices?.find((price) => {
+    //     return currentDay >= 1 && currentDay <= 5
+    //       ? price.dayType === 'weekday'
+    //       : price.dayType === 'weekend'
+    //   })
 
-      movie.price = priceObject ? priceObject.price : null
-    })
+    //   movie.price = priceObject ? priceObject.price : null
+    // })
     return {
-      ...data,
-      docs: plainDocs
+      ...data
+      // docs: plainDocs
     }
   } catch (error) {
     throw error
@@ -105,17 +105,14 @@ export const getAllHasShow = async (reqBody) => {
     // Convert Mongoose documents to plain JavaScript objects
     const plainDocs = data.docs.map((doc) => doc.toObject())
 
-    // const currentDate = new Date()
-    // const currentDay = currentDate.getDay() // Sunday is 0, Monday is 1, ..., Saturday is 6
-
-    // Add the 'price' field to each movie based on the current day type
-    plainDocs.forEach((movie) => {
+    const filterMovieDay = plainDocs.filter((movie) => {
       movie.showTimes = movie.showTimes.filter(
         (show) => show.timeFrom > new Date()
       )
+      return movie.showTimes.length > 0 && movie
     })
     return {
-      docs: plainDocs
+      docs: filterMovieDay
     }
   } catch (error) {
     throw error
@@ -161,14 +158,13 @@ export const getAllMovieHomePage = async (reqBody) => {
     throw error
   }
 }
-export const getCountMovie = async (reqBody) => {
+export const getCountMovie = async () => {
   try {
     const data = await Movie.countDocuments({})
 
     if (!data) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
     }
-
 
     return data
   } catch (error) {
@@ -215,6 +211,7 @@ export const getMovieStatus = async (reqBody) => {
       destroy: false,
       status: status
     }
+
     if (_country !== '0') {
       query = {
         ...query,
@@ -326,11 +323,10 @@ export const getAllSoftDeleteService = async (reqBody) => {
     const data = await Movie.paginate({ destroy: true }, options)
 
     if (!data || data.docs.length === 0) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'No movies found!')
+      return { docs: [] }
     }
     // Convert Mongoose documents to plain JavaScript objects
     const plainDocs = data.docs.map((doc) => doc.toObject())
-
     const currentDate = new Date()
     const currentDay = currentDate.getDay() // Sunday is 0, Monday is 1, ..., Saturday is 6
 
@@ -421,7 +417,6 @@ export const getDetailService = async (reqBody) => {
         }
       }
     ])
-    // console.log(data[0].showTimeCol)
 
     const arrayShowTimeId = data[0].showTimeCol.map((showtime) => showtime._id)
     const populateCinema = await ShowTime.paginate(
@@ -455,12 +450,14 @@ export const getDetailService = async (reqBody) => {
         : price.dayType === 'weekend'
     })
 
-    let convertShowTime = data[0].showTimeCol
+    let convertShowTime = [...data[0].showTimeCol]
     convertShowTime = convertShowTime
       .map((showTime, index) => {
-        if (showTime.destroy) return
-        // showTime.timeFrom = convertTimeToCurrentZone(showTime.timeFrom)
-        // showTime.timeTo = convertTimeToCurrentZone(showTime.timeTo)
+        if (
+          showTime.destroy &&
+          [CANCELLED_SCHEDULE, APPROVAL_SCHEDULE].includes(showTime.status)
+        )
+          return
         return {
           date: showTime.date,
           timeFrom: convertTimeToCurrentZone(showTime.timeFrom),
@@ -471,16 +468,35 @@ export const getDetailService = async (reqBody) => {
         }
       })
       .filter((showtime) => showtime != null)
+    const showtimeNotDeleted = [...data[0].showTimeCol].filter((showtime) => {
+      return (
+        !showtime.destroy &&
+        ![CANCELLED_SCHEDULE, APPROVAL_SCHEDULE].includes(showtime.status)
+      )
+    })
 
     let condition = false
     const arrayDemension = []
-    const showTimeDimension = data[0].showTimeCol
+
+    const showTimeDimension = showtimeNotDeleted
       .map((showTime) => {
         if (condition) return
         const currentShowtime = showTime.timeFrom
-        const currentArray = data[0].showTimeCol
+
+        const dimensionIds =
+          arrayDemension.length > 0
+            ? Array.from(
+                new Set(
+                  arrayDemension
+                    .flatMap((element) => element)
+                    .map((di) => di._id)
+                )
+              )
+            : []
+        const currentArray = showtimeNotDeleted
           .map((showTimeDemension) => {
             if (
+              !dimensionIds.includes(showTime._id) &&
               showTimeDemension.timeFrom.getDate() ===
                 currentShowtime.getDate() &&
               showTimeDemension.status == AVAILABLE_SCHEDULE &&
@@ -489,26 +505,29 @@ export const getDetailService = async (reqBody) => {
               return {
                 ...showTimeDemension,
                 timeFrom: convertTimeToCurrentZone(showTimeDemension.timeFrom),
+                timeTo: convertTimeToCurrentZone(showTimeDemension.timeTo),
                 date: showTimeDemension.date
               }
             }
           })
           .filter((showTime) => showTime != null)
+        if (currentArray.length == 0) return
         arrayDemension.push([...currentArray])
         const currentLength = arrayDemension.flatMap((element) => element)
-        if (currentLength.length === data[0].showTimeCol.length) {
+
+        if (currentLength.length === convertShowTime.length) {
           condition = true
         }
 
         return [...currentArray]
       })
       .filter((showTime) => showTime != null)
-
     const newData = {
       ...data[0],
       moviePriceCol: getPriceByDay,
       showTimeCol: convertShowTime,
       showTimeDimension,
+      prices: data[0].moviePriceCol,
       fromDate: convertTimeToCurrentZone(data[0].fromDate),
       toDate: convertTimeToCurrentZone(data[0].toDate)
     }

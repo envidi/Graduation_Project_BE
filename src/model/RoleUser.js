@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const limitRoleName=['admin', 'manager', 'user'];
+const limitRoleName=['admin', 'staff', 'user'];
 const roleUserSchema = new mongoose.Schema({
   roleName: {
     type: String,

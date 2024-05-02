@@ -8,6 +8,7 @@ export const PROJECTOR_1 = 'Projector_1'
 export const PROJECTOR_2 = 'Projector_2'
 export const PROJECTOR_3 = 'Projector_3'
 export const projectors = [PROJECTOR_1, PROJECTOR_2, PROJECTOR_3]
+
 const ScreenRoomSchema = mongoose.Schema(
   {
     name: {
@@ -17,6 +18,7 @@ const ScreenRoomSchema = mongoose.Schema(
     NumberSeat: {
       type: Number,
       default: 20,
+      enum: [56, 64, 72],
       required: true
     },
     projector: {
@@ -29,10 +31,12 @@ const ScreenRoomSchema = mongoose.Schema(
       ref: 'Cinema',
       required: true
     },
-    ShowtimesId: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Showtimes'
-    }],
+    ShowtimesId: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Showtimes'
+      }
+    ],
     status: {
       type: String,
       enum: statusScreen,

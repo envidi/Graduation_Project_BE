@@ -7,44 +7,40 @@ import ApiError from '../../utils/ApiError.js'
 import Category from '../../model/Category.js'
 import { convertTimeToIsoString } from '../../utils/timeLib.js'
 import { slugify } from '../../utils/stringToSlug.js'
+import cloudinary from '../../middleware/multer.js'
 import { moviePriceService } from '../moviePrice.js'
 
 export const createService = async (req) => {
   try {
     const body = req.body
-    // thêm đường dẫn ảnh vào body
-    // if (req.file) {
-    //   body.image = req.file.path
-    // }
-        // thêm ảnh 
-    // let imageUrl
-    // let cloudGetUrl
-    // if (req.file) {
-    //   cloudGetUrl = await cloudinary.uploader.upload(req.file.path, {
-    //     folder: 'AVATAR',
-    //     allowed_formats: ['jpg', 'png', 'jpeg'],
-    //     transformation: [{ width: 500, height: 500, crop: 'limit' }]
-    //   })
-    //   imageUrl = cloudGetUrl.secure_url
-    // }
-    // body.image = imageUrl
-    // const newProfile = {
-    //   ...body,
-    //   ...(cloudGetUrl && { image: imageUrl })
-    // }
-
+    //thêm đường dẫn ảnh vòa body
+    body.prices = JSON.parse(body.prices)
+    let imageUrl
+    let cloudGetUrl
     const { error } = movieSchema.validate(body, { abortEarly: true })
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
+    if (req.file) {
+      cloudGetUrl = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'AVATAR',
+        allowed_formats: ['jpg', 'png', 'jpeg'],
+        transformation: [{ width: 500, height: 500, crop: 'limit' }]
+      })
+      imageUrl = cloudGetUrl.secure_url
+    } else {
+      imageUrl =
+        'https://phongreviews.com/wp-content/uploads/2022/11/avatar-facebook-mac-dinh-19.jpg'
+    }
 
+    // const { prices, ...restBody } = body
     const { prices, ...restBody } = body
 
     const data = await Movie.create({
       ...restBody,
       fromDate: new Date(convertTimeToIsoString(body.fromDate)),
       toDate: new Date(convertTimeToIsoString(body.toDate)),
-            // ...(cloudGetUrl && { image: imageUrl }),
+      ...(cloudGetUrl && { image: imageUrl }),
       // image: imageUrl,
       slug: slugify(body.name)
     })
@@ -62,7 +58,6 @@ export const createService = async (req) => {
         }
       })
     }
-
     // Tạo giá
     if (prices && prices.length > 0) {
       for (let i = 0; i < prices.length; i++) {

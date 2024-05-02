@@ -1,6 +1,6 @@
 import express from 'express';
 import { upload } from '../middleware/multer';
-import { getAll, getDetail, create, update, remove, updateDeleted } from '../controllers/food';
+import { getAll, getDetail, create, update, remove, updateDeleted, getFoodDestroy, restoreFoodDestroy, removeHard } from '../controllers/food';
 const routerFood = express.Router();
 
 // routerFood.get('/', verifyAccessToken, getAll);
@@ -10,6 +10,7 @@ const routerFood = express.Router();
 // routerFood.delete('/:id', verifyAccessToken, isAdmin, remove);
 
 routerFood.get('/', getAll);
+routerFood.get('/destroy', getFoodDestroy);
 routerFood.get('/:id', getDetail);
 // routerFood.post('/', create);
 
@@ -19,8 +20,10 @@ routerFood.post('/', upload.single('image'), create);
 // routerFood.post('/', upload.array('images', 5), create);
 
 routerFood.patch('/:id', upload.single('image'), update);
+routerFood.patch('/:id/restore', restoreFoodDestroy);
 routerFood.patch('/deleted/:id', upload.single('image'), updateDeleted);
 routerFood.delete('/:id', remove);
+routerFood.delete('/destroy/:id', removeHard);
 
 
 export default routerFood;

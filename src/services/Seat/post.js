@@ -36,6 +36,7 @@ export const insertSeatIntoScreen = async (rowCount, columnCount, data) => {
           price: priceSeat
         }
       }
+
       const dataSeat = await seatService.createService(req)
 
       await Showtimes.findByIdAndUpdate(
@@ -47,6 +48,7 @@ export const insertSeatIntoScreen = async (rowCount, columnCount, data) => {
       )
     }
   }
+  // await Promise.all(promises)
 }
 
 export const createService = async (reqBody) => {

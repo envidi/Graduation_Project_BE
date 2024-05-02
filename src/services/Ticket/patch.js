@@ -15,7 +15,8 @@ import { IS_SHOWING } from '../../model/Movie.js'
 import { scheduleService } from '../ShowTime/index.js'
 import { paymentService } from '../Payment/index.js'
 import { accessResultToken } from '../../middleware/jwt.js'
-import { sendMailController, sendMailTicket } from '../../controllers/email.js'
+import { sendMailTicket } from '../../controllers/email.js'
+import Food from '../../model/Food.js'
 
 export const updateService = async (reqBody) => {
   try {
@@ -27,6 +28,7 @@ export const updateService = async (reqBody) => {
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, error.message) // Nếu lỗi, trả về lỗi BAD_REQUEST
     }
+
     // Kiểm tra xem Ghế có đang trống hay không
 
     const [ticket, seat] = await Promise.all([
@@ -56,13 +58,18 @@ export const updateService = async (reqBody) => {
       { $set: updateData }, // Cập nhật dữ liệu
       { new: true } // Trả về vé sau khi đã cập nhật
     )
+
     if (!data) {
       throw new ApiError(
         StatusCodes.NOT_FOUND,
         'Ticket not found or has been deleted!'
       )
     }
-    const differentElement = findDifferentElements(ticket.seatId, newIds)
+
+    const differentElement = findDifferentElements(
+      ticket.seatId.map((seat) => seat._id),
+      newIds
+    )
     const newTicketSeat = differentElement.filter((pro) => {
       if (updateData.seatId.includes(pro)) {
         return pro
@@ -70,6 +77,7 @@ export const updateService = async (reqBody) => {
     })
     const oldSeatStatus = findDifferentElements(newTicketSeat, differentElement)
     const promises = []
+
     if (newTicketSeat || newTicketSeat.length > 0) {
       newTicketSeat.forEach((element) => {
         const reqBody = {
@@ -96,9 +104,11 @@ export const updateService = async (reqBody) => {
         promises.push(seatService.updateStatusService(reqBody))
       })
     }
+
     await Promise.all(promises).catch((err) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, err.message)
     })
+
     return data
   } catch (error) {
     throw error
@@ -123,14 +133,14 @@ export const updatePaymentTicketService = async (reqBody) => {
     if (dataShowTime.movieId.status !== IS_SHOWING) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'The movie is not released. Cannot order the seat'
+        'Bộ phim chưa công chiếu. Không thể đặt ghế'
       )
     }
     const now = dayjs()
     if (now > dataShowTime.timeFrom) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'The seat reservation time has expired'
+        'Thời gian đặt ghế đã quá hạn'
       )
     }
     // Kiểm tra xem Ghế có đang trống hay không
@@ -178,6 +188,23 @@ export const updatePaymentTicketService = async (reqBody) => {
     }
 
     const promises = []
+    const foodIds = updateData.foods.map((food) => food.foodId)
+    if (foodIds || foodIds.length > 0) {
+      promises.push(
+        Food.updateMany(
+          {
+            _id: {
+              $in: foodIds
+            }
+          },
+          {
+            $addToSet: {
+              ticketId: id
+            }
+          }
+        )
+      )
+    }
 
     updateData.seatId.forEach((element) => {
       promises.push(
@@ -250,7 +277,7 @@ export const updatePaymentTicketService = async (reqBody) => {
     } = dataReturn.docs[0]
     const req = {
       body: {
-        _id: data._id,
+        orderNumber: data.orderNumber,
         email: userId.email,
         seatId,
         date: data.createdAt,

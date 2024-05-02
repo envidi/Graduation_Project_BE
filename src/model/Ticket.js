@@ -1,6 +1,6 @@
-import { types } from 'joi'
 import mongoose from 'mongoose'
 import mongoosePaginate from 'mongoose-paginate-v2'
+import { generateTimeBasedOrderNumber } from '../utils/ToStringArray'
 export const RESERVED = 'RESERVED' //vé đã được đặt chỗ nhưng chưa thanh toán.
 export const PAID = 'PAID' // vé đã thanh toán.
 export const CANCELLED = 'CANCELLED' // vé đã bị hủy
@@ -48,16 +48,54 @@ const TicketSchema = new mongoose.Schema(
       require: true
     },
     movieId: {
-      type: mongoose.Types.ObjectId,
-      ref: 'Movie'
+      _id: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Movie',
+        require: true
+      },
+      name: {
+        type: String,
+        require: true
+      },
+      categoryId: [
+        {
+          _id: {
+            type: mongoose.Types.ObjectId,
+            ref: 'Category'
+          },
+          name: {
+            type: String,
+            require: true
+          }
+        }
+      ],
+      image: {
+        type: String,
+        require: true
+      }
     },
     cinemaId: {
-      type: mongoose.Types.ObjectId,
-      ref: 'Cinema'
+      _id: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Cinema',
+        require: true
+      },
+      CinemaName: {
+        type: String
+      },
+      CinemaAdress: {
+        type: String
+      }
     },
     screenRoomId: {
-      type: mongoose.Types.ObjectId,
-      ref: 'ScreeningRoom'
+      _id: {
+        type: mongoose.Types.ObjectId,
+        ref: 'ScreeningRoom',
+        require: true
+      },
+      name: {
+        type: String
+      }
     },
     paymentId: {
       type: mongoose.Types.ObjectId,
@@ -88,9 +126,17 @@ const TicketSchema = new mongoose.Schema(
       type: Number
     },
     showtimeId: {
-      type: mongoose.Types.ObjectId,
-      ref: 'Showtimes',
-      required: true
+      _id: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Showtimes',
+        required: true
+      },
+      timeFrom: {
+        type: String
+      },
+      timeTo: {
+        type: String
+      }
     },
     quantity: {
       type: Number
@@ -114,5 +160,11 @@ const TicketSchema = new mongoose.Schema(
 )
 
 TicketSchema.plugin(mongoosePaginate)
+TicketSchema.pre('save', function (next) {
+  if (!this._doc.orderNumber) {
+    this._doc.orderNumber = generateTimeBasedOrderNumber()
+  }
+  next()
+})
 
 export default mongoose.model('Ticket', TicketSchema)

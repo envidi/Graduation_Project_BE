@@ -95,6 +95,18 @@ export const getAllByShowTime = async (req, res, next) => {
     next(error)
   }
 }
+export const getSeatByShowTime = async (req, res, next) => {
+  try {
+    const data = await seatService.getSeatByShowTime(req)
+
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      datas: data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 
 
 export const getDetail = async (req, res, next) => {

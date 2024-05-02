@@ -12,6 +12,28 @@ export const getAll = async (req, res, next) => {
     next(error)
   }
 }
+export const getFoodDestroy = async (req, res, next) => {
+  try {
+    const data = await foodService.getFoodDestroyService(req)
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      datas: data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+export const restoreFoodDestroy = async (req, res, next) => {
+  try {
+    const data = await foodService.restoreService(req)
+    return res.status(StatusCodes.OK).json({
+      message: 'Success',
+      datas: data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 
 export const getDetail = async (req, res, next) => {
   try {
@@ -69,6 +91,18 @@ export const remove = async (req, res, next) => {
   try {
     const data = await foodService.removeService(req)
 
+    return res.status(StatusCodes.OK).json({
+      message: 'Success!',
+      data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const removeHard = async (req, res, next) => {
+  try {
+    const data = await foodService.removeAdminHardService(req)
     return res.status(StatusCodes.OK).json({
       message: 'Success!',
       data
