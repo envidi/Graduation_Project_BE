@@ -77,10 +77,9 @@ export const getAllDestroyService = async (req) => {
     const data = await ScreeningRoom.paginate({ destroy: true }, options)
 
     if (!data || data.docs.length === 0) {
-      throw new ApiError(
-        StatusCodes.NOT_FOUND,
-        'No soft-deleted screening rooms found!'
-      )
+      return {
+        docs : []
+      }
     }
     return data
   } catch (error) {

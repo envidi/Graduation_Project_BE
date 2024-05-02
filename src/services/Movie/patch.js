@@ -93,8 +93,8 @@ export const updateService = async (req) => {
       {
         ...reqbody,
         ...(cloudGetUrl && { image: imageUrl }),
-        // fromDate: new Date(convertTimeToIsoString(body.fromDate)),
-        // toDate: new Date(convertTimeToIsoString(body.toDate))
+        fromDate: new Date(convertTimeToIsoString(body.fromDate)),
+        toDate: new Date(convertTimeToIsoString(body.toDate))
       }
     )
 
