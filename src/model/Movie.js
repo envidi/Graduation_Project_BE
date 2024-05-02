@@ -11,6 +11,7 @@ const productSchema = mongoose.Schema(
   {
     name: {
       type: String,
+      unique: true,
       required: true
     },
     image: {
@@ -30,14 +31,14 @@ const productSchema = mongoose.Schema(
       type: Number,
       required: true
     },
-    // fromDate: {
-    //   type: Date,
-    //   required: true
-    // },
-    // toDate: {
-    //   type: Date,
-    //   required: true
-    // },
+    fromDate: {
+      type: Date,
+      required: true
+    },
+    toDate: {
+      type: Date,
+      required: true
+    },
     author: {
       type: String,
       required: true
@@ -126,6 +127,21 @@ productSchema.pre('findOneAndDelete', async function (next) {
     next(error)
   }
 })
+productSchema.pre('save', async function (next) {
+  try {
+    const Movie = mongoose.model('Movie')
+    // Kiểm tra xem có phim nào khác có cùng tên không
+    const existingMovie = await Movie.findOne({ name: this.name })
+    if (existingMovie) {
+      const error = new Error('Tên phim đã tồn tại')
+      return next(error)
+    }
+    next()
+  } catch (error) {
+    next(error)
+  }
+})
 productSchema.plugin(mongoosePaginate)
+productSchema.index({ name: 1 }, { unique: true })
 
 export default mongoose.model('Movie', productSchema)

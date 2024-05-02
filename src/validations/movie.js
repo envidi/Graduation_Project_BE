@@ -18,14 +18,14 @@ const movieSchema = JoiExtended.object({
   trailer: Joi.string().required().min(1),
   age_limit: Joi.number().required().min(1).max(100),
   // categoryId: Joi.array().items(Joi.string()).required(),
-  // fromDate: JoiExtended.date()
-  //   .format(['YYYY/MM/DD HH:mm', 'DD-MM-YYYY HH:mm'])
-  //   .required()
-  //   .min('now'),
-  // toDate: JoiExtended.date()
-  //   .format(['YYYY/MM/DD HH:mm', 'DD-MM-YYYY HH:mm'])
-  //   .required()
-  //   .greater(Joi.ref('fromDate')),
+  fromDate: JoiExtended.date()
+    .format(['YYYY/MM/DD HH:mm', 'DD-MM-YYYY HH:mm'])
+    .required()
+    .min('now'),
+  toDate: JoiExtended.date()
+    .format(['YYYY/MM/DD HH:mm', 'DD-MM-YYYY HH:mm'])
+    .required()
+    .greater(Joi.ref('fromDate')),
   status: Joi.string()
     .required()
     .min(1)

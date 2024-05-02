@@ -9,7 +9,8 @@ import {
   checkoutPaymentSeat,
   getAllTicketByUser,
   getAllFontend,
-  getDetailTicket
+  getDetailTicket,
+  getAllServiceDataTable
 } from '../controllers/ticket'
 import { verifyAccessPaymentToken } from '../middleware/verifyToken'
 const routerTicket = express.Router()
@@ -22,6 +23,8 @@ const routerTicket = express.Router()
 
 routerTicket.get('/', getAll)
 routerTicket.get('/all', getAllFontend)
+routerTicket.get('/data', getAllServiceDataTable)
+
 routerTicket.get('/user', getAllTicketByUser)
 routerTicket.get('/detail/:id', getDetailTicket)
 routerTicket.get('/:id', getDetail)

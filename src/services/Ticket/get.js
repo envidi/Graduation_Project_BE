@@ -74,6 +74,53 @@ export const getAllServiceFontend = async (reqBody) => {
     throw error
   }
 }
+export const getAllServiceDataTable = async (reqBody) => {
+  try {
+    const {
+      _page = 1,
+      _limit = 50,
+      _sort = 'createdAt',
+      _order = 'asc',
+      includeDeleted // Thêm tham số này để kiểm tra query parameter
+    } = reqBody.query // Sử dụng req.query thay vì req.body để nhận tham số từ query string
+
+    const queryCondition = includeDeleted === 'true' ? {} : { isDeleted: false }
+
+    const options = {
+      page: _page,
+      limit: _limit,
+      sort: {
+        [_sort]: _order === 'asc' ? 1 : -1
+      },
+      populate: {
+        path: 'priceId paymentId userId',
+        select: 'price name email timeFrom typeBank typePayment'
+      }
+    }
+    // const data = await Ticket.paginate({}, options)
+    // const data = await Ticket.paginate({ isDeleted: false }, options); // Chỉ lấy các thực phẩm chưa bị xóa mềm
+    const data = await Ticket.paginate(queryCondition, options)
+    const plainDocs = data.docs.map((doc) => doc.toObject())
+    const orderNumber = plainDocs.map((item) => {
+      return {
+        _id : item._id,
+        orderNumber: item.orderNumber + '',
+        status: item.status,
+        name: item.movieId.name,
+        image: item.movieId.image,
+        totalPrice : item.totalPrice,
+        email : item.userId.email,
+        timeFrom : item.showtimeId.timeFrom
+      }
+    })
+    if (!data || data.docs.length === 0) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'No Ticket found!')
+    }
+    return orderNumber
+  } catch (error) {
+    throw error
+  }
+}
 export const getAllByUser = async (reqBody) => {
   try {
     const {
@@ -162,12 +209,12 @@ export const getDetailService = async (reqBody) => {
       {
         populate: {
           path: 'userId paymentId',
-          select : {
-            name : 1,
-            typeBank : 1,
-            typePayment : 1,
-            createdAt : 1,
-            email : 1
+          select: {
+            name: 1,
+            typeBank: 1,
+            typePayment: 1,
+            createdAt: 1,
+            email: 1
           }
         }
       }
