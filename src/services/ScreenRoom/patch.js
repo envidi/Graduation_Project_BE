@@ -160,11 +160,66 @@ export const updateService = async (reqBody) => {
     if (error) {
       throw new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message)
     }
+<<<<<<< HEAD
+    const allTimeSlots = await ScreeningRoom.paginate(
+      { _id: id },
+      {
+        populate: {
+          path: 'TimeSlotId',
+          populate: {
+            path: 'SeatId',
+            select: 'status'
+          }
+        }
+        ,
+        populate: {
+          path: 'CinemaId ShowtimesId',
+          select: 'CinemaName CinemaAdress timeFrom timeTo' // Specify the fields you want to select
+        }
+      }
+    )
+    // Không thể chuyển phòng sang rạp chiếu khác
+    // if (body.CinemaId.toString() !== allTimeSlots.docs[0].CinemaId.toString()) {
+    //   throw new ApiError(
+    //     StatusCodes.BAD_REQUEST,
+    //     'Cannot change the cinema'
+    //   )
+    // }
+    // Nếu như screen đã bị xóa mềm
+    // thì không thể chỉnh sửa
+    if (allTimeSlots.docs[0].destroy) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'This room is deleted soft. Cannot edit it'
+      )
+    }
+    // Kiểm tra xem tất cả ghế trong mỗi khung giờ đã được đặt chưa
+    // allTimeSlots.docs[0].TimeSlotId.forEach((timeslot) => {
+    //   const checkSeat = timeslot.SeatId.some(
+    //     (seat) => seat.status === SOLD || seat.status === UNAVAILABLE
+    //   )
+    //   if (checkSeat) {
+    //     throw new ApiError(
+    //       StatusCodes.BAD_REQUEST,
+    //       'Some seat in this room is sold or unavailable'
+    //     )
+    //   }
+    // })
+    const arrayShowtime = allTimeSlots.docs[0].TimeSlotId.map(
+      (timeslot) => timeslot.Show_scheduleId
+    )
+    const updateScreen = await ScreeningRoom.findByIdAndUpdate(
+      { _id: id },
+      body,
+      { new: true }
+    )
+=======
     const { ShowtimesId: showIsExist = [] } = await ScreeningRoom.findById(id)
     if (showIsExist.length > 0) {
       throw new ApiError(StatusCodes.CONFLICT, 'Phòng này đã được đặt')
     }
     const updateScreenRoom = await ScreeningRoom.findByIdAndUpdate(id, body, { new: true })
+>>>>>>> e7c27e418b083887a09910cce94acb50a7c847ec
 
     return updateScreenRoom
   } catch (error) {
