@@ -326,10 +326,15 @@ export const updateUserById = asyncHandler(async (req, res) => {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Missing inputs')
 
   const infoUser = await User.findById(id)
-
+ if (
+      infoUser.roleIds &&
+      infoUser.roleIds.toString() === '659b79c6757ca91b82e2b9d0' 
+    ) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Không thể cập nhật admin')
+    }
   if (!infoUser) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'No user found!')
-  }
+  } 
 
   const { name, email, mobile, address, password, roleIds } = req.body
 
@@ -442,11 +447,14 @@ export const blocked = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ message: 'Người dùng không tồn tại' })
     }
+    // if(user._id === user._id){
+    //   throw new ApiError(StatusCodes.BAD_REQUEST, 'Bạn không thể block chính mình')
+    // }
 
     // Kiểm tra xem người dùng có phải là admin không
     if (
       user.roleIds &&
-      user.roleIds.toString() === '659b79c6757ca91b82e2b9d0'
+      user.roleIds.toString() === '659b79c6757ca91b82e2b9d0' 
     ) {
       return res.status(400).json({ message: 'Không thể block admin' })
     } else {
