@@ -41,11 +41,11 @@ export const updateService = async (reqBody) => {
     ])
     const newIds = seat.map((s) => s._id)
 
-    seat.forEach((s) => {
-      if (!s || ![AVAILABLE, RESERVED].includes(s.status)) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, 'Ghế không khả dụng.')
-      }
-    })
+    // seat.forEach((s) => {
+    //   if (!s || ![AVAILABLE, RESERVED].includes(s.status)) {
+    //     throw new ApiError(StatusCodes.BAD_REQUEST, 'Ghế không khả dụng.')
+    //   }
+    // })
 
     // Kiểm tra xem Lịch chiếu có sẵn hay không
     const showtime = await Showtimes.findById(updateData.showtimeId)
@@ -275,9 +275,10 @@ export const updatePaymentTicketService = async (reqBody) => {
       totalPrice,
       paymentId
     } = dataReturn.docs[0]
+
     const req = {
       body: {
-        orderNumber: data.orderNumber,
+        orderNumber: data.toObject().orderNumber,
         email: userId.email,
         seatId,
         date: data.createdAt,
@@ -291,6 +292,7 @@ export const updatePaymentTicketService = async (reqBody) => {
         totalPrice
       }
     }
+    console.log('req.body', req.body)
     await sendMailTicket(req)
     return resultToken
   } catch (error) {
