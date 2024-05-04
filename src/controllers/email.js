@@ -89,6 +89,7 @@ export const sendMailTicket = asyncHandler(async (req) => {
     totalPrice,
     date
   } = req.body
+  console.log(req.body)
   const seats = seatId
     .map((seat) => {
       return `${convertNumberToAlphabet(seat.row)}${seat.column}(${

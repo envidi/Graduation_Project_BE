@@ -106,7 +106,7 @@ export const getAllServiceDataTable = async (reqBody) => {
         name: item.movieId.name,
         image: item.movieId.image,
         totalPrice: item.totalPrice,
-        email: item.userId.email,
+        email: item?.userId?.email||'',
         timeFrom: item.showtimeId.timeFrom
       }
     })
